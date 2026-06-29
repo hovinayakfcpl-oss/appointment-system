@@ -1,0 +1,229 @@
+<div class="row">
+    <div class="col-12">
+        <!-- ===== Header ===== -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap" style="gap: 15px;">
+            <div>
+                <h2 style="color: #0a1628; font-weight: 800; margin: 0;">
+                    <i class="bi bi-shield-lock-fill" style="color: #c9a84c;"></i> Admin Dashboard
+                </h2>
+                <p style="color: rgba(10, 22, 40, 0.5); margin: 0; font-size: 0.9rem;">
+                    <i class="bi bi-person-circle" style="color: #c9a84c;"></i> Welcome back, <strong style="color: #0a1628;"><%= typeof user !== 'undefined' ? user.name : 'Admin' %></strong>!
+                    <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.6rem; padding: 3px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">
+                        <i class="bi bi-shield-check"></i> Admin
+                    </span>
+                </p>
+            </div>
+            <div>
+                <span class="badge" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; padding: 10px 20px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 4px 15px rgba(201, 168, 76, 0.2);">
+                    <i class="bi bi-calendar3"></i> <%= new Date().toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) %>
+                </span>
+            </div>
+        </div>
+        
+        <!-- ===== Stats Cards ===== -->
+        <div class="row mb-4 g-3">
+            <div class="col-md-4">
+                <div class="stat-card" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border-radius: 16px; padding: 22px 25px; color: white; box-shadow: 0 4px 20px rgba(10, 22, 40, 0.12); transition: all 0.3s ease; border: 1px solid rgba(201, 168, 76, 0.08);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1" style="color: rgba(232, 213, 163, 0.5); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.7rem;">
+                                <i class="bi bi-people" style="color: #c9a84c;"></i> Total Clients
+                            </h6>
+                            <h2 class="mb-0" style="font-weight: 900; color: #c9a84c;"><%= typeof clients !== 'undefined' ? clients.length : 0 %></h2>
+                        </div>
+                        <div style="font-size: 2.5rem; opacity: 0.15; color: #c9a84c;">
+                            <i class="bi bi-people"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="stat-card" style="background: linear-gradient(135deg, #00695c, #004d40); border-radius: 16px; padding: 22px 25px; color: white; box-shadow: 0 4px 20px rgba(0, 105, 92, 0.15); transition: all 0.3s ease;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1" style="color: rgba(255, 255, 255, 0.6); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.7rem;">
+                                <i class="bi bi-calendar-check"></i> Total Appointments
+                            </h6>
+                            <h2 class="mb-0" style="font-weight: 900;"><%= typeof totalAppointments !== 'undefined' ? totalAppointments : 0 %></h2>
+                        </div>
+                        <div style="font-size: 2.5rem; opacity: 0.15;">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="stat-card" style="background: linear-gradient(135deg, #e65100, #bf360c); border-radius: 16px; padding: 22px 25px; color: white; box-shadow: 0 4px 20px rgba(230, 81, 0, 0.15); transition: all 0.3s ease;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1" style="color: rgba(255, 255, 255, 0.6); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.7rem;">
+                                <i class="bi bi-clock-history"></i> Pending Appointments
+                            </h6>
+                            <h2 class="mb-0" style="font-weight: 900;"><%= typeof pendingAppointments !== 'undefined' ? pendingAppointments : 0 %></h2>
+                        </div>
+                        <div style="font-size: 2.5rem; opacity: 0.15;">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Clients Table ===== -->
+        <div class="card shadow" style="border-radius: 16px; border: 1px solid rgba(201, 168, 76, 0.08); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border: none; padding: 18px 25px;">
+                <h5 class="mb-0" style="color: #e8d5a3; font-weight: 700;">
+                    <i class="bi bi-people" style="color: #c9a84c;"></i> All Clients
+                    <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.6rem; padding: 3px 12px; border-radius: 20px; margin-left: 10px;">
+                        <%= typeof clients !== 'undefined' ? clients.length : 0 %> Total
+                    </span>
+                </h5>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <% if (typeof clients !== 'undefined' && clients.length === 0) { %>
+                    <div class="text-center py-5" style="background: #f8f4eb;">
+                        <i class="bi bi-inbox" style="font-size: 4rem; color: rgba(201, 168, 76, 0.2);"></i>
+                        <h5 style="color: #0a1628; margin-top: 15px;">No Clients Registered</h5>
+                        <p style="color: rgba(10, 22, 40, 0.4);">Wait for clients to sign up</p>
+                    </div>
+                <% } else if (typeof clients !== 'undefined' && clients.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table" style="margin: 0;">
+                            <thead>
+                                <tr>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c;">
+                                        <i class="bi bi-person"></i> Name
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c;">
+                                        <i class="bi bi-envelope"></i> Email
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c; text-align: center;">
+                                        <i class="bi bi-calendar-check"></i> Appointments
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c;">
+                                        <i class="bi bi-clock"></i> Joined
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c; text-align: center;">
+                                        <i class="bi bi-gear"></i> Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% clients.forEach((client, index) => { %>
+                                    <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.04); transition: all 0.3s ease;">
+                                        <td style="padding: 15px 20px; vertical-align: middle;">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #c9a84c, #a8873a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a1628; font-size: 0.75rem;">
+                                                    <%= client.name ? client.name.charAt(0).toUpperCase() : 'U' %>
+                                                </div>
+                                                <strong style="color: #0a1628;"><%= client.name %></strong>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 15px 20px; vertical-align: middle; color: #1a2a4a;">
+                                            <a href="mailto:<%= client.email %>" style="color: #0a1628; text-decoration: none; transition: all 0.3s ease;">
+                                                <%= client.email %>
+                                            </a>
+                                        </td>
+                                        <td style="padding: 15px 20px; vertical-align: middle; text-align: center;">
+                                            <span class="badge" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; padding: 6px 16px; border-radius: 50px; font-size: 0.7rem; font-weight: 700;">
+                                                <%= client.appointmentCount || 0 %>
+                                            </span>
+                                        </td>
+                                        <td style="padding: 15px 20px; vertical-align: middle; color: #1a2a4a; font-weight: 500;">
+                                            <i class="bi bi-calendar" style="color: #c9a84c; font-size: 0.7rem;"></i>
+                                            <%= new Date(client.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                                        </td>
+                                        <td style="padding: 15px 20px; vertical-align: middle; text-align: center;">
+                                            <a href="/admin/client/<%= client._id %>/appointments" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 8px; padding: 6px 16px; transition: all 0.3s ease; font-weight: 600; font-size: 0.7rem;">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-5" style="background: #f8f4eb;">
+                        <i class="bi bi-exclamation-triangle" style="font-size: 4rem; color: rgba(201, 168, 76, 0.2);"></i>
+                        <h5 style="color: #0a1628; margin-top: 15px;">Something went wrong!</h5>
+                        <p style="color: rgba(10, 22, 40, 0.4);">Please try again later.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Extra Styles ===== -->
+<style>
+    /* Stat Card Hover Effect */
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(10, 22, 40, 0.2) !important;
+    }
+    
+    /* Table Row Hover */
+    .table tbody tr:hover {
+        background: rgba(201, 168, 76, 0.03) !important;
+        transform: scale(1.01);
+    }
+    
+    /* View Button Hover */
+    .table tbody .btn-sm:hover {
+        background: linear-gradient(135deg, #c9a84c, #a8873a) !important;
+        color: #0a1628 !important;
+        border-color: #c9a84c !important;
+        transform: translateY(-2px) scale(1.05);
+    }
+    
+    /* Email Link Hover */
+    .table tbody a[href^="mailto"]:hover {
+        color: #c9a84c !important;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            align-items: stretch !important;
+        }
+        
+        .stat-card {
+            padding: 15px 20px !important;
+        }
+        
+        .stat-card h2 {
+            font-size: 2rem !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .table thead th {
+            font-size: 0.5rem !important;
+            padding: 10px 12px !important;
+        }
+        
+        .table tbody td {
+            font-size: 0.7rem !important;
+            padding: 10px 12px !important;
+        }
+        
+        .table tbody .d-flex.align-items-center {
+            gap: 8px !important;
+        }
+        
+        .table tbody .d-flex.align-items-center div {
+            width: 26px !important;
+            height: 26px !important;
+            font-size: 0.6rem !important;
+        }
+        
+        .badge {
+            font-size: 0.55rem !important;
+            padding: 4px 10px !important;
+        }
+    }
+</style>

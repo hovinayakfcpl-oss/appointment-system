@@ -1,0 +1,191 @@
+<div class="row">
+    <div class="col-12">
+        <!-- ===== Header ===== -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap" style="gap: 15px;">
+            <div>
+                <h3 style="color: #0a1628; font-weight: 800; margin: 0;">
+                    <i class="bi bi-person" style="color: #c9a84c;"></i> 
+                    <%= typeof client !== 'undefined' ? client.name : 'Client' %>'s Appointments
+                </h3>
+                <p style="color: rgba(10, 22, 40, 0.5); margin: 5px 0 0; font-size: 0.85rem;">
+                    <i class="bi bi-envelope" style="color: #c9a84c;"></i> 
+                    <%= typeof client !== 'undefined' ? client.email : '' %>
+                    <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.6rem; padding: 3px 12px; border-radius: 20px; margin-left: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">
+                        <i class="bi bi-calendar-check"></i> 
+                        <%= typeof appointments !== 'undefined' ? appointments.length : 0 %> Total
+                    </span>
+                </p>
+            </div>
+            <a href="/admin/dashboard" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; font-weight: 600; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 10px 25px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.7rem;">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+        
+        <!-- ===== Appointments Table ===== -->
+        <div class="card shadow" style="border-radius: 16px; border: 1px solid rgba(201, 168, 76, 0.08); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border: none; padding: 18px 25px;">
+                <h5 class="mb-0" style="color: #e8d5a3; font-weight: 700;">
+                    <i class="bi bi-list-ul" style="color: #c9a84c;"></i> Appointment Details
+                    <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.6rem; padding: 3px 12px; border-radius: 20px; margin-left: 10px;">
+                        <%= typeof appointments !== 'undefined' ? appointments.length : 0 %> Records
+                    </span>
+                </h5>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <% if (typeof appointments !== 'undefined' && appointments.length === 0) { %>
+                    <div class="text-center py-5" style="background: #f8f4eb;">
+                        <i class="bi bi-inbox" style="font-size: 4rem; color: rgba(201, 168, 76, 0.2);"></i>
+                        <h5 style="color: #0a1628; margin-top: 15px;">No Appointments Found</h5>
+                        <p style="color: rgba(10, 22, 40, 0.4);">This client hasn't created any appointments yet.</p>
+                    </div>
+                <% } else if (typeof appointments !== 'undefined' && appointments.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table" style="margin: 0;">
+                            <thead>
+                                <tr>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c;">
+                                        <i class="bi bi-hash"></i> ID
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c;">
+                                        <i class="bi bi-file-text"></i> PO Number
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c;">
+                                        <i class="bi bi-receipt"></i> Invoice
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c;">
+                                        <i class="bi bi-calendar3"></i> Delivery Date
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c; text-align: center;">
+                                        <i class="bi bi-tag"></i> Status
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 15px 20px; border-bottom: 2px solid #c9a84c; text-align: center;">
+                                        <i class="bi bi-gear"></i> Update Status
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% appointments.forEach((app, index) => { %>
+                                    <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.04); transition: all 0.3s ease;">
+                                        <td style="padding: 15px 20px; vertical-align: middle;">
+                                            <strong style="color: #0a1628;"><%= app.appointmentId %></strong>
+                                        </td>
+                                        <td style="padding: 15px 20px; vertical-align: middle; color: #1a2a4a; font-weight: 500;">
+                                            <%= app.poNumber %>
+                                        </td>
+                                        <td style="padding: 15px 20px; vertical-align: middle; color: #1a2a4a; font-weight: 500;">
+                                            <%= app.invoiceNumber %>
+                                        </td>
+                                        <td style="padding: 15px 20px; vertical-align: middle; color: #1a2a4a; font-weight: 500;">
+                                            <i class="bi bi-calendar" style="color: #c9a84c; font-size: 0.7rem;"></i>
+                                            <%= new Date(app.deliveryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                                        </td>
+                                        <td style="padding: 15px 20px; vertical-align: middle; text-align: center;">
+                                            <span class="badge" style="background: <%= app.status === 'pending' ? 'linear-gradient(135deg, #e65100, #bf360c)' : app.status === 'confirmed' ? 'linear-gradient(135deg, #00695c, #004d40)' : 'linear-gradient(135deg, #2e7d32, #1b5e20)' %>; color: white; padding: 6px 16px; border-radius: 50px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">
+                                                <i class="bi bi-<%= app.status === 'pending' ? 'clock-history' : app.status === 'confirmed' ? 'check-circle' : 'check-circle-fill' %>"></i>
+                                                <%= app.status %>
+                                            </span>
+                                        </td>
+                                        <td style="padding: 15px 20px; vertical-align: middle; text-align: center;">
+                                            <form action="/admin/appointment/<%= app._id %>/status?_method=PUT" method="POST" class="d-inline">
+                                                <select name="status" class="form-select form-select-sm" style="border-radius: 8px; border: 2px solid rgba(201, 168, 76, 0.15); padding: 6px 12px; font-size: 0.7rem; font-weight: 600; background: white; color: #0a1628; cursor: pointer; transition: all 0.3s ease; min-width: 120px;" onchange="this.form.submit()">
+                                                    <option value="pending" <%= app.status === 'pending' ? 'selected' : '' %> style="color: #e65100;">⏳ Pending</option>
+                                                    <option value="confirmed" <%= app.status === 'confirmed' ? 'selected' : '' %> style="color: #00695c;">✅ Confirmed</option>
+                                                    <option value="completed" <%= app.status === 'completed' ? 'selected' : '' %> style="color: #2e7d32;">✔️ Completed</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-5" style="background: #f8f4eb;">
+                        <i class="bi bi-exclamation-triangle" style="font-size: 4rem; color: rgba(201, 168, 76, 0.2);"></i>
+                        <h5 style="color: #0a1628; margin-top: 15px;">Something went wrong!</h5>
+                        <p style="color: rgba(10, 22, 40, 0.4);">Please try again later.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Extra Styles ===== -->
+<style>
+    /* Table Row Hover */
+    .table tbody tr:hover {
+        background: rgba(201, 168, 76, 0.03) !important;
+        transform: scale(1.01);
+    }
+    
+    /* Select Dropdown Hover */
+    .table tbody select.form-select:hover {
+        border-color: #c9a84c !important;
+        box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+    }
+    
+    /* Select Dropdown Focus */
+    .table tbody select.form-select:focus {
+        border-color: #c9a84c !important;
+        box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.15);
+    }
+    
+    /* Back Button Hover */
+    .btn[href="/admin/dashboard"]:hover {
+        background: rgba(10, 22, 40, 0.1) !important;
+        border-color: rgba(10, 22, 40, 0.2) !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Status Badge Animation */
+    .badge {
+        transition: all 0.3s ease;
+    }
+    
+    .badge:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            align-items: stretch !important;
+        }
+        
+        .d-flex.justify-content-between a {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .table tbody select.form-select {
+            min-width: 100px !important;
+            font-size: 0.6rem !important;
+            padding: 4px 8px !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .table thead th {
+            font-size: 0.5rem !important;
+            padding: 10px 12px !important;
+        }
+        
+        .table tbody td {
+            font-size: 0.65rem !important;
+            padding: 10px 12px !important;
+        }
+        
+        .badge {
+            font-size: 0.5rem !important;
+            padding: 4px 10px !important;
+        }
+        
+        .table tbody select.form-select {
+            min-width: 80px !important;
+            font-size: 0.55rem !important;
+            padding: 3px 6px !important;
+        }
+    }
+</style>

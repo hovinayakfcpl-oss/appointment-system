@@ -1,0 +1,223 @@
+<nav class="navbar navbar-expand-lg" style="background: #0a1628; border-bottom: 2px solid #c9a84c; box-shadow: 0 8px 32px rgba(0,0,0,0.5); padding: 10px 0; position: sticky; top: 0; z-index: 1050;">
+    <div class="container-fluid px-4">
+        <!-- Brand Logo -->
+        <a class="navbar-brand fw-bold" href="/" style="display: flex; align-items: center; gap: 14px; text-decoration: none;">
+            <!-- Logo Image -->
+            <img src="/images/faith-cargo-logo.png" alt="Faith Cargo" height="50" style="object-fit: contain; filter: drop-shadow(0 0 20px rgba(201, 168, 76, 0.15));">
+            
+            <!-- Brand Text -->
+            <div>
+                <span style="color: #e8d5a3; font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; text-shadow: 0 0 30px rgba(201, 168, 76, 0.15);">
+                    FAITH CARGO
+                </span>
+                <small style="display: block; color: #c9a84c; font-size: 0.5rem; letter-spacing: 3.5px; font-weight: 400; text-transform: uppercase; margin-top: -2px; opacity: 0.8;">
+                    <i class="bi bi-award-fill" style="font-size: 0.5rem;"></i> LEGACY OF TRUST DELIVERY
+                </small>
+            </div>
+        </a>
+
+        <!-- Toggler -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="box-shadow: none; padding: 8px 14px; background: rgba(201, 168, 76, 0.12); border-radius: 10px; border: 1px solid rgba(201, 168, 76, 0.15);">
+            <span class="navbar-toggler-icon" style="filter: brightness(0) invert(1);"></span>
+        </button>
+
+        <!-- Nav Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center" style="gap: 8px;">
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <!-- User Profile -->
+                    <li class="nav-item">
+                        <div class="d-flex align-items-center gap-3 px-3 py-2" style="background: rgba(201, 168, 76, 0.06); border-radius: 50px; border: 1px solid rgba(201, 168, 76, 0.12);">
+                            <div style="width: 38px; height: 38px; background: linear-gradient(135deg, #c9a84c, #a8873a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a1628; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(201, 168, 76, 0.25);">
+                                <%= user.name ? user.name.charAt(0).toUpperCase() : 'U' %>
+                            </div>
+                            <div>
+                                <span class="text-white" style="font-weight: 600; font-size: 0.85rem; display: block; letter-spacing: 0.3px;">
+                                    <%= user.name %>
+                                </span>
+                                <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.5rem; padding: 2px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;">
+                                    <i class="bi bi-shield-check" style="font-size: 0.5rem;"></i> <%= user.role %>
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+
+                    <!-- Divider -->
+                    <li class="nav-item d-none d-lg-block" style="color: rgba(201, 168, 76, 0.15); padding: 0 5px; font-size: 1.2rem;">|</li>
+
+                    <!-- Logout -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout" style="color: rgba(232, 213, 163, 0.5); padding: 8px 22px; border-radius: 50px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 500; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(201, 168, 76, 0.05); font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                            <i class="bi bi-box-arrow-right" style="font-size: 0.9rem;"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+
+                    <!-- Notification Bell -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" style="color: rgba(232, 213, 163, 0.3); padding: 8px 12px; border-radius: 50%; transition: all 0.3s ease; position: relative;">
+                            <i class="bi bi-bell" style="font-size: 1.1rem;"></i>
+                            <span style="position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #c9a84c; border-radius: 50%; border: 2px solid #0a1628; box-shadow: 0 0 10px rgba(201, 168, 76, 0.4);"></span>
+                        </a>
+                    </li>
+                <% } else { %>
+                    <!-- Login -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login" style="color: rgba(232, 213, 163, 0.6); padding: 8px 22px; border-radius: 50px; transition: all 0.3s ease; font-weight: 500; font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    
+                    <!-- Signup -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/signup" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; padding: 8px 28px; border-radius: 50px; font-weight: 700; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 20px rgba(201, 168, 76, 0.25); font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                            <i class="bi bi-person-plus"></i> Sign Up
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Add this extra style for navbar link hover effects -->
+<style>
+    /* Navbar Link Hover Effects */
+    .navbar-nav .nav-link {
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .navbar-nav .nav-link:not([href="/logout"]):not([href="/signup"]):hover {
+        color: #c9a84c !important;
+        transform: translateY(-2px);
+    }
+    
+    .navbar-nav .nav-link:not([href="/logout"]):not([href="/signup"])::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #c9a84c, #e8d5a3);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+        border-radius: 2px;
+    }
+    
+    .navbar-nav .nav-link:not([href="/logout"]):not([href="/signup"]):hover::after {
+        width: 70%;
+    }
+    
+    /* Logout Button Hover */
+    .navbar-nav .nav-link[href="/logout"]:hover {
+        background: rgba(201, 168, 76, 0.08) !important;
+        border-color: rgba(201, 168, 76, 0.2) !important;
+        color: #c9a84c !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Signup Button Hover */
+    .navbar-nav .nav-link[href="/signup"]:hover {
+        transform: translateY(-3px) scale(1.04);
+        box-shadow: 0 8px 40px rgba(201, 168, 76, 0.45) !important;
+        background: linear-gradient(135deg, #e8d5a3, #c9a84c) !important;
+    }
+    
+    /* Login Button Hover */
+    .navbar-nav .nav-link[href="/login"]:hover {
+        color: #e8d5a3 !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Notification Bell Hover */
+    .navbar-nav .nav-link .bi-bell {
+        transition: all 0.3s ease;
+    }
+    
+    .navbar-nav .nav-link:hover .bi-bell {
+        transform: rotate(15deg) scale(1.1);
+        color: #c9a84c !important;
+    }
+    
+    /* User Profile Hover */
+    .navbar-nav .d-flex.align-items-center.gap-3 {
+        transition: all 0.3s ease;
+    }
+    
+    .navbar-nav .d-flex.align-items-center.gap-3:hover {
+        background: rgba(201, 168, 76, 0.1) !important;
+        border-color: rgba(201, 168, 76, 0.2) !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 992px) {
+        .navbar {
+            background: #0a1628 !important;
+        }
+        
+        .navbar-nav .nav-link::after {
+            display: none;
+        }
+        
+        .navbar-nav .nav-link[href="/logout"] {
+            background: rgba(201, 168, 76, 0.05);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            border-radius: 50px;
+            text-align: center;
+            justify-content: center;
+        }
+        
+        .navbar-nav .nav-link[href="/signup"] {
+            border-radius: 50px;
+            text-align: center;
+            justify-content: center;
+        }
+        
+        .navbar-nav .d-flex.align-items-center.gap-3 {
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .navbar-nav {
+            gap: 10px !important;
+            padding: 10px 0;
+        }
+        
+        .navbar-nav .nav-item {
+            width: 100%;
+        }
+        
+        .navbar-nav .nav-link {
+            justify-content: center;
+            text-align: center;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .navbar-brand {
+            gap: 10px !important;
+        }
+        
+        .navbar-brand img {
+            height: 38px !important;
+        }
+        
+        .navbar-brand span {
+            font-size: 1rem !important;
+        }
+        
+        .navbar-brand small {
+            font-size: 0.4rem !important;
+            letter-spacing: 2px !important;
+        }
+        
+        .container-fluid {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+    }
+</style>
