@@ -31,14 +31,24 @@ const AppointmentSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  contactPerson: {                    // ✅ NEW FIELD
+  contactPerson: {
     type: String,
     default: ''
   },
-  contactNumber: {                    // ✅ NEW FIELD
+  contactNumber: {
     type: String,
     default: ''
   },
+  // ===== FORWARDER FIELDS (ADMIN ONLY) =====
+  forwarderName: {                    // ✅ NEW - Forwarder Company Name
+    type: String,
+    default: ''
+  },
+  forwarderLRNumber: {               // ✅ NEW - Forwarder LR Number
+    type: String,
+    default: ''
+  },
+  // =========================================
   deliveryDate: {
     type: Date,
     required: true

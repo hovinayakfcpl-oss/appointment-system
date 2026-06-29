@@ -103,6 +103,67 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 });
 
 // ============================================
+// GET - Edit Forwarder Details Form (NEW)
+// ============================================
+router.get('/appointment/:id/edit-forwarder', adminAuth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id)
+      .populate('clientId', 'name email');
+    
+    if (!appointment) {
+      return res.redirect('/admin/dashboard');
+    }
+    
+    res.render('adminEditAppointment', {
+      title: 'Edit Forwarder Details',
+      user: req.user,
+      appointment
+    });
+  } catch (error) {
+    console.error('Edit Forwarder Error:', error);
+    res.redirect('/admin/dashboard');
+  }
+});
+
+// ============================================
+// PUT - Update Forwarder Details (NEW)
+// ============================================
+router.put('/appointment/:id/forwarder', adminAuth, async (req, res) => {
+  try {
+    const { forwarderName, forwarderLRNumber } = req.body;
+    
+    const appointment = await Appointment.findByIdAndUpdate(
+      req.params.id,
+      {
+        forwarderName: forwarderName || '',
+        forwarderLRNumber: forwarderLRNumber || '',
+        updatedAt: Date.now()
+      },
+      { new: true }
+    ).populate('clientId', 'name email');
+    
+    if (!appointment) {
+      return res.redirect('/admin/dashboard');
+    }
+    
+    res.render('adminEditAppointment', {
+      title: 'Edit Forwarder Details',
+      user: req.user,
+      appointment,
+      success: 'Forwarder details updated successfully!'
+    });
+  } catch (error) {
+    console.error('Update Forwarder Error:', error);
+    res.render('adminEditAppointment', {
+      title: 'Edit Forwarder Details',
+      user: req.user,
+      appointment: await Appointment.findById(req.params.id).populate('clientId', 'name email'),
+      error: 'Failed to update forwarder details!'
+    });
+  }
+});
+
+// ============================================
 // GET - All Appointments (Admin View)
 // ============================================
 router.get('/appointments', adminAuth, async (req, res) => {

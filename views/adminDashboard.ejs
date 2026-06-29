@@ -87,7 +87,7 @@
             </div>
         </div>
 
-        <!-- ===== Recent Appointments Table (NEW) ===== -->
+        <!-- ===== Recent Appointments Table ===== -->
         <div class="card shadow mb-4" style="border-radius: 16px; border: 1px solid rgba(201, 168, 76, 0.08); overflow: hidden;">
             <div class="card-header" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border: none; padding: 18px 25px;">
                 <h5 class="mb-0" style="color: #e8d5a3; font-weight: 700;">
@@ -108,19 +108,28 @@
                         <table class="table" style="margin: 0;">
                             <thead>
                                 <tr>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 2px solid #c9a84c;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-hash"></i> ID
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 2px solid #c9a84c;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-person"></i> Client
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 2px solid #c9a84c;">
-                                        <i class="bi bi-file-text"></i> PO Number
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-file-text"></i> PO
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 2px solid #c9a84c;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-box-seam"></i> Docket
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-truck"></i> Forwarder
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-upc-scan"></i> LR No.
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
                                         <i class="bi bi-tag"></i> Status
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 2px solid #c9a84c; text-align: center;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
                                         <i class="bi bi-gear"></i> Action
                                     </th>
                                 </tr>
@@ -128,30 +137,39 @@
                             <tbody>
                                 <% recentAppointments.forEach(app => { %>
                                     <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.04); transition: all 0.3s ease;">
-                                        <td style="padding: 12px 15px; vertical-align: middle; font-weight: 600; color: #0a1628; font-size: 0.8rem;">
+                                        <td style="padding: 10px 12px; vertical-align: middle; font-weight: 600; color: #0a1628; font-size: 0.7rem;">
                                             <%= app.appointmentId %>
                                         </td>
-                                        <td style="padding: 12px 15px; vertical-align: middle;">
+                                        <td style="padding: 10px 12px; vertical-align: middle;">
                                             <div class="d-flex align-items-center gap-2">
-                                                <div style="width: 28px; height: 28px; background: linear-gradient(135deg, #c9a84c, #a8873a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a1628; font-size: 0.6rem;">
+                                                <div style="width: 26px; height: 26px; background: linear-gradient(135deg, #c9a84c, #a8873a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a1628; font-size: 0.55rem;">
                                                     <%= app.clientId && app.clientId.name ? app.clientId.name.charAt(0).toUpperCase() : 'U' %>
                                                 </div>
-                                                <span style="color: #1a2a4a; font-weight: 500; font-size: 0.8rem;">
+                                                <span style="color: #1a2a4a; font-weight: 500; font-size: 0.7rem;">
                                                     <%= app.clientId && app.clientId.name ? app.clientId.name : 'Unknown' %>
                                                 </span>
                                             </div>
                                         </td>
-                                        <td style="padding: 12px 15px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.8rem;">
+                                        <td style="padding: 10px 12px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem;">
                                             <%= app.poNumber %>
                                         </td>
-                                        <td style="padding: 12px 15px; vertical-align: middle;">
-                                            <span class="badge" style="background: <%= app.status === 'pending' ? 'linear-gradient(135deg, #e65100, #bf360c)' : app.status === 'confirmed' ? 'linear-gradient(135deg, #00695c, #004d40)' : 'linear-gradient(135deg, #2e7d32, #1b5e20)' %>; color: white; padding: 4px 14px; border-radius: 50px; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">
+                                        <td style="padding: 10px 12px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem;">
+                                            <%= app.docketNumber || '-' %>
+                                        </td>
+                                        <td style="padding: 10px 12px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem;">
+                                            <%= app.forwarderName || '-' %>
+                                        </td>
+                                        <td style="padding: 10px 12px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem;">
+                                            <%= app.forwarderLRNumber || '-' %>
+                                        </td>
+                                        <td style="padding: 10px 12px; vertical-align: middle; text-align: center;">
+                                            <span class="badge" style="background: <%= app.status === 'pending' ? 'linear-gradient(135deg, #e65100, #bf360c)' : app.status === 'confirmed' ? 'linear-gradient(135deg, #00695c, #004d40)' : 'linear-gradient(135deg, #2e7d32, #1b5e20)' %>; color: white; padding: 3px 10px; border-radius: 50px; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; white-space: nowrap;">
                                                 <i class="bi bi-<%= app.status === 'pending' ? 'clock-history' : app.status === 'confirmed' ? 'check-circle' : 'check-circle-fill' %>"></i>
                                                 <%= app.status %>
                                             </span>
                                         </td>
-                                        <td style="padding: 12px 15px; vertical-align: middle; text-align: center;">
-                                            <a href="/admin/client/<%= app.clientId ? app.clientId._id : '' %>/appointments" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 4px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.6rem;">
+                                        <td style="padding: 10px 12px; vertical-align: middle; text-align: center;">
+                                            <a href="/admin/client/<%= app.clientId ? app.clientId._id : '' %>/appointments" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 3px 10px; transition: all 0.3s ease; font-weight: 600; font-size: 0.55rem;">
                                                 <i class="bi bi-eye"></i> View
                                             </a>
                                         </td>
@@ -191,19 +209,19 @@
                         <table class="table" style="margin: 0;">
                             <thead>
                                 <tr>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 2px solid #c9a84c;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-person"></i> Name
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 2px solid #c9a84c;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-envelope"></i> Email
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 2px solid #c9a84c; text-align: center;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
                                         <i class="bi bi-calendar-check"></i> Appointments
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 2px solid #c9a84c;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-clock"></i> Joined
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 2px solid #c9a84c; text-align: center;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
                                         <i class="bi bi-gear"></i> Action
                                     </th>
                                 </tr>
@@ -229,7 +247,7 @@
                                                 <%= client.appointmentCount || 0 %>
                                             </span>
                                         </td>
-                                        <td style="padding: 12px 18px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.75rem;">
+                                        <td style="padding: 12px 18px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.75rem; white-space: nowrap;">
                                             <i class="bi bi-calendar" style="color: #c9a84c; font-size: 0.6rem;"></i>
                                             <%= new Date(client.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %>
                                         </td>
@@ -300,28 +318,28 @@
     
     @media (max-width: 576px) {
         .table thead th {
-            font-size: 0.45rem !important;
-            padding: 8px 10px !important;
+            font-size: 0.4rem !important;
+            padding: 6px 8px !important;
         }
         
         .table tbody td {
-            font-size: 0.65rem !important;
-            padding: 8px 10px !important;
+            font-size: 0.55rem !important;
+            padding: 6px 8px !important;
         }
         
         .table tbody .d-flex.align-items-center {
-            gap: 6px !important;
+            gap: 4px !important;
         }
         
         .table tbody .d-flex.align-items-center div {
-            width: 22px !important;
-            height: 22px !important;
-            font-size: 0.5rem !important;
+            width: 18px !important;
+            height: 18px !important;
+            font-size: 0.4rem !important;
         }
         
         .badge {
-            font-size: 0.5rem !important;
-            padding: 3px 8px !important;
+            font-size: 0.4rem !important;
+            padding: 2px 6px !important;
         }
         
         .stat-card h2 {
@@ -330,6 +348,11 @@
         
         .stat-card {
             padding: 10px 12px !important;
+        }
+        
+        .btn-sm {
+            font-size: 0.45rem !important;
+            padding: 2px 6px !important;
         }
     }
 </style>
