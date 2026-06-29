@@ -27,6 +27,18 @@ const AppointmentSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  asnNumber: {
+    type: String,
+    default: ''
+  },
+  contactPerson: {                    // ✅ NEW FIELD
+    type: String,
+    default: ''
+  },
+  contactNumber: {                    // ✅ NEW FIELD
+    type: String,
+    default: ''
+  },
   deliveryDate: {
     type: Date,
     required: true

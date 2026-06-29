@@ -25,22 +25,23 @@
                 
                 <form action="/client/appointment<%= typeof appointment !== 'undefined' && appointment ? '/' + appointment._id + '?_method=PUT' : '' %>" method="POST">
                     <div class="row g-3">
-                        <!-- Appointment ID (Readonly) -->
+                        <!-- ===== APPOINTMENT ID (EDITABLE) ===== -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                <i class="bi bi-hash" style="color: #c9a84c;"></i> Appointment ID
+                                <i class="bi bi-hash" style="color: #c9a84c;"></i> Appointment ID <span style="color: #c62828;">*</span>
                             </label>
                             <div class="input-group" style="border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(10, 22, 40, 0.05);">
-                                <span class="input-group-text" style="background: #f8f4eb; color: #c9a84c; border: 2px solid #e8d5a3; border-right: none; padding: 12px 18px;">
+                                <span class="input-group-text" style="background: #0a1628; color: #c9a84c; border: none; padding: 12px 18px;">
                                     <i class="bi bi-tag"></i>
                                 </span>
                                 <input type="text" name="appointmentId" class="form-control" 
-                                       value="<%= typeof appointmentId !== 'undefined' ? appointmentId : '' %>" readonly
-                                       style="background: #f8f4eb; border: 2px solid #e8d5a3; border-left: none; padding: 12px 18px; border-radius: 0 12px 12px 0; color: #0a1628; font-weight: 600;">
+                                       value="<%= typeof appointmentId !== 'undefined' ? appointmentId : '' %>" 
+                                       placeholder="Enter Appointment ID (e.g., AP-260629-8695)" required
+                                       style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 18px; border-radius: 0 12px 12px 0; transition: all 0.3s ease; color: #0a1628; font-weight: 500;">
                             </div>
                         </div>
                         
-                        <!-- PO Number -->
+                        <!-- ===== PO NUMBER ===== -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-file-text" style="color: #c9a84c;"></i> PO Number <span style="color: #c62828;">*</span>
@@ -56,7 +57,7 @@
                             </div>
                         </div>
                         
-                        <!-- Invoice Number -->
+                        <!-- ===== INVOICE NUMBER ===== -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-receipt" style="color: #c9a84c;"></i> Invoice Number <span style="color: #c62828;">*</span>
@@ -72,7 +73,7 @@
                             </div>
                         </div>
                         
-                        <!-- E-Way Bill -->
+                        <!-- ===== E-WAY BILL ===== -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-truck" style="color: #c9a84c;"></i> E-Way Bill
@@ -88,7 +89,7 @@
                             </div>
                         </div>
                         
-                        <!-- Docket Number -->
+                        <!-- ===== DOCKET NUMBER ===== -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-box-seam" style="color: #c9a84c;"></i> Docket Number
@@ -104,7 +105,55 @@
                             </div>
                         </div>
                         
-                        <!-- Delivery Date -->
+                        <!-- ===== ASN NUMBER ===== -->
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="bi bi-upc-scan" style="color: #c9a84c;"></i> ASN Number
+                            </label>
+                            <div class="input-group" style="border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(10, 22, 40, 0.05);">
+                                <span class="input-group-text" style="background: #0a1628; color: #c9a84c; border: none; padding: 12px 18px;">
+                                    <i class="bi bi-upc-scan"></i>
+                                </span>
+                                <input type="text" name="asnNumber" class="form-control" 
+                                       value="<%= typeof appointment !== 'undefined' && appointment ? appointment.asnNumber : '' %>" 
+                                       placeholder="Enter ASN Number"
+                                       style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 18px; border-radius: 0 12px 12px 0; transition: all 0.3s ease;">
+                            </div>
+                        </div>
+                        
+                        <!-- ===== CONTACT PERSON (NEW) ===== -->
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="bi bi-person" style="color: #c9a84c;"></i> Contact Person
+                            </label>
+                            <div class="input-group" style="border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(10, 22, 40, 0.05);">
+                                <span class="input-group-text" style="background: #0a1628; color: #c9a84c; border: none; padding: 12px 18px;">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                <input type="text" name="contactPerson" class="form-control" 
+                                       value="<%= typeof appointment !== 'undefined' && appointment ? appointment.contactPerson : '' %>" 
+                                       placeholder="Enter Contact Person Name"
+                                       style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 18px; border-radius: 0 12px 12px 0; transition: all 0.3s ease;">
+                            </div>
+                        </div>
+                        
+                        <!-- ===== CONTACT NUMBER (NEW) ===== -->
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="bi bi-telephone" style="color: #c9a84c;"></i> Contact Number
+                            </label>
+                            <div class="input-group" style="border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(10, 22, 40, 0.05);">
+                                <span class="input-group-text" style="background: #0a1628; color: #c9a84c; border: none; padding: 12px 18px;">
+                                    <i class="bi bi-telephone"></i>
+                                </span>
+                                <input type="tel" name="contactNumber" class="form-control" 
+                                       value="<%= typeof appointment !== 'undefined' && appointment ? appointment.contactNumber : '' %>" 
+                                       placeholder="Enter Contact Number (e.g., 9876543210)"
+                                       style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 18px; border-radius: 0 12px 12px 0; transition: all 0.3s ease;">
+                            </div>
+                        </div>
+                        
+                        <!-- ===== DELIVERY DATE ===== -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-calendar3" style="color: #c9a84c;"></i> Delivery Date <span style="color: #c62828;">*</span>
@@ -120,7 +169,7 @@
                             </div>
                         </div>
                         
-                        <!-- Delivery Address -->
+                        <!-- ===== DELIVERY ADDRESS ===== -->
                         <div class="col-12">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-geo-alt" style="color: #c9a84c;"></i> Delivery Address <span style="color: #c62828;">*</span>
@@ -135,7 +184,7 @@
                             </div>
                         </div>
                         
-                        <!-- Remarks -->
+                        <!-- ===== REMARKS ===== -->
                         <div class="col-12">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-chat" style="color: #c9a84c;"></i> Remarks
@@ -150,7 +199,7 @@
                             </div>
                         </div>
                         
-                        <!-- Buttons -->
+                        <!-- ===== BUTTONS ===== -->
                         <div class="col-12 mt-3">
                             <button type="submit" class="btn" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; font-weight: 700; border: none; border-radius: 50px; padding: 12px 35px; box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem;">
                                 <i class="bi bi-<%= typeof appointment !== 'undefined' && appointment ? 'check-circle' : 'save' %>"></i>
