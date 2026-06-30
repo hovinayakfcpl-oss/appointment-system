@@ -23,7 +23,19 @@
                     </div>
                 <% } %>
                 
-                <form action="/client/appointment<%= typeof appointment !== 'undefined' && appointment ? '/' + appointment._id + '?_method=PUT' : '' %>" method="POST">
+                <!-- ===== DYNAMIC FORM ACTION ===== -->
+                <% 
+                    let formAction = '/client/appointment';
+                    if (typeof appointment !== 'undefined' && appointment) {
+                        if (typeof user !== 'undefined' && user.role === 'admin') {
+                            formAction = '/admin/appointment/' + appointment._id + '/admin-update?_method=PUT';
+                        } else {
+                            formAction = '/client/appointment/' + appointment._id + '?_method=PUT';
+                        }
+                    }
+                %>
+                
+                <form action="<%= formAction %>" method="POST">
                     <div class="row g-3">
                         <!-- ===== APPOINTMENT ID (EDITABLE) ===== -->
                         <div class="col-md-6">
@@ -121,7 +133,7 @@
                             </div>
                         </div>
                         
-                        <!-- ===== CONTACT PERSON (NEW) ===== -->
+                        <!-- ===== CONTACT PERSON ===== -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-person" style="color: #c9a84c;"></i> Contact Person
@@ -137,7 +149,7 @@
                             </div>
                         </div>
                         
-                        <!-- ===== CONTACT NUMBER (NEW) ===== -->
+                        <!-- ===== CONTACT NUMBER ===== -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-telephone" style="color: #c9a84c;"></i> Contact Number
@@ -205,7 +217,7 @@
                                 <i class="bi bi-<%= typeof appointment !== 'undefined' && appointment ? 'check-circle' : 'save' %>"></i>
                                 <%= typeof appointment !== 'undefined' && appointment ? 'Update Appointment' : 'Create Appointment' %>
                             </button>
-                            <a href="/client/dashboard" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; font-weight: 600; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 12px 35px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; margin-left: 10px;">
+                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/dashboard' : '/client/dashboard' %>" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; font-weight: 600; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 12px 35px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; margin-left: 10px;">
                                 <i class="bi bi-x-circle"></i> Cancel
                             </a>
                         </div>
@@ -240,7 +252,7 @@
     }
     
     /* Cancel Button Hover */
-    .card-body .btn[href="/client/dashboard"]:hover {
+    .card-body .btn[href*="/dashboard"]:hover {
         background: rgba(10, 22, 40, 0.1) !important;
         border-color: rgba(10, 22, 40, 0.2) !important;
         transform: translateY(-2px);
@@ -293,7 +305,7 @@
             justify-content: center !important;
         }
         
-        .card-body .btn[href="/client/dashboard"] {
+        .card-body .btn[href*="/dashboard"] {
             margin-left: 0 !important;
         }
         

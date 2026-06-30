@@ -24,7 +24,6 @@ router.get('/dashboard', auth, async (req, res) => {
       title: 'Client Dashboard',
       user: req.user,
       appointments
-      // ✅ Client ko success/error messages nahi dikhenge
     });
   } catch (error) {
     console.error('Dashboard Error:', error);
@@ -146,7 +145,7 @@ router.get('/appointment/:id/edit', auth, async (req, res) => {
 });
 
 // ============================================
-// PUT - Update Appointment
+// PUT - Update Appointment (Client Only)
 // ============================================
 router.put('/appointment/:id', auth, async (req, res) => {
   try {
@@ -163,15 +162,17 @@ router.put('/appointment/:id', auth, async (req, res) => {
       remarks 
     } = req.body;
 
-    // Validation
-    if (!poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
-      if (req.user.role === 'admin') {
-        return res.redirect('/admin/dashboard?error=Please fill in all required fields');
-      }
-      return res.redirect('/client/dashboard');
+    // ✅ Sirf client ke liye (admin is route ko use nahi karega)
+    if (req.user.role === 'admin') {
+      return res.redirect('/admin/dashboard?error=Use admin update route!');
     }
 
-    await Appointment.findOneAndUpdate(
+    // Validation
+    if (!poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
+      return res.redirect('/client/dashboard?error=Please fill in all required fields');
+    }
+
+    const updatedAppointment = await Appointment.findOneAndUpdate(
       { _id: req.params.id, clientId: req.user._id },
       {
         poNumber,
@@ -185,20 +186,21 @@ router.put('/appointment/:id', auth, async (req, res) => {
         deliveryAddress,
         remarks: remarks || '',
         updatedAt: Date.now()
-      }
+      },
+      { new: true }  // ✅ Updated document return karega
     );
-    
-    // ✅ Admin ko success message, Client ko bina msg ke redirect
-    if (req.user.role === 'admin') {
-      return res.redirect('/admin/dashboard?success=Appointment updated successfully!');
+
+    if (!updatedAppointment) {
+      return res.redirect('/client/dashboard?error=Appointment not found!');
     }
-    res.redirect('/client/dashboard');
+
+    console.log('✅ Client Updated Appointment:', updatedAppointment.appointmentId);
+    console.log('✅ New Docket Number:', updatedAppointment.docketNumber);
+
+    res.redirect('/client/dashboard?success=Appointment updated successfully!');
   } catch (error) {
     console.error('Update Appointment Error:', error);
-    if (req.user.role === 'admin') {
-      return res.redirect('/admin/dashboard?error=Failed to update appointment!');
-    }
-    res.redirect('/client/dashboard');
+    res.redirect('/client/dashboard?error=Failed to update appointment!');
   }
 });
 

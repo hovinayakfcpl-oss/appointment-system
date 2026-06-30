@@ -105,6 +105,61 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 });
 
 // ============================================
+// PUT - Update Appointment (Admin Direct) ✅ NEW ROUTE
+// ============================================
+router.put('/appointment/:id/admin-update', adminAuth, async (req, res) => {
+  try {
+    const { 
+      poNumber, 
+      invoiceNumber, 
+      ewayBill, 
+      docketNumber,
+      asnNumber,
+      contactPerson,
+      contactNumber,
+      deliveryDate, 
+      deliveryAddress, 
+      remarks 
+    } = req.body;
+
+    console.log('📝 Admin Updating Appointment:', req.params.id);
+    console.log('📝 New Docket Number:', docketNumber);
+
+    // ✅ Admin direct update (bina clientId check ke)
+    const updatedAppointment = await Appointment.findByIdAndUpdate(
+      req.params.id,
+      {
+        poNumber,
+        invoiceNumber,
+        ewayBill: ewayBill || '',
+        docketNumber: docketNumber || '',
+        asnNumber: asnNumber || '',
+        contactPerson: contactPerson || '',
+        contactNumber: contactNumber || '',
+        deliveryDate,
+        deliveryAddress,
+        remarks: remarks || '',
+        updatedAt: Date.now()
+      },
+      { new: true }  // ✅ Updated document return karega
+    );
+
+    if (!updatedAppointment) {
+      console.log('❌ Appointment not found!');
+      return res.redirect('/admin/dashboard?error=Appointment not found!');
+    }
+
+    console.log('✅ Appointment Updated Successfully!');
+    console.log('✅ New Docket Number:', updatedAppointment.docketNumber);
+
+    res.redirect('/admin/dashboard?success=Appointment updated successfully!');
+  } catch (error) {
+    console.error('Admin Update Error:', error);
+    res.redirect('/admin/dashboard?error=Failed to update appointment!');
+  }
+});
+
+// ============================================
 // GET - Edit Appointment Form (Admin)
 // ============================================
 router.get('/appointment/:id/edit', adminAuth, async (req, res) => {
