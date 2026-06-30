@@ -150,6 +150,7 @@ main {
     font-weight: 700;
     letter-spacing: 0.5px;
     color: #e8d5a3;
+    font-size: 1.2rem !important;
 }
 
 .card-body {
@@ -164,7 +165,7 @@ main {
     letter-spacing: 0.5px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     text-transform: uppercase;
-    font-size: 0.75rem !important;
+    font-size: 0.8rem !important;
     position: relative;
     overflow: hidden;
 }
@@ -270,29 +271,30 @@ main {
 .table thead th {
     background: #f8f4eb !important;
     color: #0a1628 !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    font-size: 0.65rem;
-    padding: 15px 20px !important;
-    border-bottom: 2px solid #c9a84c !important;
+    font-size: 0.75rem !important;
+    padding: 14px 18px !important;
+    border-bottom: 3px solid #c9a84c !important;
     border: none !important;
 }
 
 .table tbody tr {
     transition: all 0.3s ease !important;
-    border-bottom: 1px solid rgba(10, 22, 40, 0.04) !important;
+    border-bottom: 1px solid rgba(10, 22, 40, 0.06) !important;
 }
 
 .table tbody tr:hover {
-    background: rgba(201, 168, 76, 0.03) !important;
+    background: rgba(201, 168, 76, 0.05) !important;
     transform: scale(1.01);
 }
 
 .table tbody td {
-    padding: 14px 20px !important;
+    padding: 14px 18px !important;
     vertical-align: middle !important;
-    font-weight: 500;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
     color: #1a2a4a;
 }
 
@@ -301,7 +303,7 @@ main {
     padding: 6px 16px !important;
     border-radius: 50px !important;
     font-weight: 700 !important;
-    font-size: 0.65rem !important;
+    font-size: 0.7rem !important;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -340,6 +342,7 @@ main {
     background: white !important;
     transition: all 0.3s ease !important;
     color: #0a1628 !important;
+    font-size: 1rem !important;
 }
 
 .form-control:focus, .form-select:focus {
@@ -362,7 +365,7 @@ main {
     font-weight: 700;
     color: #0a1628;
     margin-bottom: 8px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     letter-spacing: 0.5px;
     text-transform: uppercase;
 }
@@ -373,6 +376,7 @@ main {
     border: none !important;
     border-radius: 12px 0 0 12px !important;
     padding: 12px 18px !important;
+    font-size: 1.1rem !important;
 }
 
 .input-group .form-control {
@@ -414,9 +418,16 @@ main {
     border-color: rgba(201, 168, 76, 0.15);
 }
 
+.stat-card h6 {
+    font-weight: 600;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
 .stat-card h2 {
     font-weight: 900;
-    font-size: 2.8rem;
+    font-size: 2.8rem !important;
     margin: 5px 0;
     color: #c9a84c;
 }
@@ -612,6 +623,16 @@ footer a:hover {
     .input-group-text {
         padding: 10px 14px !important;
     }
+    
+    .table thead th {
+        font-size: 0.6rem !important;
+        padding: 10px 12px !important;
+    }
+    
+    .table tbody td {
+        font-size: 0.8rem !important;
+        padding: 10px 12px !important;
+    }
 }
 
 @media (max-width: 576px) {
@@ -633,12 +654,16 @@ footer a:hover {
     
     .table thead th {
         font-size: 0.5rem !important;
-        padding: 10px 12px !important;
+        padding: 8px 10px !important;
     }
     
     .table tbody td {
         font-size: 0.7rem !important;
-        padding: 10px 12px !important;
+        padding: 8px 10px !important;
+    }
+    
+    .card-header h5 {
+        font-size: 1rem !important;
     }
 }
 
@@ -804,7 +829,7 @@ a:hover {
 /* ===== 21. TABLE STATUS DROPDOWN ===== */
 .table tbody select.form-select {
     min-width: 120px;
-    font-size: 0.7rem;
+    font-size: 0.7rem !important;
     font-weight: 600;
     padding: 6px 12px;
     border-radius: 8px;
@@ -860,7 +885,7 @@ a:hover {
 
 .detail-item label {
     color: rgba(10, 22, 40, 0.4) !important;
-    font-size: 0.6rem !important;
+    font-size: 0.65rem !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
     font-weight: 600 !important;
@@ -888,10 +913,10 @@ a:hover {
     color: #c9a84c !important;
     border: 1px solid rgba(201, 168, 76, 0.15) !important;
     border-radius: 6px !important;
-    padding: 4px 12px !important;
+    padding: 6px 14px !important;
     transition: all 0.3s ease !important;
     font-weight: 600 !important;
-    font-size: 0.6rem !important;
+    font-size: 0.7rem !important;
 }
 
 .btn-view:hover {
@@ -906,16 +931,54 @@ a:hover {
     background: rgba(201, 168, 76, 0.1) !important;
     color: #c9a84c !important;
     border: 1px solid rgba(201, 168, 76, 0.15) !important;
-    border-radius: 4px !important;
-    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
     transition: all 0.3s ease !important;
     font-weight: 600 !important;
-    font-size: 0.5rem !important;
+    font-size: 0.65rem !important;
 }
 
 .btn-admin-action:hover {
     background: linear-gradient(135deg, #c9a84c, #a8873a) !important;
     color: #0a1628 !important;
     border-color: #c9a84c !important;
+    transform: translateY(-2px) scale(1.05) !important;
+}
+
+/* Edit Button (Blue) */
+.btn-edit {
+    background: rgba(52, 152, 219, 0.1) !important;
+    color: #2980b9 !important;
+    border: 1px solid rgba(52, 152, 219, 0.15) !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    transition: all 0.3s ease !important;
+    font-weight: 600 !important;
+    font-size: 0.65rem !important;
+}
+
+.btn-edit:hover {
+    background: #2980b9 !important;
+    color: white !important;
+    border-color: #2980b9 !important;
+    transform: translateY(-2px) scale(1.05) !important;
+}
+
+/* Delete Button (Red) */
+.btn-delete {
+    background: rgba(231, 76, 60, 0.1) !important;
+    color: #e74c3c !important;
+    border: 1px solid rgba(231, 76, 60, 0.15) !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    transition: all 0.3s ease !important;
+    font-weight: 600 !important;
+    font-size: 0.65rem !important;
+}
+
+.btn-delete:hover {
+    background: #e74c3c !important;
+    color: white !important;
+    border-color: #e74c3c !important;
     transform: translateY(-2px) scale(1.05) !important;
 }

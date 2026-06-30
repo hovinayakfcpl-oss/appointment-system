@@ -103,6 +103,28 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 });
 
 // ============================================
+// GET - Edit Appointment Form (Admin) ✅ NEW
+// ============================================
+router.get('/appointment/:id/edit', adminAuth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment) {
+      return res.redirect('/admin/dashboard');
+    }
+    
+    res.render('clientAppointmentForm', {
+      title: 'Edit Appointment (Admin)',
+      user: req.user,
+      appointment,
+      appointmentId: appointment.appointmentId
+    });
+  } catch (error) {
+    console.error('Admin Edit Appointment Error:', error);
+    res.redirect('/admin/dashboard');
+  }
+});
+
+// ============================================
 // GET - Edit Forwarder Details Form
 // ============================================
 router.get('/appointment/:id/edit-forwarder', adminAuth, async (req, res) => {
@@ -184,7 +206,7 @@ router.get('/appointments', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// GET - Appointment Details (Admin View) ✅ UPDATED
+// GET - Appointment Details (Admin View)
 // ============================================
 router.get('/appointment/:id', adminAuth, async (req, res) => {
   try {

@@ -3,18 +3,18 @@
         <!-- ===== Header ===== -->
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap" style="gap: 15px;">
             <div>
-                <h2 style="color: #0a1628; font-weight: 800; margin: 0;">
+                <h2 style="color: #0a1628; font-weight: 800; margin: 0; font-size: 2rem;">
                     <i class="bi bi-shield-lock-fill" style="color: #c9a84c;"></i> Admin Dashboard
                 </h2>
-                <p style="color: rgba(10, 22, 40, 0.5); margin: 0; font-size: 0.9rem;">
-                    <i class="bi bi-person-circle" style="color: #c9a84c;"></i> Welcome back, <strong style="color: #0a1628;"><%= typeof user !== 'undefined' ? user.name : 'Admin' %></strong>!
-                    <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.6rem; padding: 3px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">
+                <p style="color: rgba(10, 22, 40, 0.5); margin: 0; font-size: 1.05rem;">
+                    <i class="bi bi-person-circle" style="color: #c9a84c;"></i> Welcome back, <strong style="color: #0a1628; font-size: 1.1rem;"><%= typeof user !== 'undefined' ? user.name : 'Admin' %></strong>!
+                    <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.7rem; padding: 5px 15px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">
                         <i class="bi bi-shield-check"></i> Admin
                     </span>
                 </p>
             </div>
             <div>
-                <span class="badge" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; padding: 10px 20px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 4px 15px rgba(201, 168, 76, 0.2);">
+                <span class="badge" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; padding: 12px 25px; border-radius: 50px; font-size: 0.85rem; font-weight: 700; box-shadow: 0 4px 15px rgba(201, 168, 76, 0.2);">
                     <i class="bi bi-calendar3"></i> <%= new Date().toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) %>
                 </span>
             </div>
@@ -26,12 +26,12 @@
                 <div class="stat-card" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border-radius: 16px; padding: 20px; color: white; box-shadow: 0 4px 20px rgba(10, 22, 40, 0.12); transition: all 0.3s ease; border: 1px solid rgba(201, 168, 76, 0.08);">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-1" style="color: rgba(232, 213, 163, 0.5); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.6rem;">
+                            <h6 class="mb-1" style="color: rgba(232, 213, 163, 0.5); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.8rem;">
                                 <i class="bi bi-people" style="color: #c9a84c;"></i> Total Clients
                             </h6>
-                            <h2 class="mb-0" style="font-weight: 900; color: #c9a84c; font-size: 2.2rem;"><%= typeof clients !== 'undefined' ? clients.length : 0 %></h2>
+                            <h2 class="mb-0" style="font-weight: 900; color: #c9a84c; font-size: 2.8rem;"><%= typeof clients !== 'undefined' ? clients.length : 0 %></h2>
                         </div>
-                        <div style="font-size: 2.2rem; opacity: 0.15; color: #c9a84c;">
+                        <div style="font-size: 2.5rem; opacity: 0.15; color: #c9a84c;">
                             <i class="bi bi-people"></i>
                         </div>
                     </div>
@@ -42,12 +42,12 @@
                 <div class="stat-card" style="background: linear-gradient(135deg, #00695c, #004d40); border-radius: 16px; padding: 20px; color: white; box-shadow: 0 4px 20px rgba(0, 105, 92, 0.15); transition: all 0.3s ease;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-1" style="color: rgba(255, 255, 255, 0.6); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.6rem;">
+                            <h6 class="mb-1" style="color: rgba(255, 255, 255, 0.6); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.8rem;">
                                 <i class="bi bi-calendar-check"></i> Total Appointments
                             </h6>
-                            <h2 class="mb-0" style="font-weight: 900; font-size: 2.2rem;"><%= typeof totalAppointments !== 'undefined' ? totalAppointments : 0 %></h2>
+                            <h2 class="mb-0" style="font-weight: 900; font-size: 2.8rem;"><%= typeof totalAppointments !== 'undefined' ? totalAppointments : 0 %></h2>
                         </div>
-                        <div style="font-size: 2.2rem; opacity: 0.15;">
+                        <div style="font-size: 2.5rem; opacity: 0.15;">
                             <i class="bi bi-calendar-check"></i>
                         </div>
                     </div>
@@ -58,12 +58,12 @@
                 <div class="stat-card" style="background: linear-gradient(135deg, #e65100, #bf360c); border-radius: 16px; padding: 20px; color: white; box-shadow: 0 4px 20px rgba(230, 81, 0, 0.15); transition: all 0.3s ease;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-1" style="color: rgba(255, 255, 255, 0.6); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.6rem;">
+                            <h6 class="mb-1" style="color: rgba(255, 255, 255, 0.6); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.8rem;">
                                 <i class="bi bi-clock-history"></i> Pending
                             </h6>
-                            <h2 class="mb-0" style="font-weight: 900; font-size: 2.2rem;"><%= typeof pendingAppointments !== 'undefined' ? pendingAppointments : 0 %></h2>
+                            <h2 class="mb-0" style="font-weight: 900; font-size: 2.8rem;"><%= typeof pendingAppointments !== 'undefined' ? pendingAppointments : 0 %></h2>
                         </div>
-                        <div style="font-size: 2.2rem; opacity: 0.15;">
+                        <div style="font-size: 2.5rem; opacity: 0.15;">
                             <i class="bi bi-clock-history"></i>
                         </div>
                     </div>
@@ -74,12 +74,12 @@
                 <div class="stat-card" style="background: linear-gradient(135deg, #2e7d32, #1b5e20); border-radius: 16px; padding: 20px; color: white; box-shadow: 0 4px 20px rgba(46, 125, 50, 0.15); transition: all 0.3s ease;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-1" style="color: rgba(255, 255, 255, 0.6); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.6rem;">
+                            <h6 class="mb-1" style="color: rgba(255, 255, 255, 0.6); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.8rem;">
                                 <i class="bi bi-check-circle"></i> Completed
                             </h6>
-                            <h2 class="mb-0" style="font-weight: 900; font-size: 2.2rem;"><%= typeof completedAppointments !== 'undefined' ? completedAppointments : 0 %></h2>
+                            <h2 class="mb-0" style="font-weight: 900; font-size: 2.8rem;"><%= typeof completedAppointments !== 'undefined' ? completedAppointments : 0 %></h2>
                         </div>
-                        <div style="font-size: 2.2rem; opacity: 0.15;">
+                        <div style="font-size: 2.5rem; opacity: 0.15;">
                             <i class="bi bi-check-circle"></i>
                         </div>
                     </div>
@@ -91,14 +91,14 @@
         <div class="row mb-3 g-2">
             <div class="col-md-6 col-lg-5">
                 <div class="input-group" style="border-radius: 12px; overflow: hidden; box-shadow: 0 2px 15px rgba(10, 22, 40, 0.04);">
-                    <span class="input-group-text" style="background: #0a1628; color: #c9a84c; border: none; padding: 10px 18px;">
-                        <i class="bi bi-search" style="font-size: 1rem;"></i>
+                    <span class="input-group-text" style="background: #0a1628; color: #c9a84c; border: none; padding: 12px 20px;">
+                        <i class="bi bi-search" style="font-size: 1.2rem;"></i>
                     </span>
-                    <input type="text" id="adminSearchInput" class="form-control" placeholder="Search by PO Number or Docket Number..." style="border: 2px solid #e8d5a3; border-left: none; padding: 10px 18px; border-radius: 0 12px 12px 0; transition: all 0.3s ease; font-size: 0.85rem;">
+                    <input type="text" id="adminSearchInput" class="form-control" placeholder="Search by PO Number or Docket Number..." style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 20px; border-radius: 0 12px 12px 0; transition: all 0.3s ease; font-size: 1rem;">
                 </div>
             </div>
             <div class="col-md-6 col-lg-7 text-md-end mt-2 mt-md-0">
-                <span class="badge" style="background: rgba(201, 168, 76, 0.08); color: #0a1628; padding: 8px 16px; border-radius: 50px; font-size: 0.7rem; border: 1px solid rgba(201, 168, 76, 0.1);">
+                <span class="badge" style="background: rgba(201, 168, 76, 0.08); color: #0a1628; padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; border: 1px solid rgba(201, 168, 76, 0.1);">
                     <i class="bi bi-info-circle" style="color: #c9a84c;"></i> 
                     <span id="adminSearchCount"><%= typeof recentAppointments !== 'undefined' ? recentAppointments.length : 0 %></span> appointments found
                 </span>
@@ -107,10 +107,10 @@
 
         <!-- ===== Recent Appointments Table ===== -->
         <div class="card shadow mb-4" style="border-radius: 16px; border: 1px solid rgba(201, 168, 76, 0.08); overflow: hidden;">
-            <div class="card-header" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border: none; padding: 18px 25px;">
-                <h5 class="mb-0" style="color: #e8d5a3; font-weight: 700;">
+            <div class="card-header" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border: none; padding: 20px 25px;">
+                <h5 class="mb-0" style="color: #e8d5a3; font-weight: 700; font-size: 1.3rem;">
                     <i class="bi bi-clock-history" style="color: #c9a84c;"></i> Recent Appointments
-                    <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.6rem; padding: 3px 12px; border-radius: 20px; margin-left: 10px;">
+                    <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.7rem; padding: 5px 15px; border-radius: 20px; margin-left: 10px;">
                         <%= typeof recentAppointments !== 'undefined' ? recentAppointments.length : 0 %> Latest
                     </span>
                 </h5>
@@ -119,68 +119,68 @@
                 <% if (typeof recentAppointments !== 'undefined' && recentAppointments.length === 0) { %>
                     <div class="text-center py-4" style="background: #f8f4eb;">
                         <i class="bi bi-inbox" style="font-size: 3rem; color: rgba(201, 168, 76, 0.2);"></i>
-                        <p style="color: rgba(10, 22, 40, 0.4); margin-top: 10px;">No recent appointments</p>
+                        <p style="color: rgba(10, 22, 40, 0.4); margin-top: 10px; font-size: 1rem;">No recent appointments</p>
                     </div>
                 <% } else if (typeof recentAppointments !== 'undefined' && recentAppointments.length > 0) { %>
                     <div class="table-responsive">
                         <table class="table" style="margin: 0;" id="adminRecentTable">
                             <thead>
                                 <tr>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
-                                        <i class="bi bi-hash"></i> ID
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-hash" style="color: #c9a84c; font-size: 1rem;"></i> ID
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
-                                        <i class="bi bi-person"></i> Client
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-person" style="color: #c9a84c; font-size: 1rem;"></i> Client
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
-                                        <i class="bi bi-file-text"></i> PO
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-file-text" style="color: #c9a84c; font-size: 1rem;"></i> PO
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
-                                        <i class="bi bi-box-seam"></i> Docket
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-box-seam" style="color: #c9a84c; font-size: 1rem;"></i> Docket
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
-                                        <i class="bi bi-tag"></i> Status
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 3px solid #c9a84c; text-align: center; white-space: nowrap;">
+                                        <i class="bi bi-tag" style="color: #c9a84c; font-size: 1rem;"></i> Status
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
-                                        <i class="bi bi-gear"></i> Action
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 15px; border-bottom: 3px solid #c9a84c; text-align: center; white-space: nowrap;">
+                                        <i class="bi bi-gear" style="color: #c9a84c; font-size: 1rem;"></i> Action
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% recentAppointments.forEach(app => { %>
-                                    <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.04); transition: all 0.3s ease;" data-po="<%= app.poNumber.toLowerCase() %>" data-docket="<%= (app.docketNumber || '').toLowerCase() %>">
-                                        <td style="padding: 8px 10px; vertical-align: middle; font-weight: 600; color: #0a1628; font-size: 0.65rem;">
+                                    <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.06); transition: all 0.3s ease;" data-po="<%= app.poNumber.toLowerCase() %>" data-docket="<%= (app.docketNumber || '').toLowerCase() %>">
+                                        <td style="padding: 12px 15px; vertical-align: middle; font-weight: 700; color: #0a1628; font-size: 0.9rem;">
                                             <%= app.appointmentId %>
                                         </td>
-                                        <td style="padding: 8px 10px; vertical-align: middle;">
+                                        <td style="padding: 12px 15px; vertical-align: middle;">
                                             <div class="d-flex align-items-center gap-2">
-                                                <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #c9a84c, #a8873a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a1628; font-size: 0.5rem;">
+                                                <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #c9a84c, #a8873a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a1628; font-size: 0.7rem;">
                                                     <%= app.clientId && app.clientId.name ? app.clientId.name.charAt(0).toUpperCase() : 'U' %>
                                                 </div>
-                                                <span style="color: #1a2a4a; font-weight: 500; font-size: 0.65rem;">
+                                                <span style="color: #1a2a4a; font-weight: 600; font-size: 0.9rem;">
                                                     <%= app.clientId && app.clientId.name ? app.clientId.name : 'Unknown' %>
                                                 </span>
                                             </div>
                                         </td>
-                                        <td style="padding: 8px 10px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.65rem;">
+                                        <td style="padding: 12px 15px; vertical-align: middle; color: #1a2a4a; font-weight: 600; font-size: 0.9rem;">
                                             <%= app.poNumber %>
                                         </td>
-                                        <td style="padding: 8px 10px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.65rem;">
+                                        <td style="padding: 12px 15px; vertical-align: middle; color: #1a2a4a; font-weight: 600; font-size: 0.9rem;">
                                             <%= app.docketNumber || '-' %>
                                         </td>
-                                        <td style="padding: 8px 10px; vertical-align: middle; text-align: center;">
-                                            <span class="badge" style="background: <%= app.status === 'pending' ? 'linear-gradient(135deg, #e65100, #bf360c)' : app.status === 'confirmed' ? 'linear-gradient(135deg, #00695c, #004d40)' : 'linear-gradient(135deg, #2e7d32, #1b5e20)' %>; color: white; padding: 2px 8px; border-radius: 50px; font-size: 0.45rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; white-space: nowrap;">
+                                        <td style="padding: 12px 15px; vertical-align: middle; text-align: center;">
+                                            <span class="badge" style="background: <%= app.status === 'pending' ? 'linear-gradient(135deg, #e65100, #bf360c)' : app.status === 'confirmed' ? 'linear-gradient(135deg, #00695c, #004d40)' : 'linear-gradient(135deg, #2e7d32, #1b5e20)' %>; color: white; padding: 6px 16px; border-radius: 50px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; white-space: nowrap;">
                                                 <i class="bi bi-<%= app.status === 'pending' ? 'clock-history' : app.status === 'confirmed' ? 'check-circle' : 'check-circle-fill' %>"></i>
                                                 <%= app.status %>
                                             </span>
                                         </td>
-                                        <td style="padding: 8px 10px; vertical-align: middle; text-align: center;">
+                                        <td style="padding: 12px 15px; vertical-align: middle; text-align: center;">
                                             <!-- View Details -->
-                                            <a href="/admin/appointment/<%= app._id %>" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 4px; padding: 2px 8px; transition: all 0.3s ease; font-weight: 600; font-size: 0.5rem; margin-right: 2px;" title="View Details">
+                                            <a href="/admin/appointment/<%= app._id %>" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.7rem; margin-right: 3px;" title="View Details">
                                                 <i class="bi bi-eye"></i>
                                             </a>
                                             <!-- Edit Forwarder -->
-                                            <a href="/admin/appointment/<%= app._id %>/edit-forwarder" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 4px; padding: 2px 8px; transition: all 0.3s ease; font-weight: 600; font-size: 0.5rem;" title="Edit Forwarder">
+                                            <a href="/admin/appointment/<%= app._id %>/edit-forwarder" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.7rem;" title="Edit Forwarder">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
                                         </td>
@@ -192,7 +192,7 @@
                 <% } else { %>
                     <div class="text-center py-4" style="background: #f8f4eb;">
                         <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: rgba(201, 168, 76, 0.2);"></i>
-                        <p style="color: rgba(10, 22, 40, 0.4); margin-top: 10px;">Unable to load appointments</p>
+                        <p style="color: rgba(10, 22, 40, 0.4); margin-top: 10px; font-size: 1rem;">Unable to load appointments</p>
                     </div>
                 <% } %>
             </div>
@@ -200,10 +200,10 @@
 
         <!-- ===== All Clients Table ===== -->
         <div class="card shadow" style="border-radius: 16px; border: 1px solid rgba(201, 168, 76, 0.08); overflow: hidden;">
-            <div class="card-header" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border: none; padding: 18px 25px;">
-                <h5 class="mb-0" style="color: #e8d5a3; font-weight: 700;">
+            <div class="card-header" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border: none; padding: 20px 25px;">
+                <h5 class="mb-0" style="color: #e8d5a3; font-weight: 700; font-size: 1.3rem;">
                     <i class="bi bi-people" style="color: #c9a84c;"></i> All Clients
-                    <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.6rem; padding: 3px 12px; border-radius: 20px; margin-left: 10px;">
+                    <span class="badge" style="background: rgba(201, 168, 76, 0.15); color: #c9a84c; font-size: 0.7rem; padding: 5px 15px; border-radius: 20px; margin-left: 10px;">
                         <%= typeof clients !== 'undefined' ? clients.length : 0 %> Total
                     </span>
                 </h5>
@@ -212,58 +212,58 @@
                 <% if (typeof clients !== 'undefined' && clients.length === 0) { %>
                     <div class="text-center py-5" style="background: #f8f4eb;">
                         <i class="bi bi-inbox" style="font-size: 4rem; color: rgba(201, 168, 76, 0.2);"></i>
-                        <h5 style="color: #0a1628; margin-top: 15px;">No Clients Registered</h5>
-                        <p style="color: rgba(10, 22, 40, 0.4);">Wait for clients to sign up</p>
+                        <h5 style="color: #0a1628; margin-top: 15px; font-size: 1.3rem;">No Clients Registered</h5>
+                        <p style="color: rgba(10, 22, 40, 0.4); font-size: 1rem;">Wait for clients to sign up</p>
                     </div>
                 <% } else if (typeof clients !== 'undefined' && clients.length > 0) { %>
                     <div class="table-responsive">
                         <table class="table" style="margin: 0;">
                             <thead>
                                 <tr>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 15px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
-                                        <i class="bi bi-person"></i> Name
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-person" style="color: #c9a84c; font-size: 1rem;"></i> Name
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 15px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
-                                        <i class="bi bi-envelope"></i> Email
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-envelope" style="color: #c9a84c; font-size: 1rem;"></i> Email
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 15px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
-                                        <i class="bi bi-calendar-check"></i> Appointments
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 3px solid #c9a84c; text-align: center; white-space: nowrap;">
+                                        <i class="bi bi-calendar-check" style="color: #c9a84c; font-size: 1rem;"></i> Appointments
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 15px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
-                                        <i class="bi bi-clock"></i> Joined
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-clock" style="color: #c9a84c; font-size: 1rem;"></i> Joined
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 15px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
-                                        <i class="bi bi-gear"></i> Action
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; padding: 12px 18px; border-bottom: 3px solid #c9a84c; text-align: center; white-space: nowrap;">
+                                        <i class="bi bi-gear" style="color: #c9a84c; font-size: 1rem;"></i> Action
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% clients.forEach((client) => { %>
-                                    <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.04); transition: all 0.3s ease;">
-                                        <td style="padding: 10px 15px; vertical-align: middle;">
+                                    <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.06); transition: all 0.3s ease;">
+                                        <td style="padding: 12px 18px; vertical-align: middle;">
                                             <div class="d-flex align-items-center gap-2">
-                                                <div style="width: 28px; height: 28px; background: linear-gradient(135deg, #c9a84c, #a8873a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a1628; font-size: 0.65rem;">
+                                                <div style="width: 34px; height: 34px; background: linear-gradient(135deg, #c9a84c, #a8873a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #0a1628; font-size: 0.8rem;">
                                                     <%= client.name ? client.name.charAt(0).toUpperCase() : 'U' %>
                                                 </div>
-                                                <strong style="color: #0a1628; font-size: 0.8rem;"><%= client.name %></strong>
+                                                <strong style="color: #0a1628; font-size: 0.95rem;"><%= client.name %></strong>
                                             </div>
                                         </td>
-                                        <td style="padding: 10px 15px; vertical-align: middle; color: #1a2a4a; font-size: 0.75rem;">
-                                            <a href="mailto:<%= client.email %>" style="color: #0a1628; text-decoration: none; transition: all 0.3s ease;">
+                                        <td style="padding: 12px 18px; vertical-align: middle; color: #1a2a4a; font-size: 0.9rem;">
+                                            <a href="mailto:<%= client.email %>" style="color: #0a1628; text-decoration: none; transition: all 0.3s ease; font-weight: 500;">
                                                 <%= client.email %>
                                             </a>
                                         </td>
-                                        <td style="padding: 10px 15px; vertical-align: middle; text-align: center;">
-                                            <span class="badge" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; padding: 3px 12px; border-radius: 50px; font-size: 0.6rem; font-weight: 700;">
+                                        <td style="padding: 12px 18px; vertical-align: middle; text-align: center;">
+                                            <span class="badge" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; padding: 6px 16px; border-radius: 50px; font-size: 0.8rem; font-weight: 700;">
                                                 <%= client.appointmentCount || 0 %>
                                             </span>
                                         </td>
-                                        <td style="padding: 10px 15px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem; white-space: nowrap;">
-                                            <i class="bi bi-calendar" style="color: #c9a84c; font-size: 0.55rem;"></i>
+                                        <td style="padding: 12px 18px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.85rem; white-space: nowrap;">
+                                            <i class="bi bi-calendar" style="color: #c9a84c; font-size: 0.7rem;"></i>
                                             <%= new Date(client.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %>
                                         </td>
-                                        <td style="padding: 10px 15px; vertical-align: middle; text-align: center;">
-                                            <a href="/admin/client/<%= client._id %>/appointments" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 4px; padding: 4px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.6rem;">
+                                        <td style="padding: 12px 18px; vertical-align: middle; text-align: center;">
+                                            <a href="/admin/client/<%= client._id %>/appointments" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 16px; transition: all 0.3s ease; font-weight: 600; font-size: 0.7rem;">
                                                 <i class="bi bi-eye"></i> View
                                             </a>
                                         </td>
@@ -275,8 +275,8 @@
                 <% } else { %>
                     <div class="text-center py-5" style="background: #f8f4eb;">
                         <i class="bi bi-exclamation-triangle" style="font-size: 4rem; color: rgba(201, 168, 76, 0.2);"></i>
-                        <h5 style="color: #0a1628; margin-top: 15px;">Something went wrong!</h5>
-                        <p style="color: rgba(10, 22, 40, 0.4);">Please try again later.</p>
+                        <h5 style="color: #0a1628; margin-top: 15px; font-size: 1.3rem;">Something went wrong!</h5>
+                        <p style="color: rgba(10, 22, 40, 0.4); font-size: 1rem;">Please try again later.</p>
                     </div>
                 <% } %>
             </div>
@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     /* Table Row Hover */
     .table tbody tr:hover {
-        background: rgba(201, 168, 76, 0.03) !important;
+        background: rgba(201, 168, 76, 0.05) !important;
         transform: scale(1.01);
     }
     
@@ -349,7 +349,12 @@ document.addEventListener('DOMContentLoaded', function() {
     /* Search Input Focus */
     #adminSearchInput:focus {
         border-color: #c9a84c !important;
-        box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.1) !important;
+        box-shadow: none !important;
+    }
+    
+    .input-group:focus-within {
+        box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12) !important;
+        border-radius: 12px !important;
     }
     
     /* Responsive */
@@ -364,47 +369,57 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         .stat-card h2 {
-            font-size: 1.8rem !important;
+            font-size: 2rem !important;
+        }
+        
+        .table thead th {
+            font-size: 0.6rem !important;
+            padding: 10px 12px !important;
+        }
+        
+        .table tbody td {
+            font-size: 0.8rem !important;
+            padding: 10px 12px !important;
         }
     }
     
     @media (max-width: 576px) {
         .table thead th {
-            font-size: 0.35rem !important;
-            padding: 4px 6px !important;
-        }
-        
-        .table tbody td {
-            font-size: 0.45rem !important;
-            padding: 4px 6px !important;
-        }
-        
-        .table tbody .d-flex.align-items-center {
-            gap: 3px !important;
-        }
-        
-        .table tbody .d-flex.align-items-center div {
-            width: 16px !important;
-            height: 16px !important;
-            font-size: 0.35rem !important;
-        }
-        
-        .badge {
-            font-size: 0.35rem !important;
-            padding: 2px 4px !important;
-        }
-        
-        .stat-card h2 {
-            font-size: 1.2rem !important;
-        }
-        
-        .stat-card {
+            font-size: 0.5rem !important;
             padding: 8px 10px !important;
         }
         
+        .table tbody td {
+            font-size: 0.7rem !important;
+            padding: 8px 10px !important;
+        }
+        
+        .table tbody .d-flex.align-items-center {
+            gap: 6px !important;
+        }
+        
+        .table tbody .d-flex.align-items-center div {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 0.6rem !important;
+        }
+        
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 4px 10px !important;
+        }
+        
+        .stat-card h2 {
+            font-size: 1.5rem !important;
+        }
+        
+        .stat-card {
+            padding: 12px 15px !important;
+        }
+        
         .btn-sm {
-            font-size: 0.4rem !important;
-            padding: 2px 4px !important;
+            font-size: 0.6rem !important;
+            padding: 4px 10px !important;
         }
     }
 </style>
