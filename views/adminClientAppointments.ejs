@@ -21,6 +21,24 @@
             </a>
         </div>
         
+        <!-- ===== SEARCH BAR ===== -->
+        <div class="row mb-3 g-2">
+            <div class="col-md-6 col-lg-5">
+                <div class="input-group" style="border-radius: 12px; overflow: hidden; box-shadow: 0 2px 15px rgba(10, 22, 40, 0.04);">
+                    <span class="input-group-text" style="background: #0a1628; color: #c9a84c; border: none; padding: 10px 18px;">
+                        <i class="bi bi-search" style="font-size: 1rem;"></i>
+                    </span>
+                    <input type="text" id="clientAppSearchInput" class="form-control" placeholder="Search by PO Number or Docket Number..." style="border: 2px solid #e8d5a3; border-left: none; padding: 10px 18px; border-radius: 0 12px 12px 0; transition: all 0.3s ease; font-size: 0.85rem;">
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7 text-md-end mt-2 mt-md-0">
+                <span class="badge" style="background: rgba(201, 168, 76, 0.08); color: #0a1628; padding: 8px 16px; border-radius: 50px; font-size: 0.7rem; border: 1px solid rgba(201, 168, 76, 0.1);">
+                    <i class="bi bi-info-circle" style="color: #c9a84c;"></i> 
+                    <span id="clientAppSearchCount"><%= typeof appointments !== 'undefined' ? appointments.length : 0 %></span> appointments found
+                </span>
+            </div>
+        </div>
+
         <!-- ===== Appointments Table ===== -->
         <div class="card shadow" style="border-radius: 16px; border: 1px solid rgba(201, 168, 76, 0.08); overflow: hidden;">
             <div class="card-header" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border: none; padding: 18px 25px;">
@@ -40,78 +58,81 @@
                     </div>
                 <% } else if (typeof appointments !== 'undefined' && appointments.length > 0) { %>
                     <div class="table-responsive">
-                        <table class="table" style="margin: 0;">
+                        <table class="table" style="margin: 0;" id="clientAppTable">
                             <thead>
                                 <tr>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-hash"></i> ID
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-file-text"></i> PO
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-receipt"></i> Invoice
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-box-seam"></i> Docket
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-truck"></i> Forwarder
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-upc-scan"></i> LR No.
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-calendar3"></i> Delivery
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
                                         <i class="bi bi-tag"></i> Status
                                     </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.55rem; letter-spacing: 0.5px; padding: 10px 12px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 700; text-transform: uppercase; font-size: 0.5rem; letter-spacing: 0.5px; padding: 8px 10px; border-bottom: 2px solid #c9a84c; text-align: center; white-space: nowrap;">
                                         <i class="bi bi-gear"></i> Actions
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% appointments.forEach((app, index) => { %>
-                                    <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.04); transition: all 0.3s ease;">
-                                        <td style="padding: 10px 12px; vertical-align: middle;">
-                                            <strong style="color: #0a1628; font-size: 0.7rem;"><%= app.appointmentId %></strong>
+                                    <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.04); transition: all 0.3s ease;" data-po="<%= app.poNumber.toLowerCase() %>" data-docket="<%= (app.docketNumber || '').toLowerCase() %>">
+                                        <td style="padding: 8px 10px; vertical-align: middle;">
+                                            <strong style="color: #0a1628; font-size: 0.65rem;"><%= app.appointmentId %></strong>
                                         </td>
-                                        <td style="padding: 10px 12px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem;">
+                                        <td style="padding: 8px 10px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.65rem;">
                                             <%= app.poNumber %>
                                         </td>
-                                        <td style="padding: 10px 12px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem;">
+                                        <td style="padding: 8px 10px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.65rem;">
                                             <%= app.invoiceNumber %>
                                         </td>
-                                        <td style="padding: 10px 12px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem;">
+                                        <td style="padding: 8px 10px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.65rem;">
                                             <%= app.docketNumber || '-' %>
                                         </td>
-                                        <td style="padding: 10px 12px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem;">
+                                        <td style="padding: 8px 10px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.65rem;">
                                             <%= app.forwarderName || '-' %>
                                         </td>
-                                        <td style="padding: 10px 12px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem;">
+                                        <td style="padding: 8px 10px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.65rem;">
                                             <%= app.forwarderLRNumber || '-' %>
                                         </td>
-                                        <td style="padding: 10px 12px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.7rem; white-space: nowrap;">
-                                            <i class="bi bi-calendar" style="color: #c9a84c; font-size: 0.6rem;"></i>
+                                        <td style="padding: 8px 10px; vertical-align: middle; color: #1a2a4a; font-weight: 500; font-size: 0.65rem; white-space: nowrap;">
+                                            <i class="bi bi-calendar" style="color: #c9a84c; font-size: 0.55rem;"></i>
                                             <%= new Date(app.deliveryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %>
                                         </td>
-                                        <td style="padding: 10px 12px; vertical-align: middle; text-align: center;">
-                                            <span class="badge" style="background: <%= app.status === 'pending' ? 'linear-gradient(135deg, #e65100, #bf360c)' : app.status === 'confirmed' ? 'linear-gradient(135deg, #00695c, #004d40)' : 'linear-gradient(135deg, #2e7d32, #1b5e20)' %>; color: white; padding: 3px 10px; border-radius: 50px; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; white-space: nowrap;">
+                                        <td style="padding: 8px 10px; vertical-align: middle; text-align: center;">
+                                            <span class="badge" style="background: <%= app.status === 'pending' ? 'linear-gradient(135deg, #e65100, #bf360c)' : app.status === 'confirmed' ? 'linear-gradient(135deg, #00695c, #004d40)' : 'linear-gradient(135deg, #2e7d32, #1b5e20)' %>; color: white; padding: 2px 8px; border-radius: 50px; font-size: 0.45rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; white-space: nowrap;">
                                                 <i class="bi bi-<%= app.status === 'pending' ? 'clock-history' : app.status === 'confirmed' ? 'check-circle' : 'check-circle-fill' %>"></i>
                                                 <%= app.status %>
                                             </span>
                                         </td>
-                                        <td style="padding: 10px 12px; vertical-align: middle; text-align: center;">
-                                            <!-- ===== EDIT FORWARDER BUTTON ===== -->
-                                            <a href="/admin/appointment/<%= app._id %>/edit-forwarder" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 3px 8px; transition: all 0.3s ease; font-weight: 600; font-size: 0.5rem; margin-right: 3px; white-space: nowrap;" title="Edit Forwarder Details">
-                                                <i class="bi bi-pencil"></i> Forwarder
+                                        <td style="padding: 8px 10px; vertical-align: middle; text-align: center;">
+                                            <!-- View Details -->
+                                            <a href="/admin/appointment/<%= app._id %>" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 4px; padding: 2px 8px; transition: all 0.3s ease; font-weight: 600; font-size: 0.45rem; margin-right: 2px;" title="View Details">
+                                                <i class="bi bi-eye"></i>
                                             </a>
-                                            
-                                            <!-- ===== STATUS UPDATE DROPDOWN ===== -->
+                                            <!-- Edit Forwarder -->
+                                            <a href="/admin/appointment/<%= app._id %>/edit-forwarder" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 4px; padding: 2px 8px; transition: all 0.3s ease; font-weight: 600; font-size: 0.45rem; margin-right: 2px;" title="Edit Forwarder">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <!-- Status Dropdown -->
                                             <form action="/admin/appointment/<%= app._id %>/status?_method=PUT" method="POST" class="d-inline">
-                                                <select name="status" class="form-select form-select-sm" style="border-radius: 6px; border: 2px solid rgba(201, 168, 76, 0.15); padding: 3px 6px; font-size: 0.5rem; font-weight: 600; background: white; color: #0a1628; cursor: pointer; transition: all 0.3s ease; min-width: 80px;" onchange="this.form.submit()">
+                                                <select name="status" class="form-select form-select-sm" style="border-radius: 4px; border: 2px solid rgba(201, 168, 76, 0.15); padding: 2px 4px; font-size: 0.45rem; font-weight: 600; background: white; color: #0a1628; cursor: pointer; transition: all 0.3s ease; min-width: 70px;" onchange="this.form.submit()">
                                                     <option value="pending" <%= app.status === 'pending' ? 'selected' : '' %> style="color: #e65100;">⏳ Pending</option>
                                                     <option value="confirmed" <%= app.status === 'confirmed' ? 'selected' : '' %> style="color: #00695c;">✅ Confirmed</option>
                                                     <option value="completed" <%= app.status === 'completed' ? 'selected' : '' %> style="color: #2e7d32;">✔️ Completed</option>
@@ -135,6 +156,41 @@
     </div>
 </div>
 
+<!-- ===== SEARCH JAVASCRIPT ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('clientAppSearchInput');
+    const rows = document.querySelectorAll('#clientAppTable tbody tr');
+    const searchCount = document.getElementById('clientAppSearchCount');
+    const totalCount = rows.length;
+
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const poNumber = row.getAttribute('data-po') || '';
+                const docketNumber = row.getAttribute('data-docket') || '';
+                
+                if (poNumber.includes(searchTerm) || docketNumber.includes(searchTerm)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (searchTerm === '') {
+                searchCount.textContent = totalCount;
+            } else {
+                searchCount.textContent = visibleCount;
+            }
+        });
+    }
+});
+</script>
+
 <!-- ===== Extra Styles ===== -->
 <style>
     /* Table Row Hover */
@@ -143,7 +199,7 @@
         transform: scale(1.01);
     }
     
-    /* Edit Forwarder Button Hover */
+    /* View Button Hover */
     .table tbody a.btn-sm:hover {
         background: linear-gradient(135deg, #c9a84c, #a8873a) !important;
         color: #0a1628 !important;
@@ -179,27 +235,33 @@
         transform: scale(1.05);
     }
     
+    /* Search Input Focus */
+    #clientAppSearchInput:focus {
+        border-color: #c9a84c !important;
+        box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.1) !important;
+    }
+    
     /* Responsive */
     @media (max-width: 992px) {
         .table thead th {
-            font-size: 0.45rem !important;
-            padding: 8px 10px !important;
+            font-size: 0.4rem !important;
+            padding: 6px 8px !important;
         }
         
         .table tbody td {
-            font-size: 0.6rem !important;
-            padding: 8px 10px !important;
+            font-size: 0.55rem !important;
+            padding: 6px 8px !important;
         }
         
         .table tbody select.form-select {
-            min-width: 70px !important;
-            font-size: 0.45rem !important;
+            min-width: 60px !important;
+            font-size: 0.4rem !important;
             padding: 2px 4px !important;
         }
         
         .table tbody a.btn-sm {
-            font-size: 0.45rem !important;
-            padding: 2px 6px !important;
+            font-size: 0.4rem !important;
+            padding: 2px 4px !important;
         }
     }
     
@@ -217,28 +279,28 @@
     
     @media (max-width: 576px) {
         .table thead th {
-            font-size: 0.4rem !important;
-            padding: 6px 8px !important;
+            font-size: 0.35rem !important;
+            padding: 4px 6px !important;
         }
         
         .table tbody td {
-            font-size: 0.5rem !important;
-            padding: 6px 8px !important;
+            font-size: 0.45rem !important;
+            padding: 4px 6px !important;
         }
         
         .badge {
-            font-size: 0.4rem !important;
-            padding: 2px 6px !important;
-        }
-        
-        .table tbody select.form-select {
-            min-width: 60px !important;
-            font-size: 0.4rem !important;
+            font-size: 0.35rem !important;
             padding: 2px 4px !important;
         }
         
+        .table tbody select.form-select {
+            min-width: 50px !important;
+            font-size: 0.35rem !important;
+            padding: 2px 3px !important;
+        }
+        
         .table tbody a.btn-sm {
-            font-size: 0.4rem !important;
+            font-size: 0.35rem !important;
             padding: 2px 4px !important;
         }
     }

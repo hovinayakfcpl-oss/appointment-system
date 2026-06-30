@@ -1,0 +1,270 @@
+<div class="row">
+    <div class="col-12">
+        <!-- Back Button -->
+        <div class="mb-3">
+            <a href="javascript:history.back()" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 10px 25px; transition: all 0.3s ease; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            
+            <% if (typeof user !== 'undefined' && user.role === 'admin') { %>
+                <a href="/admin/appointment/<%= appointment._id %>/edit-forwarder" class="btn" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; font-weight: 700; border: none; border-radius: 50px; padding: 10px 25px; box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; margin-left: 10px;">
+                    <i class="bi bi-pencil"></i> Edit Forwarder
+                </a>
+            <% } %>
+        </div>
+
+        <!-- Card -->
+        <div class="card shadow" style="border-radius: 16px; border: 1px solid rgba(201, 168, 76, 0.08); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border: none; padding: 20px 25px;">
+                <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
+                    <div>
+                        <h5 class="mb-0" style="color: #e8d5a3; font-weight: 700;">
+                            <i class="bi bi-file-text" style="color: #c9a84c;"></i> Appointment Details
+                        </h5>
+                        <p style="color: rgba(232, 213, 163, 0.3); font-size: 0.7rem; margin: 5px 0 0; letter-spacing: 0.5px;">
+                            <i class="bi bi-award-fill" style="color: #c9a84c; font-size: 0.5rem;"></i> 
+                            <%= typeof appointment !== 'undefined' && appointment.clientId && appointment.clientId.name ? 'Client: ' + appointment.clientId.name : 'Complete appointment information' %>
+                        </p>
+                    </div>
+                    <span class="badge" style="background: <%= appointment.status === 'pending' ? 'linear-gradient(135deg, #e65100, #bf360c)' : appointment.status === 'confirmed' ? 'linear-gradient(135deg, #00695c, #004d40)' : 'linear-gradient(135deg, #2e7d32, #1b5e20)' %>; color: white; padding: 8px 20px; border-radius: 50px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">
+                        <i class="bi bi-<%= appointment.status === 'pending' ? 'clock-history' : appointment.status === 'confirmed' ? 'check-circle' : 'check-circle-fill' %>"></i>
+                        <%= appointment.status %>
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-4" style="background: white;">
+                <div class="row g-4">
+                    <!-- ===== LEFT COLUMN ===== -->
+                    <div class="col-md-6">
+                        <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; border-bottom: 2px solid #c9a84c; padding-bottom: 8px;">
+                            <i class="bi bi-info-circle" style="color: #c9a84c;"></i> Basic Information
+                        </h6>
+                        
+                        <div class="detail-item">
+                            <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="bi bi-hash" style="color: #c9a84c;"></i> Appointment ID
+                            </label>
+                            <p style="color: #0a1628; font-weight: 700; font-size: 1.1rem; margin: 2px 0 0;"><%= appointment.appointmentId %></p>
+                        </div>
+
+                        <div class="detail-item">
+                            <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="bi bi-file-text" style="color: #c9a84c;"></i> PO Number
+                            </label>
+                            <p style="color: #0a1628; font-weight: 600; font-size: 1rem; margin: 2px 0 0;"><%= appointment.poNumber %></p>
+                        </div>
+
+                        <div class="detail-item">
+                            <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="bi bi-receipt" style="color: #c9a84c;"></i> Invoice Number
+                            </label>
+                            <p style="color: #0a1628; font-weight: 600; font-size: 1rem; margin: 2px 0 0;"><%= appointment.invoiceNumber %></p>
+                        </div>
+
+                        <div class="detail-item">
+                            <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="bi bi-truck" style="color: #c9a84c;"></i> E-Way Bill
+                            </label>
+                            <p style="color: #0a1628; font-weight: 600; font-size: 1rem; margin: 2px 0 0;"><%= appointment.ewayBill || '-' %></p>
+                        </div>
+
+                        <div class="detail-item">
+                            <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="bi bi-box-seam" style="color: #c9a84c;"></i> Docket Number
+                            </label>
+                            <p style="color: #0a1628; font-weight: 600; font-size: 1rem; margin: 2px 0 0;"><%= appointment.docketNumber || '-' %></p>
+                        </div>
+
+                        <div class="detail-item">
+                            <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="bi bi-upc-scan" style="color: #c9a84c;"></i> ASN Number
+                            </label>
+                            <p style="color: #0a1628; font-weight: 600; font-size: 1rem; margin: 2px 0 0;"><%= appointment.asnNumber || '-' %></p>
+                        </div>
+                    </div>
+
+                    <!-- ===== RIGHT COLUMN ===== -->
+                    <div class="col-md-6">
+                        <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; border-bottom: 2px solid #c9a84c; padding-bottom: 8px;">
+                            <i class="bi bi-person" style="color: #c9a84c;"></i> Contact & Delivery
+                        </h6>
+
+                        <div class="detail-item">
+                            <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="bi bi-person" style="color: #c9a84c;"></i> Contact Person
+                            </label>
+                            <p style="color: #0a1628; font-weight: 600; font-size: 1rem; margin: 2px 0 0;"><%= appointment.contactPerson || '-' %></p>
+                        </div>
+
+                        <div class="detail-item">
+                            <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="bi bi-telephone" style="color: #c9a84c;"></i> Contact Number
+                            </label>
+                            <p style="color: #0a1628; font-weight: 600; font-size: 1rem; margin: 2px 0 0;"><%= appointment.contactNumber || '-' %></p>
+                        </div>
+
+                        <div class="detail-item">
+                            <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="bi bi-calendar3" style="color: #c9a84c;"></i> Delivery Date
+                            </label>
+                            <p style="color: #0a1628; font-weight: 600; font-size: 1rem; margin: 2px 0 0;">
+                                <i class="bi bi-calendar" style="color: #c9a84c; font-size: 0.7rem;"></i>
+                                <%= new Date(appointment.deliveryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+                            </p>
+                        </div>
+
+                        <div class="detail-item">
+                            <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                <i class="bi bi-geo-alt" style="color: #c9a84c;"></i> Delivery Address
+                            </label>
+                            <p style="color: #0a1628; font-weight: 600; font-size: 0.9rem; margin: 2px 0 0; background: #f8f4eb; padding: 10px 15px; border-radius: 8px; border-left: 3px solid #c9a84c;">
+                                <%= appointment.deliveryAddress %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== FORWARDER SECTION (Admin Only) ===== -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; border-bottom: 2px solid #c9a84c; padding-bottom: 8px;">
+                            <i class="bi bi-truck" style="color: #c9a84c;"></i> Forwarder Details
+                            <% if (typeof user !== 'undefined' && user.role === 'admin') { %>
+                                <span class="badge" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; font-size: 0.5rem; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-left: 10px;">
+                                    <i class="bi bi-shield-check"></i> Admin Only
+                                </span>
+                            <% } %>
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                        <i class="bi bi-building" style="color: #c9a84c;"></i> Forwarder Name
+                                    </label>
+                                    <p style="color: #0a1628; font-weight: 600; font-size: 1rem; margin: 2px 0 0;"><%= appointment.forwarderName || 'Not Set' %></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <label style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                        <i class="bi bi-upc-scan" style="color: #c9a84c;"></i> Forwarder LR Number
+                                    </label>
+                                    <p style="color: #0a1628; font-weight: 600; font-size: 1rem; margin: 2px 0 0;"><%= appointment.forwarderLRNumber || 'Not Set' %></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== REMARKS ===== -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; border-bottom: 2px solid #c9a84c; padding-bottom: 8px;">
+                            <i class="bi bi-chat" style="color: #c9a84c;"></i> Remarks
+                        </h6>
+                        <div style="background: #f8f4eb; padding: 12px 18px; border-radius: 8px;">
+                            <p style="color: #0a1628; font-weight: 500; font-size: 0.9rem; margin: 0;">
+                                <%= appointment.remarks || 'No remarks added' %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== FOOTER ===== -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <small style="color: rgba(10, 22, 40, 0.3); font-size: 0.65rem;">
+                            <i class="bi bi-clock"></i> Created: <%= new Date(appointment.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                        </small>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <small style="color: rgba(10, 22, 40, 0.3); font-size: 0.65rem;">
+                            <i class="bi bi-clock"></i> Updated: <%= new Date(appointment.updatedAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== EXTRA STYLES ===== -->
+<style>
+    .detail-item {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(10, 22, 40, 0.04);
+    }
+    .detail-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .card {
+        animation: fadeInUp 0.5s ease forwards;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Back Button Hover */
+    .btn[href="javascript:history.back()"]:hover {
+        background: rgba(10, 22, 40, 0.1) !important;
+        border-color: rgba(10, 22, 40, 0.2) !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Edit Forwarder Button Hover */
+    .btn[href*="edit-forwarder"]:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 40px rgba(201, 168, 76, 0.45) !important;
+        background: linear-gradient(135deg, #e8d5a3, #c9a84c) !important;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 20px !important;
+        }
+        
+        .card-header .d-flex {
+            flex-direction: column;
+            align-items: flex-start !important;
+        }
+        
+        .btn[href="javascript:history.back()"] {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .btn[href*="edit-forwarder"] {
+            width: 100%;
+            text-align: center;
+            margin-left: 0 !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 15px !important;
+        }
+        
+        .detail-item p {
+            font-size: 0.85rem !important;
+        }
+        
+        .detail-item label {
+            font-size: 0.5rem !important;
+        }
+    }
+</style>

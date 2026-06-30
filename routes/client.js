@@ -55,8 +55,8 @@ router.post('/appointment', auth, async (req, res) => {
       ewayBill, 
       docketNumber,
       asnNumber,
-      contactPerson,          // ✅ NEW
-      contactNumber,          // ✅ NEW
+      contactPerson,
+      contactNumber,
       deliveryDate, 
       deliveryAddress, 
       remarks 
@@ -93,8 +93,8 @@ router.post('/appointment', auth, async (req, res) => {
       ewayBill: ewayBill || '',
       docketNumber: docketNumber || '',
       asnNumber: asnNumber || '',
-      contactPerson: contactPerson || '',        // ✅ NEW
-      contactNumber: contactNumber || '',        // ✅ NEW
+      contactPerson: contactPerson || '',
+      contactNumber: contactNumber || '',
       deliveryDate,
       deliveryAddress,
       remarks: remarks || '',
@@ -150,8 +150,8 @@ router.put('/appointment/:id', auth, async (req, res) => {
       ewayBill, 
       docketNumber,
       asnNumber,
-      contactPerson,          // ✅ NEW
-      contactNumber,          // ✅ NEW
+      contactPerson,
+      contactNumber,
       deliveryDate, 
       deliveryAddress, 
       remarks 
@@ -170,8 +170,8 @@ router.put('/appointment/:id', auth, async (req, res) => {
         ewayBill: ewayBill || '',
         docketNumber: docketNumber || '',
         asnNumber: asnNumber || '',
-        contactPerson: contactPerson || '',        // ✅ NEW
-        contactNumber: contactNumber || '',        // ✅ NEW
+        contactPerson: contactPerson || '',
+        contactNumber: contactNumber || '',
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
@@ -200,6 +200,31 @@ router.delete('/appointment/:id', auth, async (req, res) => {
     res.redirect('/client/dashboard');
   } catch (error) {
     console.error('Delete Appointment Error:', error);
+    res.redirect('/client/dashboard');
+  }
+});
+
+// ============================================
+// GET - Appointment Details (Client View) ✅ NEW
+// ============================================
+router.get('/appointment/:id', auth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findOne({
+      _id: req.params.id,
+      clientId: req.user._id
+    });
+    
+    if (!appointment) {
+      return res.redirect('/client/dashboard');
+    }
+    
+    res.render('appointmentDetails', {
+      title: 'Appointment Details',
+      user: req.user,
+      appointment
+    });
+  } catch (error) {
+    console.error('Appointment Details Error:', error);
     res.redirect('/client/dashboard');
   }
 });

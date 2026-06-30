@@ -103,7 +103,7 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// GET - Edit Forwarder Details Form (NEW)
+// GET - Edit Forwarder Details Form
 // ============================================
 router.get('/appointment/:id/edit-forwarder', adminAuth, async (req, res) => {
   try {
@@ -126,7 +126,7 @@ router.get('/appointment/:id/edit-forwarder', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// PUT - Update Forwarder Details (NEW)
+// PUT - Update Forwarder Details
 // ============================================
 router.put('/appointment/:id/forwarder', adminAuth, async (req, res) => {
   try {
@@ -184,7 +184,7 @@ router.get('/appointments', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// GET - Appointment Details (JSON - For API)
+// GET - Appointment Details (Admin View) ✅ UPDATED
 // ============================================
 router.get('/appointment/:id', adminAuth, async (req, res) => {
   try {
@@ -192,13 +192,17 @@ router.get('/appointment/:id', adminAuth, async (req, res) => {
       .populate('clientId', 'name email');
     
     if (!appointment) {
-      return res.status(404).json({ error: 'Appointment not found' });
+      return res.redirect('/admin/dashboard');
     }
     
-    res.json(appointment);
+    res.render('appointmentDetails', {
+      title: 'Appointment Details',
+      user: req.user,
+      appointment
+    });
   } catch (error) {
     console.error('Appointment Details Error:', error);
-    res.status(500).json({ error: 'Server error' });
+    res.redirect('/admin/dashboard');
   }
 });
 
