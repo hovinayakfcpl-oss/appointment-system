@@ -37,7 +37,9 @@ router.get('/dashboard', adminAuth, async (req, res) => {
       totalAppointments,
       pendingAppointments,
       completedAppointments,
-      recentAppointments
+      recentAppointments,
+      success: req.query.success || null,
+      error: req.query.error || null
     });
   } catch (error) {
     console.error('Admin Dashboard Error:', error);
@@ -52,7 +54,7 @@ router.get('/client/:id/appointments', adminAuth, async (req, res) => {
   try {
     const client = await User.findById(req.params.id);
     if (!client) {
-      return res.redirect('/admin/dashboard');
+      return res.redirect('/admin/dashboard?error=Client not found!');
     }
     
     const appointments = await Appointment.find({ clientId: client._id })
@@ -66,7 +68,7 @@ router.get('/client/:id/appointments', adminAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('Client Appointments Error:', error);
-    res.redirect('/admin/dashboard');
+    res.redirect('/admin/dashboard?error=Failed to load client appointments!');
   }
 });
 
@@ -79,7 +81,7 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
     
     // Validate status
     if (!['pending', 'confirmed', 'completed'].includes(status)) {
-      return res.redirect('back');
+      return res.redirect('/admin/dashboard?error=Invalid status!');
     }
     
     const appointment = await Appointment.findByIdAndUpdate(
@@ -92,24 +94,24 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
     );
     
     if (!appointment) {
-      return res.redirect('back');
+      return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
     
-    res.redirect('back');
+    res.redirect('/admin/dashboard?success=Status updated successfully!');
   } catch (error) {
     console.error('Update Status Error:', error);
-    res.redirect('back');
+    res.redirect('/admin/dashboard?error=Failed to update status!');
   }
 });
 
 // ============================================
-// GET - Edit Appointment Form (Admin) ✅ NEW
+// GET - Edit Appointment Form (Admin)
 // ============================================
 router.get('/appointment/:id/edit', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
     if (!appointment) {
-      return res.redirect('/admin/dashboard');
+      return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
     
     res.render('clientAppointmentForm', {
@@ -120,7 +122,7 @@ router.get('/appointment/:id/edit', adminAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('Admin Edit Appointment Error:', error);
-    res.redirect('/admin/dashboard');
+    res.redirect('/admin/dashboard?error=Failed to load appointment!');
   }
 });
 
@@ -133,7 +135,7 @@ router.get('/appointment/:id/edit-forwarder', adminAuth, async (req, res) => {
       .populate('clientId', 'name email');
     
     if (!appointment) {
-      return res.redirect('/admin/dashboard');
+      return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
     
     res.render('adminEditAppointment', {
@@ -143,7 +145,7 @@ router.get('/appointment/:id/edit-forwarder', adminAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('Edit Forwarder Error:', error);
-    res.redirect('/admin/dashboard');
+    res.redirect('/admin/dashboard?error=Failed to load forwarder details!');
   }
 });
 
@@ -165,7 +167,7 @@ router.put('/appointment/:id/forwarder', adminAuth, async (req, res) => {
     ).populate('clientId', 'name email');
     
     if (!appointment) {
-      return res.redirect('/admin/dashboard');
+      return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
     
     res.render('adminEditAppointment', {
@@ -201,7 +203,7 @@ router.get('/appointments', adminAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('All Appointments Error:', error);
-    res.redirect('/admin/dashboard');
+    res.redirect('/admin/dashboard?error=Failed to load appointments!');
   }
 });
 
@@ -214,7 +216,7 @@ router.get('/appointment/:id', adminAuth, async (req, res) => {
       .populate('clientId', 'name email');
     
     if (!appointment) {
-      return res.redirect('/admin/dashboard');
+      return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
     
     res.render('appointmentDetails', {
@@ -224,7 +226,7 @@ router.get('/appointment/:id', adminAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('Appointment Details Error:', error);
-    res.redirect('/admin/dashboard');
+    res.redirect('/admin/dashboard?error=Failed to load appointment details!');
   }
 });
 
@@ -236,13 +238,13 @@ router.delete('/appointment/:id', adminAuth, async (req, res) => {
     const appointment = await Appointment.findByIdAndDelete(req.params.id);
     
     if (!appointment) {
-      return res.status(404).json({ error: 'Appointment not found' });
+      return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
     
-    res.redirect('/admin/dashboard');
+    res.redirect('/admin/dashboard?success=Appointment deleted successfully!');
   } catch (error) {
     console.error('Delete Appointment Error:', error);
-    res.redirect('/admin/dashboard');
+    res.redirect('/admin/dashboard?error=Failed to delete appointment!');
   }
 });
 
@@ -266,6 +268,30 @@ router.get('/stats', adminAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('Stats Error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ============================================
+// GET - Today's Appointments (Admin)
+// ============================================
+router.get('/today', adminAuth, async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const todayAppointments = await Appointment.find({
+      deliveryDate: { $gte: today, $lt: tomorrow }
+    }).populate('clientId', 'name email');
+    
+    res.json({
+      count: todayAppointments.length,
+      appointments: todayAppointments
+    });
+  } catch (error) {
+    console.error('Today Appointments Error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

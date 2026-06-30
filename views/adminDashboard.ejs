@@ -20,6 +20,23 @@
             </div>
         </div>
         
+        <!-- ===== SUCCESS/ERROR MESSAGES (ADMIN ONLY) ===== -->
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="alert alert-success alert-dismissible fade show" style="border-left: 4px solid #2e7d32; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; animation: fadeInUp 0.5s ease;">
+                <i class="bi bi-check-circle-fill" style="color: #2e7d32;"></i> 
+                <strong><%= success %></strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-danger alert-dismissible fade show" style="border-left: 4px solid #c62828; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; animation: fadeInUp 0.5s ease;">
+                <i class="bi bi-exclamation-triangle-fill" style="color: #c62828;"></i> 
+                <strong><%= error %></strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        
         <!-- ===== Stats Cards ===== -->
         <div class="row mb-4 g-3">
             <div class="col-md-3 col-6">
@@ -179,6 +196,10 @@
                                             <a href="/admin/appointment/<%= app._id %>" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.7rem; margin-right: 3px;" title="View Details">
                                                 <i class="bi bi-eye"></i>
                                             </a>
+                                            <!-- Edit Appointment (Admin) -->
+                                            <a href="/admin/appointment/<%= app._id %>/edit" class="btn btn-sm" style="background: rgba(52, 152, 219, 0.1); color: #2980b9; border: 1px solid rgba(52, 152, 219, 0.15); border-radius: 6px; padding: 6px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.7rem; margin-right: 3px;" title="Edit Appointment">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
                                             <!-- Edit Forwarder -->
                                             <a href="/admin/appointment/<%= app._id %>/edit-forwarder" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.7rem;" title="Edit Forwarder">
                                                 <i class="bi bi-pencil"></i>
@@ -333,12 +354,27 @@ document.addEventListener('DOMContentLoaded', function() {
         transform: scale(1.01);
     }
     
-    /* View Button Hover */
+    /* All Button Hover */
     .table tbody .btn-sm:hover {
+        transform: translateY(-2px) scale(1.05);
+    }
+    
+    .table tbody a.btn-sm[href*="/edit-forwarder"]:hover {
         background: linear-gradient(135deg, #c9a84c, #a8873a) !important;
         color: #0a1628 !important;
         border-color: #c9a84c !important;
-        transform: translateY(-2px) scale(1.05);
+    }
+    
+    .table tbody a.btn-sm[href*="/edit"]:hover {
+        background: #2980b9 !important;
+        color: white !important;
+        border-color: #2980b9 !important;
+    }
+    
+    .table tbody a.btn-sm[href*="/appointment/"]:hover {
+        background: linear-gradient(135deg, #c9a84c, #a8873a) !important;
+        color: #0a1628 !important;
+        border-color: #c9a84c !important;
     }
     
     /* Email Link Hover */
@@ -355,6 +391,18 @@ document.addEventListener('DOMContentLoaded', function() {
     .input-group:focus-within {
         box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12) !important;
         border-radius: 12px !important;
+    }
+    
+    /* Alert Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     /* Responsive */
