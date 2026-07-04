@@ -3,6 +3,7 @@ const router = express.Router();
 const { adminAuth } = require('../middleware/auth');
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
+const upload = require('../utils/upload');
 const path = require('path');
 const fs = require('fs');
 
@@ -11,7 +12,6 @@ const fs = require('fs');
 // ============================================
 router.get('/dashboard', adminAuth, async (req, res) => {
   try {
-    // Get all clients with appointment count
     const clients = await User.find({ role: 'client' });
     const clientData = await Promise.all(clients.map(async (client) => {
       const count = await Appointment.countDocuments({ clientId: client._id });
@@ -21,12 +21,10 @@ router.get('/dashboard', adminAuth, async (req, res) => {
       };
     }));
     
-    // Stats
     const totalAppointments = await Appointment.countDocuments();
     const pendingAppointments = await Appointment.countDocuments({ status: 'pending' });
     const completedAppointments = await Appointment.countDocuments({ status: 'completed' });
     
-    // Recent Appointments with client details
     const recentAppointments = await Appointment.find()
       .populate('clientId', 'name email')
       .sort({ createdAt: -1 })
@@ -81,7 +79,6 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
   try {
     const { status } = req.body;
     
-    // Validate status
     if (!['pending', 'confirmed', 'completed'].includes(status)) {
       return res.redirect('/admin/dashboard?error=Invalid status!');
     }
@@ -107,10 +104,18 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// PUT - Update Appointment (Admin Direct)
+// PUT - Update Appointment (Admin Direct) with File Upload
 // ============================================
-router.put('/appointment/:id/admin-update', adminAuth, async (req, res) => {
+router.put('/appointment/:id/admin-update', adminAuth, upload.fields([
+  { name: 'poFile', maxCount: 1 },
+  { name: 'invoiceFile', maxCount: 1 },
+  { name: 'ewayBillFile', maxCount: 1 }
+]), async (req, res) => {
   try {
+    console.log('📝 ===== ADMIN UPDATE =====');
+    console.log('📝 Request Body:', req.body);
+    console.log('📂 Files:', req.files ? Object.keys(req.files) : 'No files');
+
     const { 
       poNumber, 
       invoiceNumber, 
@@ -124,10 +129,52 @@ router.put('/appointment/:id/admin-update', adminAuth, async (req, res) => {
       remarks 
     } = req.body;
 
-    console.log('📝 Admin Updating Appointment:', req.params.id);
-    console.log('📝 New Docket Number:', docketNumber);
+    console.log('📝 Docket Number from form:', docketNumber || 'EMPTY');
 
-    // ✅ Admin direct update (bina clientId check ke)
+    // Validation
+    if (!poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
+      return res.redirect('/admin/dashboard?error=Please fill in all required fields');
+    }
+
+    // Get uploaded files
+    const poFile = req.files?.poFile ? req.files.poFile[0] : null;
+    const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
+    const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
+
+    console.log('📄 PO File:', poFile ? poFile.filename : 'No file');
+    console.log('📄 Invoice File:', invoiceFile ? invoiceFile.filename : 'No file');
+    console.log('📄 E-Way Bill File:', ewayBillFile ? ewayBillFile.filename : 'No file');
+
+    // Find existing appointment
+    const existingAppointment = await Appointment.findById(req.params.id);
+    if (!existingAppointment) {
+      return res.redirect('/admin/dashboard?error=Appointment not found!');
+    }
+
+    // Delete old files if new ones uploaded
+    if (poFile && existingAppointment.poFile) {
+      try { 
+        const oldPath = path.join(__dirname, '../uploads', existingAppointment.poFile);
+        if (fs.existsSync(oldPath)) { fs.unlinkSync(oldPath); }
+        console.log('🗑️ Deleted old PO file');
+      } catch(e) { console.log('Delete error:', e.message); }
+    }
+    if (invoiceFile && existingAppointment.invoiceFile) {
+      try { 
+        const oldPath = path.join(__dirname, '../uploads', existingAppointment.invoiceFile);
+        if (fs.existsSync(oldPath)) { fs.unlinkSync(oldPath); }
+        console.log('🗑️ Deleted old Invoice file');
+      } catch(e) { console.log('Delete error:', e.message); }
+    }
+    if (ewayBillFile && existingAppointment.ewayBillFile) {
+      try { 
+        const oldPath = path.join(__dirname, '../uploads', existingAppointment.ewayBillFile);
+        if (fs.existsSync(oldPath)) { fs.unlinkSync(oldPath); }
+        console.log('🗑️ Deleted old E-Way Bill file');
+      } catch(e) { console.log('Delete error:', e.message); }
+    }
+
+    // ✅ Admin direct update with file fields
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       req.params.id,
       {
@@ -141,22 +188,27 @@ router.put('/appointment/:id/admin-update', adminAuth, async (req, res) => {
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
+        poFile: poFile ? poFile.filename : existingAppointment.poFile,
+        poFileOriginalName: poFile ? poFile.originalname : existingAppointment.poFileOriginalName,
+        invoiceFile: invoiceFile ? invoiceFile.filename : existingAppointment.invoiceFile,
+        invoiceFileOriginalName: invoiceFile ? invoiceFile.originalname : existingAppointment.invoiceFileOriginalName,
+        ewayBillFile: ewayBillFile ? ewayBillFile.filename : existingAppointment.ewayBillFile,
+        ewayBillFileOriginalName: ewayBillFile ? ewayBillFile.originalname : existingAppointment.ewayBillFileOriginalName,
         updatedAt: Date.now()
       },
       { new: true }
     );
 
     if (!updatedAppointment) {
-      console.log('❌ Appointment not found!');
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
 
-    console.log('✅ Appointment Updated Successfully!');
-    console.log('✅ New Docket Number:', updatedAppointment.docketNumber);
+    console.log('✅ Admin Update Success!');
+    console.log('✅ Docket Number saved:', updatedAppointment.docketNumber);
 
     res.redirect('/admin/dashboard?success=Appointment updated successfully!');
   } catch (error) {
-    console.error('Admin Update Error:', error);
+    console.error('❌ Admin Update Error:', error);
     res.redirect('/admin/dashboard?error=Failed to update appointment!');
   }
 });
@@ -296,6 +348,17 @@ router.delete('/appointment/:id', adminAuth, async (req, res) => {
     
     if (!appointment) {
       return res.redirect('/admin/dashboard?error=Appointment not found!');
+    }
+    
+    // Delete associated files
+    if (appointment.poFile) {
+      try { fs.unlinkSync(path.join(__dirname, '../uploads', appointment.poFile)); } catch(e) {}
+    }
+    if (appointment.invoiceFile) {
+      try { fs.unlinkSync(path.join(__dirname, '../uploads', appointment.invoiceFile)); } catch(e) {}
+    }
+    if (appointment.ewayBillFile) {
+      try { fs.unlinkSync(path.join(__dirname, '../uploads', appointment.ewayBillFile)); } catch(e) {}
     }
     
     res.redirect('/admin/dashboard?success=Appointment deleted successfully!');
