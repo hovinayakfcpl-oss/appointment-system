@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
 const Appointment = require('../models/Appointment');
+const upload = require('../utils/upload');
+const fs = require('fs');
+const path = require('path');
 
 // Generate Unique Appointment ID (Fallback)
 function generateAppointmentId() {
@@ -44,9 +47,13 @@ router.get('/appointment/new', auth, (req, res) => {
 });
 
 // ============================================
-// POST - Create Appointment
+// POST - Create Appointment with File Upload
 // ============================================
-router.post('/appointment', auth, async (req, res) => {
+router.post('/appointment', auth, upload.fields([
+  { name: 'poFile', maxCount: 1 },
+  { name: 'invoiceFile', maxCount: 1 },
+  { name: 'ewayBillFile', maxCount: 1 }
+]), async (req, res) => {
   try {
     const { 
       appointmentId, 
@@ -64,6 +71,14 @@ router.post('/appointment', auth, async (req, res) => {
 
     // Validation
     if (!appointmentId || !poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
+      // Delete uploaded files if validation fails
+      if (req.files) {
+        Object.values(req.files).forEach(fileArray => {
+          fileArray.forEach(file => {
+            try { fs.unlinkSync(file.path); } catch(e) {}
+          });
+        });
+      }
       return res.render('clientAppointmentForm', {
         title: 'New Appointment',
         user: req.user,
@@ -76,6 +91,14 @@ router.post('/appointment', auth, async (req, res) => {
     // Check if Appointment ID already exists
     const existingAppointment = await Appointment.findOne({ appointmentId });
     if (existingAppointment) {
+      // Delete uploaded files
+      if (req.files) {
+        Object.values(req.files).forEach(fileArray => {
+          fileArray.forEach(file => {
+            try { fs.unlinkSync(file.path); } catch(e) {}
+          });
+        });
+      }
       return res.render('clientAppointmentForm', {
         title: 'New Appointment',
         user: req.user,
@@ -84,6 +107,11 @@ router.post('/appointment', auth, async (req, res) => {
         error: 'Appointment ID already exists! Please use a different ID.'
       });
     }
+
+    // Get uploaded file paths
+    const poFile = req.files?.poFile ? req.files.poFile[0] : null;
+    const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
+    const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
 
     const appointment = new Appointment({
       clientId: req.user._id,
@@ -98,18 +126,31 @@ router.post('/appointment', auth, async (req, res) => {
       deliveryDate,
       deliveryAddress,
       remarks: remarks || '',
-      status: 'pending'
+      status: 'pending',
+      poFile: poFile ? poFile.filename : '',
+      poFileOriginalName: poFile ? poFile.originalname : '',
+      invoiceFile: invoiceFile ? invoiceFile.filename : '',
+      invoiceFileOriginalName: invoiceFile ? invoiceFile.originalname : '',
+      ewayBillFile: ewayBillFile ? ewayBillFile.filename : '',
+      ewayBillFileOriginalName: ewayBillFile ? ewayBillFile.originalname : ''
     });
 
     await appointment.save();
     
-    // ✅ Admin ko success message, Client ko bina msg ke redirect
     if (req.user.role === 'admin') {
       return res.redirect('/admin/dashboard?success=Appointment created successfully!');
     }
-    res.redirect('/client/dashboard');
+    res.redirect('/client/dashboard?success=Appointment created successfully!');
   } catch (error) {
     console.error('Create Appointment Error:', error);
+    // Delete uploaded files if error occurs
+    if (req.files) {
+      Object.values(req.files).forEach(fileArray => {
+        fileArray.forEach(file => {
+          try { fs.unlinkSync(file.path); } catch(e) {}
+        });
+      });
+    }
     res.render('clientAppointmentForm', {
       title: 'New Appointment',
       user: req.user,
@@ -147,7 +188,11 @@ router.get('/appointment/:id/edit', auth, async (req, res) => {
 // ============================================
 // PUT - Update Appointment (Client Only)
 // ============================================
-router.put('/appointment/:id', auth, async (req, res) => {
+router.put('/appointment/:id', auth, upload.fields([
+  { name: 'poFile', maxCount: 1 },
+  { name: 'invoiceFile', maxCount: 1 },
+  { name: 'ewayBillFile', maxCount: 1 }
+]), async (req, res) => {
   try {
     const { 
       poNumber, 
@@ -172,6 +217,42 @@ router.put('/appointment/:id', auth, async (req, res) => {
       return res.redirect('/client/dashboard?error=Please fill in all required fields');
     }
 
+    // Find existing appointment
+    const existingAppointment = await Appointment.findOne({
+      _id: req.params.id,
+      clientId: req.user._id
+    });
+
+    if (!existingAppointment) {
+      return res.redirect('/client/dashboard?error=Appointment not found!');
+    }
+
+    // Get uploaded file paths
+    const poFile = req.files?.poFile ? req.files.poFile[0] : null;
+    const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
+    const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
+
+    // Delete old files if new ones are uploaded
+    if (poFile && existingAppointment.poFile) {
+      try {
+        const oldFilePath = path.join(__dirname, '../uploads', existingAppointment.poFile);
+        if (fs.existsSync(oldFilePath)) fs.unlinkSync(oldFilePath);
+      } catch(e) {}
+    }
+    if (invoiceFile && existingAppointment.invoiceFile) {
+      try {
+        const oldFilePath = path.join(__dirname, '../uploads', existingAppointment.invoiceFile);
+        if (fs.existsSync(oldFilePath)) fs.unlinkSync(oldFilePath);
+      } catch(e) {}
+    }
+    if (ewayBillFile && existingAppointment.ewayBillFile) {
+      try {
+        const oldFilePath = path.join(__dirname, '../uploads', existingAppointment.ewayBillFile);
+        if (fs.existsSync(oldFilePath)) fs.unlinkSync(oldFilePath);
+      } catch(e) {}
+    }
+
+    // Update appointment
     const updatedAppointment = await Appointment.findOneAndUpdate(
       { _id: req.params.id, clientId: req.user._id },
       {
@@ -185,9 +266,15 @@ router.put('/appointment/:id', auth, async (req, res) => {
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
+        poFile: poFile ? poFile.filename : existingAppointment.poFile,
+        poFileOriginalName: poFile ? poFile.originalname : existingAppointment.poFileOriginalName,
+        invoiceFile: invoiceFile ? invoiceFile.filename : existingAppointment.invoiceFile,
+        invoiceFileOriginalName: invoiceFile ? invoiceFile.originalname : existingAppointment.invoiceFileOriginalName,
+        ewayBillFile: ewayBillFile ? ewayBillFile.filename : existingAppointment.ewayBillFile,
+        ewayBillFileOriginalName: ewayBillFile ? ewayBillFile.originalname : existingAppointment.ewayBillFileOriginalName,
         updatedAt: Date.now()
       },
-      { new: true }  // ✅ Updated document return karega
+      { new: true }
     );
 
     if (!updatedAppointment) {
@@ -195,7 +282,6 @@ router.put('/appointment/:id', auth, async (req, res) => {
     }
 
     console.log('✅ Client Updated Appointment:', updatedAppointment.appointmentId);
-    console.log('✅ New Docket Number:', updatedAppointment.docketNumber);
 
     res.redirect('/client/dashboard?success=Appointment updated successfully!');
   } catch (error) {
@@ -209,25 +295,42 @@ router.put('/appointment/:id', auth, async (req, res) => {
 // ============================================
 router.delete('/appointment/:id', auth, async (req, res) => {
   try {
-    const result = await Appointment.findOneAndDelete({
+    const appointment = await Appointment.findOne({
       _id: req.params.id,
       clientId: req.user._id
     });
-    if (!result) {
+    
+    if (!appointment) {
       return res.status(404).send('Appointment not found');
     }
+
+    // Delete associated files
+    const uploadDir = path.join(__dirname, '../uploads');
+    const files = [appointment.poFile, appointment.invoiceFile, appointment.ewayBillFile];
+    files.forEach(file => {
+      if (file) {
+        try {
+          const filePath = path.join(uploadDir, file);
+          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        } catch(e) {}
+      }
+    });
+
+    await Appointment.findOneAndDelete({
+      _id: req.params.id,
+      clientId: req.user._id
+    });
     
-    // ✅ Admin ko success message, Client ko bina msg ke redirect
     if (req.user.role === 'admin') {
       return res.redirect('/admin/dashboard?success=Appointment deleted successfully!');
     }
-    res.redirect('/client/dashboard');
+    res.redirect('/client/dashboard?success=Appointment deleted successfully!');
   } catch (error) {
     console.error('Delete Appointment Error:', error);
     if (req.user.role === 'admin') {
       return res.redirect('/admin/dashboard?error=Failed to delete appointment!');
     }
-    res.redirect('/client/dashboard');
+    res.redirect('/client/dashboard?error=Failed to delete appointment!');
   }
 });
 

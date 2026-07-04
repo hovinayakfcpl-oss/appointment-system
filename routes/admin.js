@@ -3,6 +3,8 @@ const router = express.Router();
 const { adminAuth } = require('../middleware/auth');
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
+const path = require('path');
+const fs = require('fs');
 
 // ============================================
 // ADMIN DASHBOARD
@@ -105,7 +107,7 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// PUT - Update Appointment (Admin Direct) ✅ NEW ROUTE
+// PUT - Update Appointment (Admin Direct)
 // ============================================
 router.put('/appointment/:id/admin-update', adminAuth, async (req, res) => {
   try {
@@ -141,7 +143,7 @@ router.put('/appointment/:id/admin-update', adminAuth, async (req, res) => {
         remarks: remarks || '',
         updatedAt: Date.now()
       },
-      { new: true }  // ✅ Updated document return karega
+      { new: true }
     );
 
     if (!updatedAppointment) {
@@ -300,6 +302,66 @@ router.delete('/appointment/:id', adminAuth, async (req, res) => {
   } catch (error) {
     console.error('Delete Appointment Error:', error);
     res.redirect('/admin/dashboard?error=Failed to delete appointment!');
+  }
+});
+
+// ============================================
+// GET - Download PO PDF
+// ============================================
+router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment || !appointment.poFile) {
+      return res.status(404).send('File not found');
+    }
+    const filePath = path.join(__dirname, '../uploads', appointment.poFile);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send('File not found');
+    }
+    res.download(filePath, appointment.poFileOriginalName || 'PO_Document.pdf');
+  } catch (error) {
+    console.error('Download Error:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+// ============================================
+// GET - Download Invoice PDF
+// ============================================
+router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment || !appointment.invoiceFile) {
+      return res.status(404).send('File not found');
+    }
+    const filePath = path.join(__dirname, '../uploads', appointment.invoiceFile);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send('File not found');
+    }
+    res.download(filePath, appointment.invoiceFileOriginalName || 'Invoice_Document.pdf');
+  } catch (error) {
+    console.error('Download Error:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+// ============================================
+// GET - Download E-Way Bill PDF
+// ============================================
+router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment || !appointment.ewayBillFile) {
+      return res.status(404).send('File not found');
+    }
+    const filePath = path.join(__dirname, '../uploads', appointment.ewayBillFile);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send('File not found');
+    }
+    res.download(filePath, appointment.ewayBillFileOriginalName || 'EWayBill_Document.pdf');
+  } catch (error) {
+    console.error('Download Error:', error);
+    res.status(500).send('Server error');
   }
 });
 

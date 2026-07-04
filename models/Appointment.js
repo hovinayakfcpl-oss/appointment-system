@@ -40,11 +40,37 @@ const AppointmentSchema = new mongoose.Schema({
     default: ''
   },
   // ===== FORWARDER FIELDS (ADMIN ONLY) =====
-  forwarderName: {                    // ✅ NEW - Forwarder Company Name
+  forwarderName: {
     type: String,
     default: ''
   },
-  forwarderLRNumber: {               // ✅ NEW - Forwarder LR Number
+  forwarderLRNumber: {
+    type: String,
+    default: ''
+  },
+  // =========================================
+  // ===== PDF FILE FIELDS (NEW) =====
+  poFile: {
+    type: String,
+    default: ''
+  },
+  poFileOriginalName: {
+    type: String,
+    default: ''
+  },
+  invoiceFile: {
+    type: String,
+    default: ''
+  },
+  invoiceFileOriginalName: {
+    type: String,
+    default: ''
+  },
+  ewayBillFile: {
+    type: String,
+    default: ''
+  },
+  ewayBillFileOriginalName: {
     type: String,
     default: ''
   },
