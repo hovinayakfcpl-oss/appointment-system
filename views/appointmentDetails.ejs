@@ -7,8 +7,11 @@
             </a>
             
             <% if (typeof user !== 'undefined' && user.role === 'admin') { %>
-                <a href="/admin/appointment/<%= appointment._id %>/edit-forwarder" class="btn" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; font-weight: 700; border: none; border-radius: 50px; padding: 10px 25px; box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; margin-left: 10px;">
-                    <i class="bi bi-pencil"></i> Edit Forwarder
+                <a href="/admin/appointment/<%= appointment._id %>/edit" class="btn" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; font-weight: 700; border: none; border-radius: 50px; padding: 10px 25px; box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; margin-left: 10px;">
+                    <i class="bi bi-pencil"></i> Edit Appointment
+                </a>
+                <a href="/admin/appointment/<%= appointment._id %>/edit-forwarder" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; font-weight: 600; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 10px 25px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; margin-left: 10px;">
+                    <i class="bi bi-truck"></i> Edit Forwarder
                 </a>
             <% } %>
         </div>
@@ -144,9 +147,16 @@
                                         <span style="font-weight: 600; font-size: 0.8rem;">PO PDF</span>
                                     </div>
                                     <% if (appointment.poFile) { %>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download/po" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 12px; font-size: 0.65rem; text-decoration: none; transition: all 0.3s ease;">
-                                            <i class="bi bi-download"></i> Download
-                                        </a>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <a href="/admin/appointment/<%= appointment._id %>/download/po" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                            <% if (typeof user !== 'undefined' && user.role === 'admin') { %>
+                                                <button type="button" class="btn btn-sm btn-danger delete-file" data-url="/admin/appointment/<%= appointment._id %>/file/po" style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            <% } %>
+                                        </div>
                                     <% } else { %>
                                         <span class="badge" style="background: rgba(10, 22, 40, 0.05); color: #999; font-size: 0.6rem; padding: 4px 10px;">Not Uploaded</span>
                                     <% } %>
@@ -160,9 +170,16 @@
                                         <span style="font-weight: 600; font-size: 0.8rem;">Invoice PDF</span>
                                     </div>
                                     <% if (appointment.invoiceFile) { %>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download/invoice" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 12px; font-size: 0.65rem; text-decoration: none; transition: all 0.3s ease;">
-                                            <i class="bi bi-download"></i> Download
-                                        </a>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <a href="/admin/appointment/<%= appointment._id %>/download/invoice" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                            <% if (typeof user !== 'undefined' && user.role === 'admin') { %>
+                                                <button type="button" class="btn btn-sm btn-danger delete-file" data-url="/admin/appointment/<%= appointment._id %>/file/invoice" style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            <% } %>
+                                        </div>
                                     <% } else { %>
                                         <span class="badge" style="background: rgba(10, 22, 40, 0.05); color: #999; font-size: 0.6rem; padding: 4px 10px;">Not Uploaded</span>
                                     <% } %>
@@ -176,15 +193,50 @@
                                         <span style="font-weight: 600; font-size: 0.8rem;">E-Way Bill PDF</span>
                                     </div>
                                     <% if (appointment.ewayBillFile) { %>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download/ewaybill" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 12px; font-size: 0.65rem; text-decoration: none; transition: all 0.3s ease;">
-                                            <i class="bi bi-download"></i> Download
-                                        </a>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <a href="/admin/appointment/<%= appointment._id %>/download/ewaybill" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                            <% if (typeof user !== 'undefined' && user.role === 'admin') { %>
+                                                <button type="button" class="btn btn-sm btn-danger delete-file" data-url="/admin/appointment/<%= appointment._id %>/file/ewaybill" style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            <% } %>
+                                        </div>
                                     <% } else { %>
                                         <span class="badge" style="background: rgba(10, 22, 40, 0.05); color: #999; font-size: 0.6rem; padding: 4px 10px;">Not Uploaded</span>
                                     <% } %>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- ===== POD SECTION ===== -->
+                        <% if (typeof user !== 'undefined' && user.role === 'admin') { %>
+                        <div class="row g-2 mt-2">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center justify-content-between p-2" style="background: #f8f4eb; border-radius: 8px; border-left: 3px solid #c9a84c;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-file-earmark-pdf" style="color: #c9a84c;"></i>
+                                        <span style="font-weight: 600; font-size: 0.8rem;">POD PDF</span>
+                                        <span class="badge" style="background: rgba(201, 168, 76, 0.1); color: #c62828; font-size: 0.5rem; padding: 2px 8px; border-radius: 20px;">Admin</span>
+                                    </div>
+                                    <% if (appointment.podFile) { %>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <a href="/admin/appointment/<%= appointment._id %>/download/pod" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger delete-file" data-url="/admin/appointment/<%= appointment._id %>/file/pod" style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    <% } else { %>
+                                        <span class="badge" style="background: rgba(10, 22, 40, 0.05); color: #999; font-size: 0.6rem; padding: 4px 10px;">Not Uploaded</span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+
                         <small style="color: rgba(10, 22, 40, 0.3); font-size: 0.6rem; margin-top: 5px; display: block;">
                             <i class="bi bi-info-circle"></i> Only visible to Admin users
                         </small>
@@ -255,6 +307,42 @@
     </div>
 </div>
 
+<!-- ===== DELETE FILE JAVASCRIPT ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-file').forEach(button => {
+        button.addEventListener('click', async function() {
+            const url = this.dataset.url;
+            
+            if (!confirm('Are you sure you want to delete this file?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ File deleted successfully!');
+                    location.reload();
+                } else {
+                    alert('❌ Error: ' + (result.error || 'Something went wrong'));
+                }
+            } catch (error) {
+                alert('❌ Error deleting file');
+                console.error(error);
+            }
+        });
+    });
+});
+</script>
+
 <!-- ===== EXTRA STYLES ===== -->
 <style>
     .detail-item {
@@ -290,17 +378,30 @@
         transform: translateY(-2px);
     }
     
-    /* Edit Forwarder Button Hover */
-    .btn[href*="edit-forwarder"]:hover {
+    /* Edit Button Hover */
+    .btn[href*="/edit"]:hover {
         transform: translateY(-3px) scale(1.02);
         box-shadow: 0 8px 40px rgba(201, 168, 76, 0.45) !important;
         background: linear-gradient(135deg, #e8d5a3, #c9a84c) !important;
+    }
+    
+    /* Edit Forwarder Button Hover */
+    .btn[href*="edit-forwarder"]:hover {
+        background: rgba(10, 22, 40, 0.1) !important;
+        border-color: rgba(10, 22, 40, 0.2) !important;
+        transform: translateY(-2px);
     }
     
     /* Download Button Hover */
     .btn[href*="/download/"]:hover {
         transform: translateY(-2px) scale(1.05);
         box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3) !important;
+    }
+    
+    /* Delete Button Hover */
+    .btn-danger:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3) !important;
     }
     
     /* Responsive */
@@ -317,6 +418,13 @@
         .btn[href="javascript:history.back()"] {
             width: 100%;
             text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .btn[href*="/edit"] {
+            width: 100%;
+            text-align: center;
+            margin-left: 0 !important;
             margin-bottom: 10px;
         }
         
@@ -338,6 +446,15 @@
         
         .detail-item label {
             font-size: 0.5rem !important;
+        }
+        
+        .d-flex.align-items-center.gap-1 {
+            flex-wrap: wrap !important;
+        }
+        
+        .btn-sm {
+            font-size: 0.55rem !important;
+            padding: 3px 8px !important;
         }
     }
 </style>
