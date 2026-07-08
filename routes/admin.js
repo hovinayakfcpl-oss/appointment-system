@@ -378,9 +378,10 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// PUT - Update Appointment (Admin Direct) with File Upload
+// ✅ FIXED: POST - Update Appointment (Admin Direct) with File Upload
+// ✅ CHANGED: router.put → router.post (method override issue fix)
 // ============================================
-router.put('/appointment/:id/admin-update', adminAuth, upload.fields([
+router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
   { name: 'poFile', maxCount: 1 },
   { name: 'invoiceFile', maxCount: 1 },
   { name: 'ewayBillFile', maxCount: 1 },
@@ -472,6 +473,11 @@ router.put('/appointment/:id/admin-update', adminAuth, upload.fields([
     }
 
     console.log('✅ Admin Update Success!');
+    console.log('✅ PO File:', updatedAppointment.poFile);
+    console.log('✅ Invoice File:', updatedAppointment.invoiceFile);
+    console.log('✅ E-Way Bill File:', updatedAppointment.ewayBillFile);
+    console.log('✅ POD File:', updatedAppointment.podFile);
+
     res.redirect('/admin/dashboard?success=Appointment updated successfully!');
   } catch (error) {
     console.error('❌ Admin Update Error:', error);
