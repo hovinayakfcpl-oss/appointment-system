@@ -16,9 +16,15 @@
                     </span>
                 </p>
             </div>
-            <a href="/admin/dashboard" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; font-weight: 600; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 12px 30px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem;">
-                <i class="bi bi-arrow-left"></i> Back to Dashboard
-            </a>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="/admin/dashboard" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; font-weight: 600; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 12px 30px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem;">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+                <!-- ===== View Client Details ===== -->
+                <a href="/admin/client/<%= typeof client !== 'undefined' ? client._id : '' %>" class="btn" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; font-weight: 700; border: none; border-radius: 50px; padding: 12px 30px; box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem;">
+                    <i class="bi bi-person"></i> Client Details
+                </a>
+            </div>
         </div>
         
         <!-- ===== SEARCH BAR ===== -->
@@ -28,7 +34,7 @@
                     <span class="input-group-text" style="background: #0a1628; color: #c9a84c; border: none; padding: 12px 20px; font-size: 1.1rem;">
                         <i class="bi bi-search"></i>
                     </span>
-                    <input type="text" id="clientAppSearchInput" class="form-control" placeholder="Search by PO Number or Docket Number..." style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 20px; border-radius: 0 12px 12px 0; transition: all 0.3s ease; font-size: 1rem;">
+                    <input type="text" id="clientAppSearchInput" class="form-control" placeholder="Search by PO, Docket, Invoice or Appointment ID..." style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 20px; border-radius: 0 12px 12px 0; transition: all 0.3s ease; font-size: 1rem;">
                 </div>
             </div>
             <div class="col-md-6 col-lg-7 text-md-end mt-2 mt-md-0">
@@ -92,7 +98,11 @@
                             </thead>
                             <tbody>
                                 <% appointments.forEach((app, index) => { %>
-                                    <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.06); transition: all 0.3s ease;" data-po="<%= app.poNumber.toLowerCase() %>" data-docket="<%= (app.docketNumber || '').toLowerCase() %>">
+                                    <tr style="border-bottom: 1px solid rgba(10, 22, 40, 0.06); transition: all 0.3s ease;" 
+                                        data-po="<%= app.poNumber.toLowerCase() %>" 
+                                        data-docket="<%= (app.docketNumber || '').toLowerCase() %>"
+                                        data-invoice="<%= app.invoiceNumber.toLowerCase() %>"
+                                        data-id="<%= app.appointmentId.toLowerCase() %>">
                                         <td style="padding: 14px 18px; vertical-align: middle;">
                                             <strong style="color: #0a1628; font-size: 0.9rem;"><%= app.appointmentId %></strong>
                                         </td>
@@ -122,32 +132,42 @@
                                             </span>
                                         </td>
                                         <td style="padding: 14px 18px; vertical-align: middle; text-align: center;">
-                                            <!-- View Details -->
-                                            <a href="/admin/appointment/<%= app._id %>" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem; margin-right: 3px;" title="View Details">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <!-- Edit Appointment (Admin) -->
-                                            <a href="/admin/appointment/<%= app._id %>/edit" class="btn btn-sm" style="background: rgba(52, 152, 219, 0.1); color: #2980b9; border: 1px solid rgba(52, 152, 219, 0.15); border-radius: 6px; padding: 6px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem; margin-right: 3px;" title="Edit Appointment">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </a>
-                                            <!-- Delete Appointment (Admin) -->
-                                            <form action="/admin/appointment/<%= app._id %>?_method=DELETE" method="POST" class="d-inline">
-                                                <button type="submit" class="btn btn-sm" style="background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.15); border-radius: 6px; padding: 6px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem; margin-right: 3px;" onclick="return confirm('Are you sure you want to delete this appointment?')" title="Delete Appointment">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-                                            <!-- Edit Forwarder -->
-                                            <a href="/admin/appointment/<%= app._id %>/edit-forwarder" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 12px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem; margin-right: 3px;" title="Edit Forwarder">
-                                                <i class="bi bi-truck"></i>
-                                            </a>
-                                            <!-- Status Dropdown -->
-                                            <form action="/admin/appointment/<%= app._id %>/status?_method=PUT" method="POST" class="d-inline">
-                                                <select name="status" class="form-select form-select-sm" style="border-radius: 6px; border: 2px solid rgba(201, 168, 76, 0.15); padding: 6px 10px; font-size: 0.7rem; font-weight: 600; background: white; color: #0a1628; cursor: pointer; transition: all 0.3s ease; min-width: 100px;" onchange="this.form.submit()">
-                                                    <option value="pending" <%= app.status === 'pending' ? 'selected' : '' %> style="color: #e65100;">⏳ Pending</option>
-                                                    <option value="confirmed" <%= app.status === 'confirmed' ? 'selected' : '' %> style="color: #00695c;">✅ Confirmed</option>
-                                                    <option value="completed" <%= app.status === 'completed' ? 'selected' : '' %> style="color: #2e7d32;">✔️ Completed</option>
-                                                </select>
-                                            </form>
+                                            <!-- ===== Action Buttons ===== -->
+                                            <div class="d-flex flex-wrap align-items-center justify-content-center gap-1">
+                                                <!-- View Details -->
+                                                <a href="/admin/appointment/<%= app._id %>" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 10px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem;" title="View Details">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                
+                                                <!-- Edit Appointment -->
+                                                <a href="/admin/appointment/<%= app._id %>/edit" class="btn btn-sm" style="background: rgba(52, 152, 219, 0.1); color: #2980b9; border: 1px solid rgba(52, 152, 219, 0.15); border-radius: 6px; padding: 6px 10px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem;" title="Edit Appointment">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                
+                                                <!-- Edit Forwarder -->
+                                                <a href="/admin/appointment/<%= app._id %>/edit-forwarder" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 10px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem;" title="Edit Forwarder">
+                                                    <i class="bi bi-truck"></i>
+                                                </a>
+                                                
+                                                <!-- Delete Appointment -->
+                                                <form action="/admin/appointment/<%= app._id %>" method="POST" class="d-inline">
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <button type="submit" class="btn btn-sm" style="background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.15); border-radius: 6px; padding: 6px 10px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem;" onclick="return confirm('Are you sure you want to delete this appointment?')" title="Delete Appointment">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <!-- ===== Status Dropdown ===== -->
+                                            <div class="mt-1">
+                                                <form action="/admin/appointment/<%= app._id %>/status" method="POST" class="d-inline">
+                                                    <input type="hidden" name="_method" value="PUT">
+                                                    <select name="status" class="form-select form-select-sm" style="border-radius: 6px; border: 2px solid rgba(201, 168, 76, 0.15); padding: 4px 8px; font-size: 0.65rem; font-weight: 600; background: white; color: #0a1628; cursor: pointer; transition: all 0.3s ease; min-width: 90px;" onchange="this.form.submit()">
+                                                        <option value="pending" <%= app.status === 'pending' ? 'selected' : '' %> style="color: #e65100;">⏳ Pending</option>
+                                                        <option value="confirmed" <%= app.status === 'confirmed' ? 'selected' : '' %> style="color: #00695c;">✅ Confirmed</option>
+                                                        <option value="completed" <%= app.status === 'completed' ? 'selected' : '' %> style="color: #2e7d32;">✔️ Completed</option>
+                                                    </select>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 <% }) %>
@@ -182,8 +202,13 @@ document.addEventListener('DOMContentLoaded', function() {
             rows.forEach(row => {
                 const poNumber = row.getAttribute('data-po') || '';
                 const docketNumber = row.getAttribute('data-docket') || '';
+                const invoiceNumber = row.getAttribute('data-invoice') || '';
+                const appointmentId = row.getAttribute('data-id') || '';
                 
-                if (poNumber.includes(searchTerm) || docketNumber.includes(searchTerm)) {
+                if (poNumber.includes(searchTerm) || 
+                    docketNumber.includes(searchTerm) || 
+                    invoiceNumber.includes(searchTerm) || 
+                    appointmentId.includes(searchTerm)) {
                     row.style.display = '';
                     visibleCount++;
                 } else {
@@ -207,11 +232,13 @@ document.addEventListener('DOMContentLoaded', function() {
     .table tbody tr:hover {
         background: rgba(201, 168, 76, 0.05) !important;
         transform: scale(1.01);
+        box-shadow: 0 2px 10px rgba(10, 22, 40, 0.04);
     }
     
     /* All Button Hover Effects */
     .table tbody a.btn-sm:hover {
-        transform: translateY(-2px) scale(1.05);
+        transform: translateY(-2px) scale(1.08);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
     
     .table tbody a.btn-sm[href*="edit-forwarder"]:hover {
@@ -230,6 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
         background: #e74c3c !important;
         color: white !important;
         border-color: #e74c3c !important;
+        transform: translateY(-2px) scale(1.08);
     }
     
     .table tbody a.btn-sm[href*="/appointment/"]:hover {
@@ -255,6 +283,13 @@ document.addEventListener('DOMContentLoaded', function() {
         background: rgba(10, 22, 40, 0.1) !important;
         border-color: rgba(10, 22, 40, 0.2) !important;
         transform: translateY(-2px);
+    }
+    
+    /* Client Details Button Hover */
+    .btn[href*="/admin/client/"]:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 40px rgba(201, 168, 76, 0.45) !important;
+        background: linear-gradient(135deg, #e8d5a3, #c9a84c) !important;
     }
     
     /* Status Badge Animation */
@@ -299,6 +334,11 @@ document.addEventListener('DOMContentLoaded', function() {
             font-size: 0.55rem !important;
             padding: 4px 8px !important;
         }
+        
+        .table tbody button.btn-sm {
+            font-size: 0.55rem !important;
+            padding: 4px 8px !important;
+        }
     }
     
     @media (max-width: 768px) {
@@ -307,7 +347,12 @@ document.addEventListener('DOMContentLoaded', function() {
             align-items: stretch !important;
         }
         
-        .d-flex.justify-content-between a {
+        .d-flex.justify-content-between .d-flex {
+            flex-direction: column !important;
+            width: 100% !important;
+        }
+        
+        .d-flex.justify-content-between .d-flex a {
             width: 100%;
             text-align: center;
         }
@@ -320,6 +365,22 @@ document.addEventListener('DOMContentLoaded', function() {
         .table tbody td {
             font-size: 0.65rem !important;
             padding: 8px 10px !important;
+        }
+        
+        .table tbody select.form-select {
+            min-width: 70px !important;
+            font-size: 0.5rem !important;
+            padding: 3px 6px !important;
+        }
+        
+        .table tbody a.btn-sm {
+            font-size: 0.5rem !important;
+            padding: 3px 6px !important;
+        }
+        
+        .table tbody button.btn-sm {
+            font-size: 0.5rem !important;
+            padding: 3px 6px !important;
         }
     }
     
@@ -341,18 +402,22 @@ document.addEventListener('DOMContentLoaded', function() {
         
         .table tbody select.form-select {
             min-width: 60px !important;
-            font-size: 0.5rem !important;
-            padding: 3px 6px !important;
+            font-size: 0.45rem !important;
+            padding: 2px 4px !important;
         }
         
         .table tbody a.btn-sm {
             font-size: 0.45rem !important;
-            padding: 3px 6px !important;
+            padding: 2px 5px !important;
         }
         
         .table tbody button.btn-sm {
             font-size: 0.45rem !important;
-            padding: 3px 6px !important;
+            padding: 2px 5px !important;
+        }
+        
+        .table tbody .d-flex.gap-1 {
+            gap: 2px !important;
         }
     }
 </style>

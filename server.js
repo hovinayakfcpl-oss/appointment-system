@@ -6,12 +6,12 @@ const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
 const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
-const cloudinary = require('cloudinary').v2; // ← ADD THIS
+const cloudinary = require('cloudinary').v2;
 
 const app = express();
 
 // ============================================
-// CLOUDINARY CONFIG (for download route)
+// CLOUDINARY CONFIG
 // ============================================
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -79,24 +79,83 @@ app.use('/client', clientRoutes);
 app.use('/admin', adminRoutes);
 
 // ============================================
-// 🆕 DOWNLOAD ROUTE - FIXES 401 ERROR
+// 📄 DOWNLOAD ROUTE - VIEW PDF IN BROWSER
+// ✅ FIXED: Using 'image' resource_type for proper PDF viewing
 // ============================================
 app.get('/download/:publicId', async (req, res) => {
     try {
         const { publicId } = req.params;
         
-        console.log('📥 Download requested for:', publicId);
+        console.log('📥 View PDF requested for:', publicId);
         
-        // Generate signed URL (valid for 60 seconds)
-        const signedUrl = cloudinary.url(publicId, {
+        // ✅ FIXED: Using 'image' resource_type
+        const url = cloudinary.url(publicId, {
             secure: true,
-            sign_url: true,
-            expires_at: Math.floor(Date.now() / 1000) + 60,
-            resource_type: 'raw'
+            resource_type: 'image', // ✅ CHANGED: 'raw' → 'image'
+            format: 'pdf'
         });
         
-        console.log('✅ Signed URL generated successfully');
-        res.redirect(signedUrl);
+        console.log('📄 PDF URL:', url);
+        
+        // Fetch the PDF from Cloudinary
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`Cloudinary error: ${response.status}`);
+        }
+        
+        const buffer = await response.arrayBuffer();
+        
+        // ✅ Set proper headers for PDF viewing
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${publicId}.pdf"`);
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        
+        res.send(Buffer.from(buffer));
+        
+    } catch (error) {
+        console.error('❌ View PDF error:', error);
+        res.status(500).send(`
+            <h2>❌ Failed to Load PDF</h2>
+            <p>Error: ${error.message}</p>
+            <p><a href="javascript:history.back()">← Go Back</a></p>
+        `);
+    }
+});
+
+// ============================================
+// 📥 DOWNLOAD ATTACHMENT ROUTE - Force Download
+// ============================================
+app.get('/download-attachment/:publicId', async (req, res) => {
+    try {
+        const { publicId } = req.params;
+        
+        console.log('📥 Download attachment requested for:', publicId);
+        
+        // ✅ FIXED: Using 'image' resource_type
+        const url = cloudinary.url(publicId, {
+            secure: true,
+            resource_type: 'image', // ✅ CHANGED: 'raw' → 'image'
+            format: 'pdf'
+        });
+        
+        console.log('📄 PDF URL:', url);
+        
+        // Fetch the PDF from Cloudinary
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`Cloudinary error: ${response.status}`);
+        }
+        
+        const buffer = await response.arrayBuffer();
+        
+        // ✅ Force download instead of view
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${publicId}.pdf"`);
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        
+        res.send(Buffer.from(buffer));
         
     } catch (error) {
         console.error('❌ Download error:', error);
@@ -109,39 +168,30 @@ app.get('/download/:publicId', async (req, res) => {
 });
 
 // ============================================
-// OPTIONAL: ALTERNATIVE DIRECT DOWNLOAD ROUTE
-// (Use this if redirect method doesn't work)
+// 🔗 SIGNED URL ROUTE (For private files)
 // ============================================
-app.get('/download-direct/:publicId', async (req, res) => {
+app.get('/download-signed/:publicId', async (req, res) => {
     try {
         const { publicId } = req.params;
         
-        // Get the Cloudinary URL
-        const url = cloudinary.url(publicId, {
+        console.log('🔗 Signed URL requested for:', publicId);
+        
+        // Generate signed URL (valid for 60 seconds)
+        const signedUrl = cloudinary.url(publicId, {
             secure: true,
-            resource_type: 'raw'
+            sign_url: true,
+            expires_at: Math.floor(Date.now() / 1000) + 60,
+            resource_type: 'image', // ✅ CHANGED: 'raw' → 'image'
+            format: 'pdf'
         });
         
-        console.log('📥 Direct downloading:', publicId);
-        
-        // Fetch the file from Cloudinary
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-            throw new Error(`Failed to fetch file: ${response.status}`);
-        }
-        
-        const buffer = await response.arrayBuffer();
-        
-        // Set headers for download
-        res.setHeader('Content-Disposition', `attachment; filename="${publicId}.pdf"`);
-        res.setHeader('Content-Type', 'application/pdf');
-        res.send(Buffer.from(buffer));
+        console.log('✅ Signed URL generated successfully');
+        res.redirect(signedUrl);
         
     } catch (error) {
-        console.error('❌ Direct download error:', error);
+        console.error('❌ Signed URL error:', error);
         res.status(500).send(`
-            <h2>❌ Download Failed</h2>
+            <h2>❌ Failed to Generate Download Link</h2>
             <p>Error: ${error.message}</p>
             <p><a href="javascript:history.back()">← Go Back</a></p>
         `);
@@ -161,5 +211,7 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📥 Download URL format: http://localhost:${PORT}/download/PUBLIC_ID`);
+    console.log(`📄 View PDF: http://localhost:${PORT}/download/PUBLIC_ID`);
+    console.log(`📥 Download: http://localhost:${PORT}/download-attachment/PUBLIC_ID`);
+    console.log(`🔗 Signed URL: http://localhost:${PORT}/download-signed/PUBLIC_ID`);
 });

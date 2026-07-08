@@ -17,14 +17,15 @@ console.log('✅ Cloudinary Config:', {
 });
 
 // ============================================
-// STORAGE - Cloudinary (RAW TYPE FOR PDF)
-// ✅ FIX: Added access_mode: 'public' to fix 401 download error
+// STORAGE - Cloudinary (IMAGE TYPE FOR PDF)
+// ✅ FIX 1: Changed resource_type from 'raw' to 'image' for proper PDF viewing
+// ✅ FIX 2: Added access_mode: 'public' to fix 401 download error
 // ============================================
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'appointment_documents',
-    resource_type: 'raw',
+    resource_type: 'image', // ✅ CHANGED: 'raw' → 'image' for proper PDF serving
     format: 'pdf',
     access_mode: 'public', // ✅ FIX: Makes files publicly downloadable
     public_id: (req, file) => {
@@ -92,24 +93,43 @@ const handleMulterError = (err, req, res, next) => {
 
 // ============================================
 // HELPER: Get public URL for file
+// ✅ FIXED: Using 'image' resource_type
 // ============================================
 const getFileUrl = (publicId) => {
   return cloudinary.url(publicId, {
     secure: true,
-    resource_type: 'raw'
+    resource_type: 'image' // ✅ CHANGED: 'raw' → 'image'
   });
 };
 
 // ============================================
 // HELPER: Get signed URL for secure download
+// ✅ FIXED: Using 'image' resource_type
 // ============================================
 const getSignedUrl = (publicId, expiresInSeconds = 60) => {
   return cloudinary.url(publicId, {
     secure: true,
     sign_url: true,
-    resource_type: 'raw',
+    resource_type: 'image', // ✅ CHANGED: 'raw' → 'image'
     expires_at: Math.floor(Date.now() / 1000) + expiresInSeconds
   });
+};
+
+// ============================================
+// HELPER: Get PDF download URL with proper headers
+// ============================================
+const getPdfUrl = (publicId, options = {}) => {
+  const { download = false, filename = null } = options;
+  
+  const url = cloudinary.url(publicId, {
+    secure: true,
+    resource_type: 'image',
+    format: 'pdf',
+    flags: download ? 'attachment' : undefined,
+    filename_override: filename || `${publicId}.pdf`
+  });
+  
+  return url;
 };
 
 // ============================================
@@ -119,3 +139,4 @@ module.exports = upload;
 module.exports.handleMulterError = handleMulterError;
 module.exports.getFileUrl = getFileUrl;
 module.exports.getSignedUrl = getSignedUrl;
+module.exports.getPdfUrl = getPdfUrl;

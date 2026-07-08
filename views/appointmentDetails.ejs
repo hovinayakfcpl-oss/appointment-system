@@ -148,10 +148,26 @@
                                     </div>
                                     <% if (appointment.poFile) { %>
                                         <div class="d-flex align-items-center gap-1">
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/po' : '/client/appointment/' + appointment._id + '/download/po' %>" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" title="Download">
+                                            <!-- ✅ VIEW PDF - Opens in browser -->
+                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/po' : '/client/appointment/' + appointment._id + '/download/po' %>" 
+                                               target="_blank" 
+                                               class="btn btn-sm" 
+                                               style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
+                                               title="View PDF">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <!-- ✅ DOWNLOAD PDF - Force download -->
+                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download-attachment/po' : '/client/appointment/' + appointment._id + '/download-attachment/po' %>" 
+                                               class="btn btn-sm" 
+                                               style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
+                                               title="Download">
                                                 <i class="bi bi-download"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger delete-file" data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/po' : '/client/appointment/' + appointment._id + '/file/po' %>" style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" title="Delete">
+                                            <!-- ✅ DELETE FILE -->
+                                            <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                    data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/po' : '/client/appointment/' + appointment._id + '/file/po' %>" 
+                                                    style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" 
+                                                    title="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -170,10 +186,26 @@
                                     </div>
                                     <% if (appointment.invoiceFile) { %>
                                         <div class="d-flex align-items-center gap-1">
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/invoice' : '/client/appointment/' + appointment._id + '/download/invoice' %>" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" title="Download">
+                                            <!-- ✅ VIEW PDF -->
+                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/invoice' : '/client/appointment/' + appointment._id + '/download/invoice' %>" 
+                                               target="_blank" 
+                                               class="btn btn-sm" 
+                                               style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
+                                               title="View PDF">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <!-- ✅ DOWNLOAD PDF -->
+                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download-attachment/invoice' : '/client/appointment/' + appointment._id + '/download-attachment/invoice' %>" 
+                                               class="btn btn-sm" 
+                                               style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
+                                               title="Download">
                                                 <i class="bi bi-download"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger delete-file" data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/invoice' : '/client/appointment/' + appointment._id + '/file/invoice' %>" style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" title="Delete">
+                                            <!-- ✅ DELETE FILE -->
+                                            <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                    data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/invoice' : '/client/appointment/' + appointment._id + '/file/invoice' %>" 
+                                                    style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" 
+                                                    title="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -192,10 +224,26 @@
                                     </div>
                                     <% if (appointment.ewayBillFile) { %>
                                         <div class="d-flex align-items-center gap-1">
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/ewaybill' : '/client/appointment/' + appointment._id + '/download/ewaybill' %>" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" title="Download">
+                                            <!-- ✅ VIEW PDF -->
+                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/ewaybill' : '/client/appointment/' + appointment._id + '/download/ewaybill' %>" 
+                                               target="_blank" 
+                                               class="btn btn-sm" 
+                                               style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
+                                               title="View PDF">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <!-- ✅ DOWNLOAD PDF -->
+                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download-attachment/ewaybill' : '/client/appointment/' + appointment._id + '/download-attachment/ewaybill' %>" 
+                                               class="btn btn-sm" 
+                                               style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
+                                               title="Download">
                                                 <i class="bi bi-download"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger delete-file" data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/ewaybill' : '/client/appointment/' + appointment._id + '/file/ewaybill' %>" style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" title="Delete">
+                                            <!-- ✅ DELETE FILE -->
+                                            <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                    data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/ewaybill' : '/client/appointment/' + appointment._id + '/file/ewaybill' %>" 
+                                                    style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" 
+                                                    title="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -206,7 +254,7 @@
                             </div>
                         </div>
 
-                        <!-- ===== POD SECTION - Client View Only (No Delete) ===== -->
+                        <!-- ===== POD SECTION ===== -->
                         <div class="row g-2 mt-2">
                             <div class="col-md-4">
                                 <div class="d-flex align-items-center justify-content-between p-2" style="background: #f8f4eb; border-radius: 8px; border-left: 3px solid #c9a84c;">
@@ -219,11 +267,27 @@
                                     </div>
                                     <% if (appointment.podFile) { %>
                                         <div class="d-flex align-items-center gap-1">
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/pod' : '/client/appointment/' + appointment._id + '/download/pod' %>" class="btn btn-sm" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" title="View">
+                                            <!-- ✅ VIEW PDF -->
+                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/pod' : '/client/appointment/' + appointment._id + '/download/pod' %>" 
+                                               target="_blank" 
+                                               class="btn btn-sm" 
+                                               style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
+                                               title="View PDF">
                                                 <i class="bi bi-eye"></i>
                                             </a>
+                                            <!-- ✅ DOWNLOAD PDF (if admin) -->
                                             <% if (typeof user !== 'undefined' && user.role === 'admin') { %>
-                                                <button type="button" class="btn btn-sm btn-danger delete-file" data-url="/admin/appointment/<%= appointment._id %>/file/pod" style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" title="Delete">
+                                                <a href="/admin/appointment/<%= appointment._id %>/download-attachment/pod" 
+                                                   class="btn btn-sm" 
+                                                   style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
+                                                   title="Download">
+                                                    <i class="bi bi-download"></i>
+                                                </a>
+                                                <!-- ✅ DELETE FILE (Admin only) -->
+                                                <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                        data-url="/admin/appointment/<%= appointment._id %>/file/pod" 
+                                                        style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" 
+                                                        title="Delete">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             <% } %>
@@ -237,6 +301,8 @@
                         
                         <small style="color: rgba(10, 22, 40, 0.3); font-size: 0.6rem; margin-top: 5px; display: block;">
                             <i class="bi bi-info-circle"></i> 
+                            <i class="bi bi-eye" style="color: #c9a84c;"></i> View = Open in browser | 
+                            <i class="bi bi-download" style="color: #2e7d32;"></i> Download = Save to device |
                             <%= typeof user !== 'undefined' && user.role === 'admin' ? 'Admin can delete all files' : 'POD is view only. Contact admin for changes.' %>
                         </small>
                     </div>
@@ -392,10 +458,16 @@ document.addEventListener('DOMContentLoaded', function() {
         transform: translateY(-2px);
     }
     
-    /* Download/View Button Hover */
+    /* View Button Hover */
     .btn[href*="/download/"]:hover {
         transform: translateY(-2px) scale(1.05);
         box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3) !important;
+    }
+    
+    /* Download Button Hover */
+    .btn[href*="download-attachment"]:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3) !important;
     }
     
     /* Delete Button Hover */

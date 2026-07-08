@@ -26,17 +26,28 @@
                 <!-- ===== DYNAMIC FORM ACTION ===== -->
                 <% 
                     let formAction = '/client/appointment';
+                    let formMethod = 'POST';
+                    let isEdit = false;
+                    
                     if (typeof appointment !== 'undefined' && appointment) {
+                        isEdit = true;
                         if (typeof user !== 'undefined' && user.role === 'admin') {
-                            formAction = '/admin/appointment/' + appointment._id + '/admin-update?_method=PUT';
+                            formAction = '/admin/appointment/' + appointment._id + '/admin-update';
+                            formMethod = 'POST';
                         } else {
-                            formAction = '/client/appointment/' + appointment._id + '?_method=PUT';
+                            formAction = '/client/appointment/' + appointment._id;
+                            formMethod = 'POST';
                         }
                     }
                 %>
                 
                 <!-- ===== FORM WITH enctype FOR FILE UPLOAD ===== -->
                 <form action="<%= formAction %>" method="POST" enctype="multipart/form-data">
+                    <!-- ===== METHOD OVERRIDE FOR PUT ===== -->
+                    <% if (isEdit) { %>
+                        <input type="hidden" name="_method" value="PUT">
+                    <% } %>
+                    
                     <div class="row g-3">
                         <!-- ===== APPOINTMENT ID ===== -->
                         <div class="col-md-6">
@@ -48,10 +59,16 @@
                                     <i class="bi bi-tag"></i>
                                 </span>
                                 <input type="text" name="appointmentId" class="form-control" 
-                                       value="<%= typeof appointmentId !== 'undefined' ? appointmentId : '' %>" 
+                                       value="<%= typeof appointmentId !== 'undefined' ? appointmentId : (typeof appointment !== 'undefined' && appointment ? appointment.appointmentId : '') %>" 
                                        placeholder="Enter Appointment ID" required
-                                       style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 18px; border-radius: 0 12px 12px 0; transition: all 0.3s ease; color: #0a1628; font-weight: 500;">
+                                       <%= isEdit ? 'readonly' : '' %>
+                                       style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 18px; border-radius: 0 12px 12px 0; transition: all 0.3s ease; color: #0a1628; font-weight: 500; <%= isEdit ? 'background: #f5f0e8;' : '' %>">
                             </div>
+                            <% if (isEdit) { %>
+                                <small style="color: rgba(10, 22, 40, 0.3); font-size: 0.6rem;">
+                                    <i class="bi bi-lock"></i> Appointment ID cannot be changed
+                                </small>
+                            <% } %>
                         </div>
                         
                         <!-- ===== PO NUMBER ===== -->
@@ -227,15 +244,20 @@
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-file-text" style="color: #c9a84c;"></i> PO PDF
                             </label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="file" name="poFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px; flex: 1;">
+                            <div>
+                                <input type="file" name="poFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
                                 <% if (typeof appointment !== 'undefined' && appointment && appointment.poFile) { %>
-                                    <button type="button" class="btn btn-sm btn-danger delete-file" data-id="<%= appointment._id %>" data-type="po" data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/po' : '/client/appointment/' + appointment._id + '/file/po' %>" style="border-radius: 50px; padding: 6px 14px; font-size: 0.65rem;">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; display: block; margin-top: 2px;">
-                                        <i class="bi bi-check-circle" style="color: #2e7d32;"></i> <%= appointment.poFileOriginalName || 'Uploaded' %>
-                                    </small>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
+                                            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
+                                            <%= appointment.poFileOriginalName || 'Uploaded' %>
+                                        </small>
+                                        <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/po' : '/client/appointment/' + appointment._id + '/file/po' %>" 
+                                                style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
                                 <% } %>
                             </div>
                         </div>
@@ -245,15 +267,20 @@
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-receipt" style="color: #c9a84c;"></i> Invoice PDF
                             </label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="file" name="invoiceFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px; flex: 1;">
+                            <div>
+                                <input type="file" name="invoiceFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
                                 <% if (typeof appointment !== 'undefined' && appointment && appointment.invoiceFile) { %>
-                                    <button type="button" class="btn btn-sm btn-danger delete-file" data-id="<%= appointment._id %>" data-type="invoice" data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/invoice' : '/client/appointment/' + appointment._id + '/file/invoice' %>" style="border-radius: 50px; padding: 6px 14px; font-size: 0.65rem;">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; display: block; margin-top: 2px;">
-                                        <i class="bi bi-check-circle" style="color: #2e7d32;"></i> <%= appointment.invoiceFileOriginalName || 'Uploaded' %>
-                                    </small>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
+                                            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
+                                            <%= appointment.invoiceFileOriginalName || 'Uploaded' %>
+                                        </small>
+                                        <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/invoice' : '/client/appointment/' + appointment._id + '/file/invoice' %>" 
+                                                style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
                                 <% } %>
                             </div>
                         </div>
@@ -263,15 +290,20 @@
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-truck" style="color: #c9a84c;"></i> E-Way Bill PDF
                             </label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="file" name="ewayBillFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px; flex: 1;">
+                            <div>
+                                <input type="file" name="ewayBillFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
                                 <% if (typeof appointment !== 'undefined' && appointment && appointment.ewayBillFile) { %>
-                                    <button type="button" class="btn btn-sm btn-danger delete-file" data-id="<%= appointment._id %>" data-type="ewaybill" data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/ewaybill' : '/client/appointment/' + appointment._id + '/file/ewaybill' %>" style="border-radius: 50px; padding: 6px 14px; font-size: 0.65rem;">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; display: block; margin-top: 2px;">
-                                        <i class="bi bi-check-circle" style="color: #2e7d32;"></i> <%= appointment.ewayBillFileOriginalName || 'Uploaded' %>
-                                    </small>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
+                                            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
+                                            <%= appointment.ewayBillFileOriginalName || 'Uploaded' %>
+                                        </small>
+                                        <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/ewaybill' : '/client/appointment/' + appointment._id + '/file/ewaybill' %>" 
+                                                style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
                                 <% } %>
                             </div>
                         </div>
@@ -279,13 +311,16 @@
                         <div class="col-12">
                             <small style="color: rgba(10, 22, 40, 0.3); font-size: 0.6rem;">
                                 <i class="bi bi-info-circle"></i> Only PDF files are allowed. Max size: 5MB per file.
+                                <% if (isEdit) { %>
+                                    Leave blank to keep existing files.
+                                <% } %>
                             </small>
                         </div>
                         
                         <!-- ============================================================ -->
                         <!-- ===== POD UPLOAD SECTION - ADMIN ONLY (ON EDIT PAGE) ===== -->
                         <!-- ============================================================ -->
-                        <% if (typeof user !== 'undefined' && user.role === 'admin' && typeof appointment !== 'undefined' && appointment) { %>
+                        <% if (typeof user !== 'undefined' && user.role === 'admin' && isEdit) { %>
                         <div class="col-12">
                             <hr style="border-color: rgba(201, 168, 76, 0.15);">
                             <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -297,15 +332,20 @@
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-file-check" style="color: #c9a84c;"></i> POD PDF
                             </label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="file" name="podFile" class="form-control" accept=".pdf" style="border: 2px solid #c9a84c; border-radius: 12px; padding: 8px 12px; flex: 1;">
+                            <div>
+                                <input type="file" name="podFile" class="form-control" accept=".pdf" style="border: 2px solid #c9a84c; border-radius: 12px; padding: 8px 12px;">
                                 <% if (typeof appointment !== 'undefined' && appointment && appointment.podFile) { %>
-                                    <button type="button" class="btn btn-sm btn-danger delete-file" data-id="<%= appointment._id %>" data-type="pod" data-url="/admin/appointment/<%= appointment._id %>/file/pod" style="border-radius: 50px; padding: 6px 14px; font-size: 0.65rem;">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; display: block; margin-top: 2px;">
-                                        <i class="bi bi-check-circle" style="color: #2e7d32;"></i> <%= appointment.podFileOriginalName || 'Uploaded' %>
-                                    </small>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
+                                            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
+                                            <%= appointment.podFileOriginalName || 'Uploaded' %>
+                                        </small>
+                                        <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                data-url="/admin/appointment/<%= appointment._id %>/file/pod" 
+                                                style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
                                 <% } %>
                             </div>
                         </div>
@@ -313,6 +353,7 @@
                         <div class="col-12">
                             <small style="color: rgba(10, 22, 40, 0.3); font-size: 0.6rem;">
                                 <i class="bi bi-info-circle"></i> Only PDF files are allowed. Max size: 5MB.
+                                Leave blank to keep existing file.
                             </small>
                         </div>
                         <% } %>
@@ -321,8 +362,8 @@
                         <!-- ===== BUTTONS ===== -->
                         <div class="col-12 mt-3">
                             <button type="submit" class="btn" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; font-weight: 700; border: none; border-radius: 50px; padding: 12px 35px; box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem;">
-                                <i class="bi bi-<%= typeof appointment !== 'undefined' && appointment ? 'check-circle' : 'save' %>"></i>
-                                <%= typeof appointment !== 'undefined' && appointment ? 'Update Appointment' : 'Create Appointment' %>
+                                <i class="bi bi-<%= isEdit ? 'check-circle' : 'save' %>"></i>
+                                <%= isEdit ? 'Update Appointment' : 'Create Appointment' %>
                             </button>
                             <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/dashboard' : '/client/dashboard' %>" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; font-weight: 600; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 12px 35px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; margin-left: 10px;">
                                 <i class="bi bi-x-circle"></i> Cancel
@@ -342,9 +383,15 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.delete-file').forEach(button => {
         button.addEventListener('click', async function() {
             const url = this.dataset.url;
-            const type = this.dataset.type;
             
-            if (!confirm(`Are you sure you want to delete this ${type.toUpperCase()} file?`)) {
+            if (!url) {
+                alert('❌ Error: Delete URL not found');
+                return;
+            }
+            
+            const fileName = this.closest('div')?.querySelector('small')?.textContent?.trim() || 'file';
+            
+            if (!confirm(`Are you sure you want to delete ${fileName}?`)) {
                 return;
             }
             
@@ -392,6 +439,11 @@ document.addEventListener('DOMContentLoaded', function() {
         box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.1) !important;
     }
     
+    .card-body input[type="file"]:hover {
+        border-color: #c9a84c !important;
+        background: rgba(201, 168, 76, 0.02);
+    }
+    
     .card-body .btn[type="submit"]:hover {
         transform: translateY(-3px) scale(1.02);
         box-shadow: 0 8px 40px rgba(201, 168, 76, 0.45) !important;
@@ -405,7 +457,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     .delete-file:hover {
-        transform: scale(1.05);
+        transform: scale(1.1);
+        box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
     }
     
     .card-body .form-label {
@@ -432,6 +485,30 @@ document.addEventListener('DOMContentLoaded', function() {
             opacity: 1;
             transform: translateY(0);
         }
+    }
+    
+    /* File input styling */
+    .card-body input[type="file"] {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .card-body input[type="file"]::file-selector-button {
+        background: linear-gradient(135deg, #0a1628, #1a2a4a);
+        color: #e8d5a3;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.7rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-right: 10px;
+    }
+    
+    .card-body input[type="file"]::file-selector-button:hover {
+        background: linear-gradient(135deg, #1a2a4a, #2a3a5a);
+        transform: scale(1.02);
     }
     
     @media (max-width: 768px) {
@@ -489,6 +566,11 @@ document.addEventListener('DOMContentLoaded', function() {
             font-size: 0.75rem !important;
         }
         
+        .card-body input[type="file"]::file-selector-button {
+            padding: 4px 10px !important;
+            font-size: 0.6rem !important;
+        }
+        
         .card-body .btn {
             font-size: 0.65rem !important;
             padding: 10px 20px !important;
@@ -496,7 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         .delete-file {
             font-size: 0.55rem !important;
-            padding: 4px 10px !important;
+            padding: 2px 8px !important;
         }
     }
 </style>

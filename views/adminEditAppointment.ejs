@@ -39,7 +39,9 @@
                 <% } %>
                 
                 <!-- ===== FORM ===== -->
-                <form action="/admin/appointment/<%= typeof appointment !== 'undefined' ? appointment._id : '' %>/admin-update?_method=PUT" method="POST" enctype="multipart/form-data">
+                <form action="/admin/appointment/<%= typeof appointment !== 'undefined' ? appointment._id : '' %>/admin-update" method="POST" enctype="multipart/form-data">
+                    <!-- ===== METHOD OVERRIDE ===== -->
+                    <input type="hidden" name="_method" value="PUT">
                     
                     <!-- ===== Appointment Info Card ===== -->
                     <div class="card mb-4" style="background: #f8f4eb; border-radius: 12px; border: 1px solid rgba(201, 168, 76, 0.1);">
@@ -221,6 +223,9 @@
                         <hr style="border-color: rgba(201, 168, 76, 0.15);">
                         <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
                             <i class="bi bi-file-pdf" style="color: #c9a84c;"></i> Attach Documents (PDF Only)
+                            <span style="color: rgba(10, 22, 40, 0.3); font-weight: 400; font-size: 0.6rem; text-transform: none;">
+                                - Leave blank to keep existing
+                            </span>
                         </h6>
                     </div>
                     
@@ -230,15 +235,27 @@
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-file-text" style="color: #c9a84c;"></i> PO PDF
                             </label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="file" name="poFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px; flex: 1;">
+                            <div>
+                                <input type="file" name="poFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
                                 <% if (typeof appointment !== 'undefined' && appointment && appointment.poFile) { %>
-                                    <button type="button" class="btn btn-sm btn-danger delete-file" data-id="<%= appointment._id %>" data-type="po" data-url="/admin/appointment/<%= appointment._id %>/file/po" style="border-radius: 50px; padding: 6px 14px; font-size: 0.65rem;">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; display: block; margin-top: 2px;">
-                                        <i class="bi bi-check-circle" style="color: #2e7d32;"></i> <%= appointment.poFileOriginalName || 'Uploaded' %>
-                                    </small>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
+                                            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
+                                            <%= appointment.poFileOriginalName || 'Uploaded' %>
+                                        </small>
+                                        <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                data-url="/admin/appointment/<%= appointment._id %>/file/po" 
+                                                style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <!-- ===== View Link ===== -->
+                                        <a href="/admin/appointment/<%= appointment._id %>/download/po" 
+                                           target="_blank" 
+                                           class="btn btn-sm" 
+                                           style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
                                 <% } %>
                             </div>
                         </div>
@@ -248,15 +265,27 @@
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-receipt" style="color: #c9a84c;"></i> Invoice PDF
                             </label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="file" name="invoiceFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px; flex: 1;">
+                            <div>
+                                <input type="file" name="invoiceFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
                                 <% if (typeof appointment !== 'undefined' && appointment && appointment.invoiceFile) { %>
-                                    <button type="button" class="btn btn-sm btn-danger delete-file" data-id="<%= appointment._id %>" data-type="invoice" data-url="/admin/appointment/<%= appointment._id %>/file/invoice" style="border-radius: 50px; padding: 6px 14px; font-size: 0.65rem;">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; display: block; margin-top: 2px;">
-                                        <i class="bi bi-check-circle" style="color: #2e7d32;"></i> <%= appointment.invoiceFileOriginalName || 'Uploaded' %>
-                                    </small>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
+                                            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
+                                            <%= appointment.invoiceFileOriginalName || 'Uploaded' %>
+                                        </small>
+                                        <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                data-url="/admin/appointment/<%= appointment._id %>/file/invoice" 
+                                                style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <!-- ===== View Link ===== -->
+                                        <a href="/admin/appointment/<%= appointment._id %>/download/invoice" 
+                                           target="_blank" 
+                                           class="btn btn-sm" 
+                                           style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
                                 <% } %>
                             </div>
                         </div>
@@ -266,15 +295,27 @@
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-truck" style="color: #c9a84c;"></i> E-Way Bill PDF
                             </label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="file" name="ewayBillFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px; flex: 1;">
+                            <div>
+                                <input type="file" name="ewayBillFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
                                 <% if (typeof appointment !== 'undefined' && appointment && appointment.ewayBillFile) { %>
-                                    <button type="button" class="btn btn-sm btn-danger delete-file" data-id="<%= appointment._id %>" data-type="ewaybill" data-url="/admin/appointment/<%= appointment._id %>/file/ewaybill" style="border-radius: 50px; padding: 6px 14px; font-size: 0.65rem;">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; display: block; margin-top: 2px;">
-                                        <i class="bi bi-check-circle" style="color: #2e7d32;"></i> <%= appointment.ewayBillFileOriginalName || 'Uploaded' %>
-                                    </small>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
+                                            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
+                                            <%= appointment.ewayBillFileOriginalName || 'Uploaded' %>
+                                        </small>
+                                        <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                data-url="/admin/appointment/<%= appointment._id %>/file/ewaybill" 
+                                                style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <!-- ===== View Link ===== -->
+                                        <a href="/admin/appointment/<%= appointment._id %>/download/ewaybill" 
+                                           target="_blank" 
+                                           class="btn btn-sm" 
+                                           style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
                                 <% } %>
                             </div>
                         </div>
@@ -283,6 +324,9 @@
                     <div class="col-12">
                         <small style="color: rgba(10, 22, 40, 0.3); font-size: 0.6rem;">
                             <i class="bi bi-info-circle"></i> Only PDF files are allowed. Max size: 5MB per file.
+                            <span style="display: block; margin-top: 2px;">
+                                <i class="bi bi-eye" style="color: #c9a84c;"></i> Click eye icon to view existing file.
+                            </span>
                         </small>
                     </div>
                     
@@ -301,15 +345,27 @@
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-file-check" style="color: #c9a84c;"></i> POD PDF
                             </label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="file" name="podFile" class="form-control" accept=".pdf" style="border: 2px solid #c9a84c; border-radius: 12px; padding: 8px 12px; flex: 1;">
+                            <div>
+                                <input type="file" name="podFile" class="form-control" accept=".pdf" style="border: 2px solid #c9a84c; border-radius: 12px; padding: 8px 12px;">
                                 <% if (typeof appointment !== 'undefined' && appointment && appointment.podFile) { %>
-                                    <button type="button" class="btn btn-sm btn-danger delete-file" data-id="<%= appointment._id %>" data-type="pod" data-url="/admin/appointment/<%= appointment._id %>/file/pod" style="border-radius: 50px; padding: 6px 14px; font-size: 0.65rem;">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.6rem; display: block; margin-top: 2px;">
-                                        <i class="bi bi-check-circle" style="color: #2e7d32;"></i> <%= appointment.podFileOriginalName || 'Uploaded' %>
-                                    </small>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
+                                            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
+                                            <%= appointment.podFileOriginalName || 'Uploaded' %>
+                                        </small>
+                                        <button type="button" class="btn btn-sm btn-danger delete-file" 
+                                                data-url="/admin/appointment/<%= appointment._id %>/file/pod" 
+                                                style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <!-- ===== View Link ===== -->
+                                        <a href="/admin/appointment/<%= appointment._id %>/download/pod" 
+                                           target="_blank" 
+                                           class="btn btn-sm" 
+                                           style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
                                 <% } %>
                             </div>
                         </div>
@@ -327,8 +383,11 @@
                         <button type="submit" class="btn" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; font-weight: 700; border: none; border-radius: 50px; padding: 12px 35px; box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem;">
                             <i class="bi bi-save"></i> Update Appointment
                         </button>
+                        <a href="/admin/appointment/<%= typeof appointment !== 'undefined' ? appointment._id : '' %>" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; font-weight: 600; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 12px 35px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; margin-left: 10px;">
+                            <i class="bi bi-arrow-left"></i> Back to Details
+                        </a>
                         <a href="/admin/dashboard" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; font-weight: 600; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 12px 35px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; margin-left: 10px;">
-                            <i class="bi bi-arrow-left"></i> Back to Dashboard
+                            <i class="bi bi-grid"></i> Dashboard
                         </a>
                     </div>
                     
@@ -344,9 +403,15 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.delete-file').forEach(button => {
         button.addEventListener('click', async function() {
             const url = this.dataset.url;
-            const type = this.dataset.type;
             
-            if (!confirm(`Are you sure you want to delete this ${type.toUpperCase()} file?`)) {
+            if (!url) {
+                alert('❌ Error: Delete URL not found');
+                return;
+            }
+            
+            const fileName = this.closest('div')?.querySelector('small')?.textContent?.trim() || 'file';
+            
+            if (!confirm(`Are you sure you want to delete ${fileName}?`)) {
                 return;
             }
             
@@ -364,7 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('✅ File deleted successfully!');
                     location.reload();
                 } else {
-                    alert('❌ Error: ' + result.error);
+                    alert('❌ Error: ' + (result.error || 'Something went wrong'));
                 }
             } catch (error) {
                 alert('❌ Error deleting file');
@@ -394,20 +459,45 @@ document.addEventListener('DOMContentLoaded', function() {
         box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.1) !important;
     }
     
+    .card-body input[type="file"]:hover {
+        border-color: #c9a84c !important;
+        background: rgba(201, 168, 76, 0.02);
+    }
+    
+    .card-body input[type="file"]::file-selector-button {
+        background: linear-gradient(135deg, #0a1628, #1a2a4a);
+        color: #e8d5a3;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.7rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-right: 10px;
+    }
+    
+    .card-body input[type="file"]::file-selector-button:hover {
+        background: linear-gradient(135deg, #1a2a4a, #2a3a5a);
+        transform: scale(1.02);
+    }
+    
     .card-body .btn[type="submit"]:hover {
         transform: translateY(-3px) scale(1.02);
         box-shadow: 0 8px 40px rgba(201, 168, 76, 0.45) !important;
         background: linear-gradient(135deg, #e8d5a3, #c9a84c) !important;
     }
     
-    .card-body .btn[href*="/admin/dashboard"]:hover {
+    .card-body .btn[href*="/admin/dashboard"]:hover,
+    .card-body .btn[href*="/admin/appointment/"]:hover {
         background: rgba(10, 22, 40, 0.1) !important;
         border-color: rgba(10, 22, 40, 0.2) !important;
         transform: translateY(-2px);
     }
     
     .delete-file:hover {
-        transform: scale(1.05);
+        transform: scale(1.1);
+        box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
     }
     
     .card-body .form-label {
@@ -436,6 +526,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    /* View button hover */
+    .btn[href*="/download/"]:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3) !important;
+    }
+    
     @media (max-width: 768px) {
         .card-body {
             padding: 20px !important;
@@ -449,7 +545,8 @@ document.addEventListener('DOMContentLoaded', function() {
             justify-content: center !important;
         }
         
-        .card-body .btn[href*="/admin/dashboard"] {
+        .card-body .btn[href*="/admin/dashboard"],
+        .card-body .btn[href*="/admin/appointment/"] {
             margin-left: 0 !important;
         }
         
@@ -473,11 +570,6 @@ document.addEventListener('DOMContentLoaded', function() {
             padding: 15px !important;
         }
         
-        .card-body .input-group-text {
-            padding: 10px 12px !important;
-            font-size: 0.8rem !important;
-        }
-        
         .card-body .form-control {
             padding: 10px 12px !important;
             font-size: 0.85rem !important;
@@ -493,6 +585,11 @@ document.addEventListener('DOMContentLoaded', function() {
             font-size: 0.75rem !important;
         }
         
+        .card-body input[type="file"]::file-selector-button {
+            padding: 4px 10px !important;
+            font-size: 0.6rem !important;
+        }
+        
         .card-body .btn {
             font-size: 0.65rem !important;
             padding: 10px 20px !important;
@@ -500,7 +597,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         .delete-file {
             font-size: 0.55rem !important;
-            padding: 4px 10px !important;
+            padding: 2px 8px !important;
+        }
+        
+        .btn[href*="/download/"] {
+            font-size: 0.55rem !important;
+            padding: 2px 8px !important;
         }
     }
 </style>
