@@ -1,84 +1,85 @@
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
+
 // ============================================
-// DOWNLOAD ROUTES - SIMPLE & WORKING
+// CLOUDINARY CONFIG
 // ============================================
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-// ===== DOWNLOAD PO PDF =====
-router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
-  try {
-    const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.poFile) {
-      return res.status(404).send('File not found');
+console.log('✅ Cloudinary Config:', {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'Not Set',
+  api_key: process.env.CLOUDINARY_API_KEY ? '✅ Set' : '❌ Not Set'
+});
+
+// ============================================
+// STORAGE - Cloudinary (RAW TYPE FOR PDF)
+// ============================================
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'appointment_documents',
+    resource_type: 'raw',
+    format: 'pdf',
+    public_id: (req, file) => {
+      const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      console.log('📄 Cloudinary Public ID:', uniqueName);
+      return uniqueName;
     }
-    
-    // ✅ Cloudinary URL - Direct redirect
-    if (appointment.poFile && appointment.poFile.includes('cloudinary')) {
-      console.log('📁 Cloudinary URL:', appointment.poFile);
-      return res.redirect(appointment.poFile);
-    }
-    
-    return res.status(404).send('File not found');
-  } catch (error) {
-    console.error('Download Error:', error);
-    res.status(500).send('Server error');
   }
 });
 
-// ===== DOWNLOAD INVOICE PDF =====
-router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
-  try {
-    const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.invoiceFile) {
-      return res.status(404).send('File not found');
-    }
-    
-    if (appointment.invoiceFile && appointment.invoiceFile.includes('cloudinary')) {
-      console.log('📁 Cloudinary URL:', appointment.invoiceFile);
-      return res.redirect(appointment.invoiceFile);
-    }
-    
-    return res.status(404).send('File not found');
-  } catch (error) {
-    console.error('Download Error:', error);
-    res.status(500).send('Server error');
+// ============================================
+// FILE FILTER - Only allow PDFs
+// ============================================
+const fileFilter = (req, file, cb) => {
+  console.log('📄 File received:', file.originalname);
+  console.log('📄 File mimetype:', file.mimetype);
+  
+  if (file.mimetype === 'application/pdf' || file.mimetype === 'application/x-pdf') {
+    console.log('✅ PDF file accepted:', file.originalname);
+    cb(null, true);
+  } else {
+    console.log('❌ File rejected - Not a PDF:', file.originalname);
+    cb(new Error('Only PDF files are allowed!'), false);
+  }
+};
+
+// ============================================
+// MULTER UPLOAD CONFIGURATION
+// ============================================
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit per file
   }
 });
 
-// ===== DOWNLOAD E-WAY BILL PDF =====
-router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => {
-  try {
-    const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.ewayBillFile) {
-      return res.status(404).send('File not found');
+// ============================================
+// ERROR HANDLING MIDDLEWARE
+// ============================================
+const handleMulterError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'FILE_TOO_LARGE') {
+      console.log('❌ File too large! Max size: 5MB');
+      return res.status(400).json({ error: 'File too large! Max size is 5MB.' });
     }
-    
-    if (appointment.ewayBillFile && appointment.ewayBillFile.includes('cloudinary')) {
-      console.log('📁 Cloudinary URL:', appointment.ewayBillFile);
-      return res.redirect(appointment.ewayBillFile);
-    }
-    
-    return res.status(404).send('File not found');
-  } catch (error) {
-    console.error('Download Error:', error);
-    res.status(500).send('Server error');
+    console.log('❌ Multer Error:', err.message);
+    return res.status(400).json({ error: err.message });
+  } else if (err) {
+    console.log('❌ Unknown Error:', err.message);
+    return res.status(500).json({ error: err.message });
   }
-});
+  next();
+};
 
-// ===== DOWNLOAD POD PDF =====
-router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
-  try {
-    const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.podFile) {
-      return res.status(404).send('File not found');
-    }
-    
-    if (appointment.podFile && appointment.podFile.includes('cloudinary')) {
-      console.log('📁 Cloudinary URL:', appointment.podFile);
-      return res.redirect(appointment.podFile);
-    }
-    
-    return res.status(404).send('File not found');
-  } catch (error) {
-    console.error('Download Error:', error);
-    res.status(500).send('Server error');
-  }
-});
+// ============================================
+// EXPORT
+// ============================================
+module.exports = upload;
+module.exports.handleMulterError = handleMulterError;
