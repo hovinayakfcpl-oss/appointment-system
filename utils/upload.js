@@ -1,39 +1,19 @@
 const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('cloudinary').v2;
+const path = require('path');
+const fs = require('fs');
 
 // ============================================
-// CLOUDINARY CONFIG
+// UPLOAD DIRECTORY SETUP
 // ============================================
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const uploadDir = path.join(__dirname, '../uploads');
 
-console.log('✅ Cloudinary Config:', {
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'Not Set',
-  api_key: process.env.CLOUDINARY_API_KEY ? '✅ Set' : '❌ Not Set'
-});
-
-// ============================================
-// STORAGE - Cloudinary (RAW TYPE FOR PDF)
-// ============================================
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'appointment_documents',
-    resource_type: 'raw',           // ✅ IMPORTANT: PDF ke liye 'raw' type
-    format: 'pdf',                  // ✅ PDF format specify karo
-    public_id: (req, file) => {
-      // Remove extension from filename for clean public_id
-      const originalName = file.originalname.replace(/\.[^/.]+$/, '');
-      const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + '-' + originalName;
-      console.log('📄 Cloudinary Public ID:', uniqueName);
-      return uniqueName;
-    }
-  }
-});
+// Create uploads directory if it doesn't exist
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log('✅ Uploads directory created at:', uploadDir);
+} else {
+  console.log('✅ Uploads directory already exists at:', uploadDir);
+}
 
 // ============================================
 // FILE FILTER - Only allow PDFs
@@ -50,6 +30,21 @@ const fileFilter = (req, file, cb) => {
     cb(new Error('Only PDF files are allowed!'), false);
   }
 };
+
+// ============================================
+// STORAGE CONFIGURATION
+// ============================================
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    console.log('📁 Saving file to:', uploadDir);
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + '-' + file.originalname;
+    console.log('📄 Generated filename:', uniqueName);
+    cb(null, uniqueName);
+  }
+});
 
 // ============================================
 // MULTER UPLOAD CONFIGURATION

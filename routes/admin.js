@@ -4,7 +4,8 @@ const { adminAuth } = require('../middleware/auth');
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
 const upload = require('../utils/upload');
-const cloudinary = require('cloudinary').v2;
+const path = require('path');
+const fs = require('fs');
 
 // ============================================
 // ADMIN DASHBOARD
@@ -136,16 +137,16 @@ router.put('/appointment/:id/admin-update', adminAuth, upload.fields([
       return res.redirect('/admin/dashboard?error=Please fill in all required fields');
     }
 
-    // Get uploaded files from Cloudinary
+    // Get uploaded files (Local filenames)
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
     const podFile = req.files?.podFile ? req.files.podFile[0] : null;
 
-    console.log('📄 PO File URL:', poFile ? poFile.path : 'No file');
-    console.log('📄 Invoice File URL:', invoiceFile ? invoiceFile.path : 'No file');
-    console.log('📄 E-Way Bill File URL:', ewayBillFile ? ewayBillFile.path : 'No file');
-    console.log('📄 POD File URL:', podFile ? podFile.path : 'No file');
+    console.log('📄 PO File:', poFile ? poFile.filename : 'No file');
+    console.log('📄 Invoice File:', invoiceFile ? invoiceFile.filename : 'No file');
+    console.log('📄 E-Way Bill File:', ewayBillFile ? ewayBillFile.filename : 'No file');
+    console.log('📄 POD File:', podFile ? podFile.filename : 'No file');
 
     // Find existing appointment
     const existingAppointment = await Appointment.findById(req.params.id);
@@ -153,7 +154,7 @@ router.put('/appointment/:id/admin-update', adminAuth, upload.fields([
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
 
-    // ✅ Admin direct update with file fields + POD (Cloudinary URLs)
+    // ✅ Admin direct update with file fields + POD (Local filenames)
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       req.params.id,
       {
@@ -167,13 +168,13 @@ router.put('/appointment/:id/admin-update', adminAuth, upload.fields([
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
-        poFile: poFile ? poFile.path : existingAppointment.poFile,
+        poFile: poFile ? poFile.filename : existingAppointment.poFile,
         poFileOriginalName: poFile ? poFile.originalname : existingAppointment.poFileOriginalName,
-        invoiceFile: invoiceFile ? invoiceFile.path : existingAppointment.invoiceFile,
+        invoiceFile: invoiceFile ? invoiceFile.filename : existingAppointment.invoiceFile,
         invoiceFileOriginalName: invoiceFile ? invoiceFile.originalname : existingAppointment.invoiceFileOriginalName,
-        ewayBillFile: ewayBillFile ? ewayBillFile.path : existingAppointment.ewayBillFile,
+        ewayBillFile: ewayBillFile ? ewayBillFile.filename : existingAppointment.ewayBillFile,
         ewayBillFileOriginalName: ewayBillFile ? ewayBillFile.originalname : existingAppointment.ewayBillFileOriginalName,
-        podFile: podFile ? podFile.path : existingAppointment.podFile,
+        podFile: podFile ? podFile.filename : existingAppointment.podFile,
         podFileOriginalName: podFile ? podFile.originalname : existingAppointment.podFileOriginalName,
         updatedAt: Date.now()
       },
@@ -331,27 +332,21 @@ router.delete('/appointment/:id', adminAuth, async (req, res) => {
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
     
-    // Delete from Cloudinary
+    // Delete associated files
+    const uploadDir = path.join(__dirname, '../uploads');
     const files = [
-      appointment.poFile,
-      appointment.invoiceFile,
+      appointment.poFile, 
+      appointment.invoiceFile, 
       appointment.ewayBillFile,
       appointment.podFile
     ];
-    
     files.forEach(file => {
       if (file) {
         try {
-          // Extract public ID from Cloudinary URL
-          const publicId = file.split('/').pop().split('.')[0];
-          if (publicId) {
-            cloudinary.uploader.destroy('appointment_documents/' + publicId)
-              .then(result => console.log('🗑️ Deleted from Cloudinary:', publicId))
-              .catch(err => console.log('⚠️ Cloudinary delete error:', err.message));
-          }
-        } catch(e) {
-          console.log('⚠️ Error deleting from Cloudinary:', e.message);
-        }
+          const filePath = path.join(uploadDir, file);
+          if (fs.existsSync(filePath)) { fs.unlinkSync(filePath); }
+          console.log('🗑️ Deleted file:', file);
+        } catch(e) {}
       }
     });
     
@@ -363,7 +358,7 @@ router.delete('/appointment/:id', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// DELETE - Delete Specific File (Admin - Cloudinary)
+// DELETE - Delete Specific File (Admin)
 // ============================================
 router.delete('/appointment/:id/file/:type', adminAuth, async (req, res) => {
   try {
@@ -376,43 +371,34 @@ router.delete('/appointment/:id/file/:type', adminAuth, async (req, res) => {
 
     let fileField = '';
     let nameField = '';
-    let fileUrl = '';
     
     switch(type) {
       case 'po':
         fileField = 'poFile';
         nameField = 'poFileOriginalName';
-        fileUrl = appointment.poFile;
         break;
       case 'invoice':
         fileField = 'invoiceFile';
         nameField = 'invoiceFileOriginalName';
-        fileUrl = appointment.invoiceFile;
         break;
       case 'ewaybill':
         fileField = 'ewayBillFile';
         nameField = 'ewayBillFileOriginalName';
-        fileUrl = appointment.ewayBillFile;
         break;
       case 'pod':
         fileField = 'podFile';
         nameField = 'podFileOriginalName';
-        fileUrl = appointment.podFile;
         break;
       default:
         return res.status(400).json({ error: 'Invalid file type' });
     }
 
-    // Delete from Cloudinary
-    if (fileUrl) {
-      try {
-        const publicId = fileUrl.split('/').pop().split('.')[0];
-        if (publicId) {
-          await cloudinary.uploader.destroy('appointment_documents/' + publicId);
-          console.log('🗑️ Deleted from Cloudinary:', publicId);
-        }
-      } catch(e) {
-        console.log('⚠️ Cloudinary delete error:', e.message);
+    // Delete file from server
+    if (appointment[fileField]) {
+      const filePath = path.join(__dirname, '../uploads', appointment[fileField]);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log('🗑️ Deleted file:', appointment[fileField]);
       }
     }
 
@@ -429,7 +415,7 @@ router.delete('/appointment/:id/file/:type', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// GET - Download PO PDF (Cloudinary - Raw)
+// GET - Download PO PDF (Local Storage)
 // ============================================
 router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
   try {
@@ -437,12 +423,12 @@ router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
     if (!appointment || !appointment.poFile) {
       return res.status(404).send('File not found');
     }
-    // ✅ Add 'raw' flag for PDF download
-    const downloadUrl = appointment.poFile.includes('?') 
-      ? appointment.poFile + '&raw=true' 
-      : appointment.poFile + '?raw=true';
-    console.log('📁 Downloading from:', downloadUrl);
-    res.redirect(downloadUrl);
+    const filePath = path.join(__dirname, '../uploads', appointment.poFile);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send('File not found on server');
+    }
+    console.log('📁 Downloading:', appointment.poFileOriginalName);
+    res.download(filePath, appointment.poFileOriginalName || 'PO_Document.pdf');
   } catch (error) {
     console.error('Download Error:', error);
     res.status(500).send('Server error');
@@ -450,7 +436,7 @@ router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// GET - Download Invoice PDF (Cloudinary - Raw)
+// GET - Download Invoice PDF (Local Storage)
 // ============================================
 router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
   try {
@@ -458,11 +444,12 @@ router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
     if (!appointment || !appointment.invoiceFile) {
       return res.status(404).send('File not found');
     }
-    const downloadUrl = appointment.invoiceFile.includes('?') 
-      ? appointment.invoiceFile + '&raw=true' 
-      : appointment.invoiceFile + '?raw=true';
-    console.log('📁 Downloading from:', downloadUrl);
-    res.redirect(downloadUrl);
+    const filePath = path.join(__dirname, '../uploads', appointment.invoiceFile);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send('File not found on server');
+    }
+    console.log('📁 Downloading:', appointment.invoiceFileOriginalName);
+    res.download(filePath, appointment.invoiceFileOriginalName || 'Invoice_Document.pdf');
   } catch (error) {
     console.error('Download Error:', error);
     res.status(500).send('Server error');
@@ -470,7 +457,7 @@ router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// GET - Download E-Way Bill PDF (Cloudinary - Raw)
+// GET - Download E-Way Bill PDF (Local Storage)
 // ============================================
 router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => {
   try {
@@ -478,11 +465,12 @@ router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => 
     if (!appointment || !appointment.ewayBillFile) {
       return res.status(404).send('File not found');
     }
-    const downloadUrl = appointment.ewayBillFile.includes('?') 
-      ? appointment.ewayBillFile + '&raw=true' 
-      : appointment.ewayBillFile + '?raw=true';
-    console.log('📁 Downloading from:', downloadUrl);
-    res.redirect(downloadUrl);
+    const filePath = path.join(__dirname, '../uploads', appointment.ewayBillFile);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send('File not found on server');
+    }
+    console.log('📁 Downloading:', appointment.ewayBillFileOriginalName);
+    res.download(filePath, appointment.ewayBillFileOriginalName || 'EWayBill_Document.pdf');
   } catch (error) {
     console.error('Download Error:', error);
     res.status(500).send('Server error');
@@ -490,7 +478,7 @@ router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => 
 });
 
 // ============================================
-// GET - Download POD PDF (Cloudinary - Raw)
+// GET - Download POD PDF (Local Storage)
 // ============================================
 router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
   try {
@@ -498,11 +486,12 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
     if (!appointment || !appointment.podFile) {
       return res.status(404).send('File not found');
     }
-    const downloadUrl = appointment.podFile.includes('?') 
-      ? appointment.podFile + '&raw=true' 
-      : appointment.podFile + '?raw=true';
-    console.log('📁 Downloading from:', downloadUrl);
-    res.redirect(downloadUrl);
+    const filePath = path.join(__dirname, '../uploads', appointment.podFile);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send('File not found on server');
+    }
+    console.log('📁 Downloading:', appointment.podFileOriginalName);
+    res.download(filePath, appointment.podFileOriginalName || 'POD_Document.pdf');
   } catch (error) {
     console.error('Download Error:', error);
     res.status(500).send('Server error');
