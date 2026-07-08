@@ -7,6 +7,7 @@ const upload = require('../utils/upload');
 const cloudinary = require('cloudinary').v2;
 const path = require('path');
 const fs = require('fs');
+const https = require('https'); // ✅ ADDED: For downloading files
 
 // ============================================
 // CLOUDINARY CONFIG
@@ -36,7 +37,7 @@ const getCloudinaryUrl = (publicId) => {
 };
 
 // ============================================
-// HELPER: Get download URL with proper headers
+// HELPER: Get download URL
 // ============================================
 const getDownloadUrl = (publicId) => {
     if (!publicId) return null;
@@ -46,6 +47,36 @@ const getDownloadUrl = (publicId) => {
     
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
     return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
+};
+
+// ============================================
+// HELPER: Download file from URL using https
+// ============================================
+const downloadFile = (url) => {
+    return new Promise((resolve, reject) => {
+        https.get(url, (response) => {
+            if (response.statusCode === 302 || response.statusCode === 301) {
+                // Handle redirect
+                https.get(response.headers.location, (redirectResponse) => {
+                    const chunks = [];
+                    redirectResponse.on('data', (chunk) => chunks.push(chunk));
+                    redirectResponse.on('end', () => resolve(Buffer.concat(chunks)));
+                    redirectResponse.on('error', reject);
+                }).on('error', reject);
+                return;
+            }
+            
+            if (response.statusCode !== 200) {
+                reject(new Error(`HTTP ${response.statusCode}`));
+                return;
+            }
+            
+            const chunks = [];
+            response.on('data', (chunk) => chunks.push(chunk));
+            response.on('end', () => resolve(Buffer.concat(chunks)));
+            response.on('error', reject);
+        }).on('error', reject);
+    });
 };
 
 // ============================================
@@ -153,7 +184,7 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
 
 // ============================================
 // 📥 FORCE DOWNLOAD ROUTES (Attachment)
-// ✅ FIXED: Using fetch + proper headers instead of fl_attachment
+// ✅ FIXED: Using https module instead of fetch
 // ============================================
 
 // ===== FORCE DOWNLOAD PO PDF =====
@@ -166,29 +197,21 @@ router.get('/appointment/:id/download-attachment/po', adminAuth, async (req, res
     
     console.log('📥 Force Download PO - public_id:', appointment.poFile);
     
-    // Get the Cloudinary URL
     const fileUrl = getDownloadUrl(appointment.poFile);
     console.log('📄 Download URL:', fileUrl);
     
-    // Fetch the file from Cloudinary
-    const response = await fetch(fileUrl);
-    if (!response.ok) {
-      throw new Error(`Cloudinary error: ${response.status}`);
-    }
+    // ✅ Download using https module
+    const buffer = await downloadFile(fileUrl);
     
-    // Get the file buffer
-    const buffer = await response.arrayBuffer();
-    
-    // Set proper headers for download
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${appointment.poFileOriginalName || 'PO_Document.pdf'}"`);
     res.setHeader('Cache-Control', 'public, max-age=3600');
     
-    return res.send(Buffer.from(buffer));
+    return res.send(buffer);
     
   } catch (error) {
     console.error('❌ Force Download PO Error:', error);
-    res.status(500).send('Server error: ' + error.message);
+    res.status(500).send(`Server error: ${error.message}`);
   }
 });
 
@@ -205,22 +228,17 @@ router.get('/appointment/:id/download-attachment/invoice', adminAuth, async (req
     const fileUrl = getDownloadUrl(appointment.invoiceFile);
     console.log('📄 Download URL:', fileUrl);
     
-    const response = await fetch(fileUrl);
-    if (!response.ok) {
-      throw new Error(`Cloudinary error: ${response.status}`);
-    }
-    
-    const buffer = await response.arrayBuffer();
+    const buffer = await downloadFile(fileUrl);
     
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${appointment.invoiceFileOriginalName || 'Invoice_Document.pdf'}"`);
     res.setHeader('Cache-Control', 'public, max-age=3600');
     
-    return res.send(Buffer.from(buffer));
+    return res.send(buffer);
     
   } catch (error) {
     console.error('❌ Force Download Invoice Error:', error);
-    res.status(500).send('Server error: ' + error.message);
+    res.status(500).send(`Server error: ${error.message}`);
   }
 });
 
@@ -237,22 +255,17 @@ router.get('/appointment/:id/download-attachment/ewaybill', adminAuth, async (re
     const fileUrl = getDownloadUrl(appointment.ewayBillFile);
     console.log('📄 Download URL:', fileUrl);
     
-    const response = await fetch(fileUrl);
-    if (!response.ok) {
-      throw new Error(`Cloudinary error: ${response.status}`);
-    }
-    
-    const buffer = await response.arrayBuffer();
+    const buffer = await downloadFile(fileUrl);
     
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${appointment.ewayBillFileOriginalName || 'EWayBill_Document.pdf'}"`);
     res.setHeader('Cache-Control', 'public, max-age=3600');
     
-    return res.send(Buffer.from(buffer));
+    return res.send(buffer);
     
   } catch (error) {
     console.error('❌ Force Download E-Way Bill Error:', error);
-    res.status(500).send('Server error: ' + error.message);
+    res.status(500).send(`Server error: ${error.message}`);
   }
 });
 
@@ -269,22 +282,17 @@ router.get('/appointment/:id/download-attachment/pod', adminAuth, async (req, re
     const fileUrl = getDownloadUrl(appointment.podFile);
     console.log('📄 Download URL:', fileUrl);
     
-    const response = await fetch(fileUrl);
-    if (!response.ok) {
-      throw new Error(`Cloudinary error: ${response.status}`);
-    }
-    
-    const buffer = await response.arrayBuffer();
+    const buffer = await downloadFile(fileUrl);
     
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${appointment.podFileOriginalName || 'POD_Document.pdf'}"`);
     res.setHeader('Cache-Control', 'public, max-age=3600');
     
-    return res.send(Buffer.from(buffer));
+    return res.send(buffer);
     
   } catch (error) {
     console.error('❌ Force Download POD Error:', error);
-    res.status(500).send('Server error: ' + error.message);
+    res.status(500).send(`Server error: ${error.message}`);
   }
 });
 
