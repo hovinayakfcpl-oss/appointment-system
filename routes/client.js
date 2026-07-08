@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
 const Appointment = require('../models/Appointment');
-const upload = require('../utils/upload');
 const fs = require('fs');
 const path = require('path');
 
@@ -47,18 +46,13 @@ router.get('/appointment/new', auth, (req, res) => {
 });
 
 // ============================================
-// POST - Create Appointment with File Upload
+// POST - Create Appointment (CLIENT - NO FILE UPLOAD)
 // ============================================
-router.post('/appointment', auth, upload.fields([
-  { name: 'poFile', maxCount: 1 },
-  { name: 'invoiceFile', maxCount: 1 },
-  { name: 'ewayBillFile', maxCount: 1 }
-]), async (req, res) => {
+router.post('/appointment', auth, async (req, res) => {
   try {
     // ===== DEBUG LOGS =====
-    console.log('📝 ===== CREATE APPOINTMENT =====');
+    console.log('📝 ===== CLIENT CREATE APPOINTMENT =====');
     console.log('📝 Request Body:', req.body);
-    console.log('📂 Files:', req.files ? Object.keys(req.files) : 'No files');
     
     const { 
       appointmentId, 
@@ -79,14 +73,6 @@ router.post('/appointment', auth, upload.fields([
     // Validation
     if (!appointmentId || !poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
       console.log('❌ Validation failed! Missing required fields.');
-      // Delete uploaded files if validation fails
-      if (req.files) {
-        Object.values(req.files).forEach(fileArray => {
-          fileArray.forEach(file => {
-            try { fs.unlinkSync(file.path); } catch(e) {}
-          });
-        });
-      }
       return res.render('clientAppointmentForm', {
         title: 'New Appointment',
         user: req.user,
@@ -100,14 +86,6 @@ router.post('/appointment', auth, upload.fields([
     const existingAppointment = await Appointment.findOne({ appointmentId });
     if (existingAppointment) {
       console.log('❌ Appointment ID already exists:', appointmentId);
-      // Delete uploaded files
-      if (req.files) {
-        Object.values(req.files).forEach(fileArray => {
-          fileArray.forEach(file => {
-            try { fs.unlinkSync(file.path); } catch(e) {}
-          });
-        });
-      }
       return res.render('clientAppointmentForm', {
         title: 'New Appointment',
         user: req.user,
@@ -117,15 +95,8 @@ router.post('/appointment', auth, upload.fields([
       });
     }
 
-    // Get uploaded file paths
-    const poFile = req.files?.poFile ? req.files.poFile[0] : null;
-    const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
-    const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
-
-    console.log('📄 PO File:', poFile ? poFile.filename : 'No file');
-    console.log('📄 Invoice File:', invoiceFile ? invoiceFile.filename : 'No file');
-    console.log('📄 E-Way Bill File:', ewayBillFile ? ewayBillFile.filename : 'No file');
-
+    // ===== CLIENT: NO FILE UPLOAD =====
+    // Client sirf form fields bhar sakta hai, files nahi upload kar sakta
     const appointment = new Appointment({
       clientId: req.user._id,
       appointmentId,
@@ -139,13 +110,8 @@ router.post('/appointment', auth, upload.fields([
       deliveryDate,
       deliveryAddress,
       remarks: remarks || '',
-      status: 'pending',
-      poFile: poFile ? poFile.filename : '',
-      poFileOriginalName: poFile ? poFile.originalname : '',
-      invoiceFile: invoiceFile ? invoiceFile.filename : '',
-      invoiceFileOriginalName: invoiceFile ? invoiceFile.originalname : '',
-      ewayBillFile: ewayBillFile ? ewayBillFile.filename : '',
-      ewayBillFileOriginalName: ewayBillFile ? ewayBillFile.originalname : ''
+      status: 'pending'
+      // ⚠️ NO FILE FIELDS - ONLY ADMIN CAN UPLOAD FILES
     });
 
     await appointment.save();
@@ -158,14 +124,6 @@ router.post('/appointment', auth, upload.fields([
     res.redirect('/client/dashboard?success=Appointment created successfully!');
   } catch (error) {
     console.error('❌ Create Appointment Error:', error);
-    // Delete uploaded files if error occurs
-    if (req.files) {
-      Object.values(req.files).forEach(fileArray => {
-        fileArray.forEach(file => {
-          try { fs.unlinkSync(file.path); } catch(e) {}
-        });
-      });
-    }
     res.render('clientAppointmentForm', {
       title: 'New Appointment',
       user: req.user,
@@ -201,18 +159,13 @@ router.get('/appointment/:id/edit', auth, async (req, res) => {
 });
 
 // ============================================
-// PUT - Update Appointment (Client Only)
+// PUT - Update Appointment (CLIENT - NO FILE UPLOAD)
 // ============================================
-router.put('/appointment/:id', auth, upload.fields([
-  { name: 'poFile', maxCount: 1 },
-  { name: 'invoiceFile', maxCount: 1 },
-  { name: 'ewayBillFile', maxCount: 1 }
-]), async (req, res) => {
+router.put('/appointment/:id', auth, async (req, res) => {
   try {
     // ===== DEBUG LOGS =====
-    console.log('📝 ===== UPDATE APPOINTMENT =====');
+    console.log('📝 ===== CLIENT UPDATE APPOINTMENT =====');
     console.log('📝 Request Body:', req.body);
-    console.log('📂 Files:', req.files ? Object.keys(req.files) : 'No files');
 
     const { 
       poNumber, 
@@ -249,39 +202,8 @@ router.put('/appointment/:id', auth, upload.fields([
       return res.redirect('/client/dashboard?error=Appointment not found!');
     }
 
-    // Get uploaded file paths
-    const poFile = req.files?.poFile ? req.files.poFile[0] : null;
-    const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
-    const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
-
-    console.log('📄 PO File:', poFile ? poFile.filename : 'No file');
-    console.log('📄 Invoice File:', invoiceFile ? invoiceFile.filename : 'No file');
-    console.log('📄 E-Way Bill File:', ewayBillFile ? ewayBillFile.filename : 'No file');
-
-    // Delete old files if new ones are uploaded
-    if (poFile && existingAppointment.poFile) {
-      try {
-        const oldFilePath = path.join(__dirname, '../uploads', existingAppointment.poFile);
-        if (fs.existsSync(oldFilePath)) fs.unlinkSync(oldFilePath);
-        console.log('🗑️ Deleted old PO file:', existingAppointment.poFile);
-      } catch(e) {}
-    }
-    if (invoiceFile && existingAppointment.invoiceFile) {
-      try {
-        const oldFilePath = path.join(__dirname, '../uploads', existingAppointment.invoiceFile);
-        if (fs.existsSync(oldFilePath)) fs.unlinkSync(oldFilePath);
-        console.log('🗑️ Deleted old Invoice file:', existingAppointment.invoiceFile);
-      } catch(e) {}
-    }
-    if (ewayBillFile && existingAppointment.ewayBillFile) {
-      try {
-        const oldFilePath = path.join(__dirname, '../uploads', existingAppointment.ewayBillFile);
-        if (fs.existsSync(oldFilePath)) fs.unlinkSync(oldFilePath);
-        console.log('🗑️ Deleted old E-Way Bill file:', existingAppointment.ewayBillFile);
-      } catch(e) {}
-    }
-
-    // Update appointment
+    // ===== CLIENT: NO FILE UPLOAD =====
+    // Sirf form fields update karo, files nahi
     const updatedAppointment = await Appointment.findOneAndUpdate(
       { _id: req.params.id, clientId: req.user._id },
       {
@@ -295,13 +217,8 @@ router.put('/appointment/:id', auth, upload.fields([
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
-        poFile: poFile ? poFile.filename : existingAppointment.poFile,
-        poFileOriginalName: poFile ? poFile.originalname : existingAppointment.poFileOriginalName,
-        invoiceFile: invoiceFile ? invoiceFile.filename : existingAppointment.invoiceFile,
-        invoiceFileOriginalName: invoiceFile ? invoiceFile.originalname : existingAppointment.invoiceFileOriginalName,
-        ewayBillFile: ewayBillFile ? ewayBillFile.filename : existingAppointment.ewayBillFile,
-        ewayBillFileOriginalName: ewayBillFile ? ewayBillFile.originalname : existingAppointment.ewayBillFileOriginalName,
         updatedAt: Date.now()
+        // ⚠️ FILE FIELDS NOT UPDATED - ONLY ADMIN CAN UPDATE FILES
       },
       { new: true }
     );
@@ -310,7 +227,7 @@ router.put('/appointment/:id', auth, upload.fields([
       return res.redirect('/client/dashboard?error=Appointment not found!');
     }
 
-    console.log('✅ Appointment Updated Successfully!');
+    console.log('✅ Client Update Success!');
     console.log('✅ Docket Number saved:', updatedAppointment.docketNumber);
 
     res.redirect('/client/dashboard?success=Appointment updated successfully!');
@@ -333,19 +250,6 @@ router.delete('/appointment/:id', auth, async (req, res) => {
     if (!appointment) {
       return res.status(404).send('Appointment not found');
     }
-
-    // Delete associated files
-    const uploadDir = path.join(__dirname, '../uploads');
-    const files = [appointment.poFile, appointment.invoiceFile, appointment.ewayBillFile];
-    files.forEach(file => {
-      if (file) {
-        try {
-          const filePath = path.join(uploadDir, file);
-          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-          console.log('🗑️ Deleted file:', file);
-        } catch(e) {}
-      }
-    });
 
     await Appointment.findOneAndDelete({
       _id: req.params.id,
