@@ -5,8 +5,6 @@ const User = require('../models/User');
 const Appointment = require('../models/Appointment');
 const upload = require('../utils/upload');
 const cloudinary = require('cloudinary').v2;
-const path = require('path');
-const fs = require('fs');
 
 // ============================================
 // ADMIN DASHBOARD
@@ -431,7 +429,7 @@ router.delete('/appointment/:id/file/:type', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// GET - Download PO PDF (Cloudinary)
+// GET - Download PO PDF (Cloudinary - Raw)
 // ============================================
 router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
   try {
@@ -439,8 +437,12 @@ router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
     if (!appointment || !appointment.poFile) {
       return res.status(404).send('File not found');
     }
-    console.log('📁 Redirecting to:', appointment.poFile);
-    res.redirect(appointment.poFile);
+    // ✅ Add 'raw' flag for PDF download
+    const downloadUrl = appointment.poFile.includes('?') 
+      ? appointment.poFile + '&raw=true' 
+      : appointment.poFile + '?raw=true';
+    console.log('📁 Downloading from:', downloadUrl);
+    res.redirect(downloadUrl);
   } catch (error) {
     console.error('Download Error:', error);
     res.status(500).send('Server error');
@@ -448,7 +450,7 @@ router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// GET - Download Invoice PDF (Cloudinary)
+// GET - Download Invoice PDF (Cloudinary - Raw)
 // ============================================
 router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
   try {
@@ -456,8 +458,11 @@ router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
     if (!appointment || !appointment.invoiceFile) {
       return res.status(404).send('File not found');
     }
-    console.log('📁 Redirecting to:', appointment.invoiceFile);
-    res.redirect(appointment.invoiceFile);
+    const downloadUrl = appointment.invoiceFile.includes('?') 
+      ? appointment.invoiceFile + '&raw=true' 
+      : appointment.invoiceFile + '?raw=true';
+    console.log('📁 Downloading from:', downloadUrl);
+    res.redirect(downloadUrl);
   } catch (error) {
     console.error('Download Error:', error);
     res.status(500).send('Server error');
@@ -465,7 +470,7 @@ router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// GET - Download E-Way Bill PDF (Cloudinary)
+// GET - Download E-Way Bill PDF (Cloudinary - Raw)
 // ============================================
 router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => {
   try {
@@ -473,8 +478,11 @@ router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => 
     if (!appointment || !appointment.ewayBillFile) {
       return res.status(404).send('File not found');
     }
-    console.log('📁 Redirecting to:', appointment.ewayBillFile);
-    res.redirect(appointment.ewayBillFile);
+    const downloadUrl = appointment.ewayBillFile.includes('?') 
+      ? appointment.ewayBillFile + '&raw=true' 
+      : appointment.ewayBillFile + '?raw=true';
+    console.log('📁 Downloading from:', downloadUrl);
+    res.redirect(downloadUrl);
   } catch (error) {
     console.error('Download Error:', error);
     res.status(500).send('Server error');
@@ -482,7 +490,7 @@ router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => 
 });
 
 // ============================================
-// GET - Download POD PDF (Cloudinary)
+// GET - Download POD PDF (Cloudinary - Raw)
 // ============================================
 router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
   try {
@@ -490,8 +498,11 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
     if (!appointment || !appointment.podFile) {
       return res.status(404).send('File not found');
     }
-    console.log('📁 Redirecting to:', appointment.podFile);
-    res.redirect(appointment.podFile);
+    const downloadUrl = appointment.podFile.includes('?') 
+      ? appointment.podFile + '&raw=true' 
+      : appointment.podFile + '?raw=true';
+    console.log('📁 Downloading from:', downloadUrl);
+    res.redirect(downloadUrl);
   } catch (error) {
     console.error('Download Error:', error);
     res.status(500).send('Server error');

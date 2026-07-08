@@ -17,15 +17,18 @@ console.log('✅ Cloudinary Config:', {
 });
 
 // ============================================
-// STORAGE - Cloudinary
+// STORAGE - Cloudinary (RAW TYPE FOR PDF)
 // ============================================
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'appointment_documents',
-    allowed_formats: ['pdf'],
+    resource_type: 'raw',           // ✅ IMPORTANT: PDF ke liye 'raw' type
+    format: 'pdf',                  // ✅ PDF format specify karo
     public_id: (req, file) => {
-      const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      // Remove extension from filename for clean public_id
+      const originalName = file.originalname.replace(/\.[^/.]+$/, '');
+      const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + '-' + originalName;
       console.log('📄 Cloudinary Public ID:', uniqueName);
       return uniqueName;
     }
