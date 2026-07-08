@@ -327,6 +327,69 @@ router.put('/appointment/:id', auth, upload.fields([
 });
 
 // ============================================
+// DELETE - Delete Specific File (Client)
+// ============================================
+router.delete('/appointment/:id/file/:type', auth, async (req, res) => {
+  try {
+    const { id, type } = req.params;
+    
+    // ✅ Client can only delete: po, invoice, ewaybill (NOT pod)
+    const allowedTypes = ['po', 'invoice', 'ewaybill'];
+    if (!allowedTypes.includes(type)) {
+      return res.status(403).json({ error: 'You are not authorized to delete this file' });
+    }
+
+    const appointment = await Appointment.findOne({
+      _id: id,
+      clientId: req.user._id
+    });
+    
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    let fileField = '';
+    let nameField = '';
+    
+    switch(type) {
+      case 'po':
+        fileField = 'poFile';
+        nameField = 'poFileOriginalName';
+        break;
+      case 'invoice':
+        fileField = 'invoiceFile';
+        nameField = 'invoiceFileOriginalName';
+        break;
+      case 'ewaybill':
+        fileField = 'ewayBillFile';
+        nameField = 'ewayBillFileOriginalName';
+        break;
+      default:
+        return res.status(400).json({ error: 'Invalid file type' });
+    }
+
+    // Delete file from server
+    if (appointment[fileField]) {
+      const filePath = path.join(__dirname, '../uploads', appointment[fileField]);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log('🗑️ Client deleted file:', appointment[fileField]);
+      }
+    }
+
+    // Clear fields in database
+    appointment[fileField] = '';
+    appointment[nameField] = '';
+    await appointment.save();
+
+    res.json({ success: true, message: 'File deleted successfully' });
+  } catch (error) {
+    console.error('Delete File Error:', error);
+    res.status(500).json({ error: 'Failed to delete file' });
+  }
+});
+
+// ============================================
 // DELETE - Delete Appointment
 // ============================================
 router.delete('/appointment/:id', auth, async (req, res) => {
@@ -340,7 +403,7 @@ router.delete('/appointment/:id', auth, async (req, res) => {
       return res.status(404).send('Appointment not found');
     }
 
-    // Delete associated files
+    // Delete associated files (only PO, Invoice, E-Way Bill - not POD)
     const uploadDir = path.join(__dirname, '../uploads');
     const files = [appointment.poFile, appointment.invoiceFile, appointment.ewayBillFile];
     files.forEach(file => {

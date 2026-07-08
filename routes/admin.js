@@ -104,12 +104,13 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// PUT - Update Appointment (Admin Direct) with File Upload
+// PUT - Update Appointment (Admin Direct) with File Upload + POD
 // ============================================
 router.put('/appointment/:id/admin-update', adminAuth, upload.fields([
   { name: 'poFile', maxCount: 1 },
   { name: 'invoiceFile', maxCount: 1 },
-  { name: 'ewayBillFile', maxCount: 1 }
+  { name: 'ewayBillFile', maxCount: 1 },
+  { name: 'podFile', maxCount: 1 }
 ]), async (req, res) => {
   try {
     console.log('📝 ===== ADMIN UPDATE =====');
@@ -140,10 +141,12 @@ router.put('/appointment/:id/admin-update', adminAuth, upload.fields([
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
+    const podFile = req.files?.podFile ? req.files.podFile[0] : null;
 
     console.log('📄 PO File:', poFile ? poFile.filename : 'No file');
     console.log('📄 Invoice File:', invoiceFile ? invoiceFile.filename : 'No file');
     console.log('📄 E-Way Bill File:', ewayBillFile ? ewayBillFile.filename : 'No file');
+    console.log('📄 POD File:', podFile ? podFile.filename : 'No file');
 
     // Find existing appointment
     const existingAppointment = await Appointment.findById(req.params.id);
@@ -173,8 +176,15 @@ router.put('/appointment/:id/admin-update', adminAuth, upload.fields([
         console.log('🗑️ Deleted old E-Way Bill file');
       } catch(e) { console.log('Delete error:', e.message); }
     }
+    if (podFile && existingAppointment.podFile) {
+      try { 
+        const oldPath = path.join(__dirname, '../uploads', existingAppointment.podFile);
+        if (fs.existsSync(oldPath)) { fs.unlinkSync(oldPath); }
+        console.log('🗑️ Deleted old POD file');
+      } catch(e) { console.log('Delete error:', e.message); }
+    }
 
-    // ✅ Admin direct update with file fields
+    // ✅ Admin direct update with file fields + POD
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       req.params.id,
       {
@@ -194,6 +204,8 @@ router.put('/appointment/:id/admin-update', adminAuth, upload.fields([
         invoiceFileOriginalName: invoiceFile ? invoiceFile.originalname : existingAppointment.invoiceFileOriginalName,
         ewayBillFile: ewayBillFile ? ewayBillFile.filename : existingAppointment.ewayBillFile,
         ewayBillFileOriginalName: ewayBillFile ? ewayBillFile.originalname : existingAppointment.ewayBillFileOriginalName,
+        podFile: podFile ? podFile.filename : existingAppointment.podFile,
+        podFileOriginalName: podFile ? podFile.originalname : existingAppointment.podFileOriginalName,
         updatedAt: Date.now()
       },
       { new: true }
@@ -350,21 +362,85 @@ router.delete('/appointment/:id', adminAuth, async (req, res) => {
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
     
-    // Delete associated files
-    if (appointment.poFile) {
-      try { fs.unlinkSync(path.join(__dirname, '../uploads', appointment.poFile)); } catch(e) {}
-    }
-    if (appointment.invoiceFile) {
-      try { fs.unlinkSync(path.join(__dirname, '../uploads', appointment.invoiceFile)); } catch(e) {}
-    }
-    if (appointment.ewayBillFile) {
-      try { fs.unlinkSync(path.join(__dirname, '../uploads', appointment.ewayBillFile)); } catch(e) {}
-    }
+    // Delete all associated files
+    const uploadDir = path.join(__dirname, '../uploads');
+    const files = [
+      appointment.poFile, 
+      appointment.invoiceFile, 
+      appointment.ewayBillFile,
+      appointment.podFile
+    ];
+    files.forEach(file => {
+      if (file) {
+        try {
+          const filePath = path.join(uploadDir, file);
+          if (fs.existsSync(filePath)) { fs.unlinkSync(filePath); }
+          console.log('🗑️ Deleted file:', file);
+        } catch(e) {}
+      }
+    });
     
     res.redirect('/admin/dashboard?success=Appointment deleted successfully!');
   } catch (error) {
     console.error('Delete Appointment Error:', error);
     res.redirect('/admin/dashboard?error=Failed to delete appointment!');
+  }
+});
+
+// ============================================
+// DELETE - Delete Specific File (Admin)
+// ============================================
+router.delete('/appointment/:id/file/:type', adminAuth, async (req, res) => {
+  try {
+    const { id, type } = req.params;
+    const appointment = await Appointment.findById(id);
+    
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    let fileField = '';
+    let nameField = '';
+    
+    switch(type) {
+      case 'po':
+        fileField = 'poFile';
+        nameField = 'poFileOriginalName';
+        break;
+      case 'invoice':
+        fileField = 'invoiceFile';
+        nameField = 'invoiceFileOriginalName';
+        break;
+      case 'ewaybill':
+        fileField = 'ewayBillFile';
+        nameField = 'ewayBillFileOriginalName';
+        break;
+      case 'pod':
+        fileField = 'podFile';
+        nameField = 'podFileOriginalName';
+        break;
+      default:
+        return res.status(400).json({ error: 'Invalid file type' });
+    }
+
+    // Delete file from server
+    if (appointment[fileField]) {
+      const filePath = path.join(__dirname, '../uploads', appointment[fileField]);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log('🗑️ Deleted file:', appointment[fileField]);
+      }
+    }
+
+    // Clear fields in database
+    appointment[fileField] = '';
+    appointment[nameField] = '';
+    await appointment.save();
+
+    res.json({ success: true, message: 'File deleted successfully' });
+  } catch (error) {
+    console.error('Delete File Error:', error);
+    res.status(500).json({ error: 'Failed to delete file' });
   }
 });
 
@@ -422,6 +498,26 @@ router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => 
       return res.status(404).send('File not found');
     }
     res.download(filePath, appointment.ewayBillFileOriginalName || 'EWayBill_Document.pdf');
+  } catch (error) {
+    console.error('Download Error:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+// ============================================
+// GET - Download POD PDF
+// ============================================
+router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment || !appointment.podFile) {
+      return res.status(404).send('File not found');
+    }
+    const filePath = path.join(__dirname, '../uploads', appointment.podFile);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send('File not found');
+    }
+    res.download(filePath, appointment.podFileOriginalName || 'POD_Document.pdf');
   } catch (error) {
     console.error('Download Error:', error);
     res.status(500).send('Server error');

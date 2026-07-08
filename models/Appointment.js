@@ -49,7 +49,7 @@ const AppointmentSchema = new mongoose.Schema({
     default: ''
   },
   // =========================================
-  // ===== PDF FILE FIELDS (NEW) =====
+  // ===== PDF FILE FIELDS =====
   poFile: {
     type: String,
     default: ''
@@ -71,6 +71,15 @@ const AppointmentSchema = new mongoose.Schema({
     default: ''
   },
   ewayBillFileOriginalName: {
+    type: String,
+    default: ''
+  },
+  // ===== POD FILE FIELD (ADMIN ONLY) =====
+  podFile: {
+    type: String,
+    default: ''
+  },
+  podFileOriginalName: {
     type: String,
     default: ''
   },
