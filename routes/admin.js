@@ -23,8 +23,7 @@ console.log('☁️ Cloudinary Config (admin.js):', {
 });
 
 // ============================================
-// HELPER: Get Cloudinary URL for file
-// ✅ FIXED: No .pdf extension - public_id already has full path
+// HELPER: Get Cloudinary URL for file (VIEW)
 // ============================================
 const getCloudinaryUrl = (publicId) => {
     if (!publicId) return null;
@@ -33,14 +32,11 @@ const getCloudinaryUrl = (publicId) => {
     }
     
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    
-    // ✅ public_id already contains folder path
-    // ✅ DO NOT add .pdf extension - Cloudinary handles it
     return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
 };
 
 // ============================================
-// HELPER: Get download URL with attachment flag
+// HELPER: Get download URL with proper headers
 // ============================================
 const getDownloadUrl = (publicId) => {
     if (!publicId) return null;
@@ -49,10 +45,7 @@ const getDownloadUrl = (publicId) => {
     }
     
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    
-    // ✅ Add fl_attachment before the public_id
-    // ✅ DO NOT add .pdf extension
-    return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}`;
+    return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
 };
 
 // ============================================
@@ -160,6 +153,7 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
 
 // ============================================
 // 📥 FORCE DOWNLOAD ROUTES (Attachment)
+// ✅ FIXED: Using fetch + proper headers instead of fl_attachment
 // ============================================
 
 // ===== FORCE DOWNLOAD PO PDF =====
@@ -172,9 +166,25 @@ router.get('/appointment/:id/download-attachment/po', adminAuth, async (req, res
     
     console.log('📥 Force Download PO - public_id:', appointment.poFile);
     
+    // Get the Cloudinary URL
     const fileUrl = getDownloadUrl(appointment.poFile);
-    console.log('📄 Generated Download URL:', fileUrl);
-    return res.redirect(fileUrl);
+    console.log('📄 Download URL:', fileUrl);
+    
+    // Fetch the file from Cloudinary
+    const response = await fetch(fileUrl);
+    if (!response.ok) {
+      throw new Error(`Cloudinary error: ${response.status}`);
+    }
+    
+    // Get the file buffer
+    const buffer = await response.arrayBuffer();
+    
+    // Set proper headers for download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${appointment.poFileOriginalName || 'PO_Document.pdf'}"`);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    
+    return res.send(Buffer.from(buffer));
     
   } catch (error) {
     console.error('❌ Force Download PO Error:', error);
@@ -193,8 +203,20 @@ router.get('/appointment/:id/download-attachment/invoice', adminAuth, async (req
     console.log('📥 Force Download Invoice - public_id:', appointment.invoiceFile);
     
     const fileUrl = getDownloadUrl(appointment.invoiceFile);
-    console.log('📄 Generated Download URL:', fileUrl);
-    return res.redirect(fileUrl);
+    console.log('📄 Download URL:', fileUrl);
+    
+    const response = await fetch(fileUrl);
+    if (!response.ok) {
+      throw new Error(`Cloudinary error: ${response.status}`);
+    }
+    
+    const buffer = await response.arrayBuffer();
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${appointment.invoiceFileOriginalName || 'Invoice_Document.pdf'}"`);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    
+    return res.send(Buffer.from(buffer));
     
   } catch (error) {
     console.error('❌ Force Download Invoice Error:', error);
@@ -213,8 +235,20 @@ router.get('/appointment/:id/download-attachment/ewaybill', adminAuth, async (re
     console.log('📥 Force Download E-Way Bill - public_id:', appointment.ewayBillFile);
     
     const fileUrl = getDownloadUrl(appointment.ewayBillFile);
-    console.log('📄 Generated Download URL:', fileUrl);
-    return res.redirect(fileUrl);
+    console.log('📄 Download URL:', fileUrl);
+    
+    const response = await fetch(fileUrl);
+    if (!response.ok) {
+      throw new Error(`Cloudinary error: ${response.status}`);
+    }
+    
+    const buffer = await response.arrayBuffer();
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${appointment.ewayBillFileOriginalName || 'EWayBill_Document.pdf'}"`);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    
+    return res.send(Buffer.from(buffer));
     
   } catch (error) {
     console.error('❌ Force Download E-Way Bill Error:', error);
@@ -233,8 +267,20 @@ router.get('/appointment/:id/download-attachment/pod', adminAuth, async (req, re
     console.log('📥 Force Download POD - public_id:', appointment.podFile);
     
     const fileUrl = getDownloadUrl(appointment.podFile);
-    console.log('📄 Generated Download URL:', fileUrl);
-    return res.redirect(fileUrl);
+    console.log('📄 Download URL:', fileUrl);
+    
+    const response = await fetch(fileUrl);
+    if (!response.ok) {
+      throw new Error(`Cloudinary error: ${response.status}`);
+    }
+    
+    const buffer = await response.arrayBuffer();
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${appointment.podFileOriginalName || 'POD_Document.pdf'}"`);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    
+    return res.send(Buffer.from(buffer));
     
   } catch (error) {
     console.error('❌ Force Download POD Error:', error);
