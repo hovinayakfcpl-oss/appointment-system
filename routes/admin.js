@@ -24,24 +24,35 @@ console.log('☁️ Cloudinary Config (admin.js):', {
 
 // ============================================
 // HELPER: Get Cloudinary URL for file
-// ✅ FIXED: Using 'raw' resource_type (since files uploaded as raw)
+// ✅ FIXED: Manually construct URL without version
 // ============================================
 const getCloudinaryUrl = (publicId) => {
     if (!publicId) return null;
     if (publicId.startsWith('http://') || publicId.startsWith('https://')) {
         return publicId;
     }
-    // ✅ Using 'raw' resource_type
-    return cloudinary.url(publicId, {
-        secure: true,
-        resource_type: 'raw', // ✅ CHANGED: 'image' → 'raw'
-        format: 'pdf'
-    });
+    
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    // ✅ Manually construct URL without version
+    return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}.pdf`;
+};
+
+// ============================================
+// HELPER: Get download URL with attachment flag
+// ============================================
+const getDownloadUrl = (publicId) => {
+    if (!publicId) return null;
+    if (publicId.startsWith('http://') || publicId.startsWith('https://')) {
+        return publicId;
+    }
+    
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    // ✅ Add attachment flag for force download
+    return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}.pdf`;
 };
 
 // ============================================
 // HELPER: Delete file from Cloudinary
-// ✅ FIXED: Using 'raw' resource_type
 // ============================================
 const deleteFromCloudinary = async (publicId) => {
     if (!publicId) return;
@@ -49,7 +60,7 @@ const deleteFromCloudinary = async (publicId) => {
     
     try {
         const result = await cloudinary.uploader.destroy(publicId, {
-            resource_type: 'raw' // ✅ CHANGED: 'image' → 'raw'
+            resource_type: 'raw'
         });
         console.log(`🗑️ Cloudinary delete result for ${publicId}:`, result);
         return result;
@@ -60,7 +71,7 @@ const deleteFromCloudinary = async (publicId) => {
 
 // ============================================
 // 📄 VIEW PDF ROUTES (Opens in browser - inline)
-// ✅ FIXED: Using direct redirect (simpler and works with raw)
+// ✅ FIXED: Using manually constructed URL without version
 // ============================================
 
 // ===== VIEW PO PDF =====
@@ -73,16 +84,10 @@ router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
     
     console.log('📥 View PO:', appointment.poFile);
     
-    // ✅ Generate direct Cloudinary URL with raw type
-    const fileUrl = cloudinary.url(appointment.poFile, {
-        secure: true,
-        resource_type: 'raw',
-        format: 'pdf'
-    });
-    
+    // ✅ Use manually constructed URL
+    const fileUrl = getCloudinaryUrl(appointment.poFile);
     console.log('📄 URL:', fileUrl);
     
-    // ✅ Redirect to Cloudinary (works with raw files)
     return res.redirect(fileUrl);
     
   } catch (error) {
@@ -101,12 +106,7 @@ router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
     
     console.log('📥 View Invoice:', appointment.invoiceFile);
     
-    const fileUrl = cloudinary.url(appointment.invoiceFile, {
-        secure: true,
-        resource_type: 'raw',
-        format: 'pdf'
-    });
-    
+    const fileUrl = getCloudinaryUrl(appointment.invoiceFile);
     console.log('📄 URL:', fileUrl);
     return res.redirect(fileUrl);
     
@@ -126,12 +126,7 @@ router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => 
     
     console.log('📥 View E-Way Bill:', appointment.ewayBillFile);
     
-    const fileUrl = cloudinary.url(appointment.ewayBillFile, {
-        secure: true,
-        resource_type: 'raw',
-        format: 'pdf'
-    });
-    
+    const fileUrl = getCloudinaryUrl(appointment.ewayBillFile);
     console.log('📄 URL:', fileUrl);
     return res.redirect(fileUrl);
     
@@ -151,12 +146,7 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
     
     console.log('📥 View POD:', appointment.podFile);
     
-    const fileUrl = cloudinary.url(appointment.podFile, {
-        secure: true,
-        resource_type: 'raw',
-        format: 'pdf'
-    });
-    
+    const fileUrl = getCloudinaryUrl(appointment.podFile);
     console.log('📄 URL:', fileUrl);
     return res.redirect(fileUrl);
     
@@ -168,7 +158,7 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
 
 // ============================================
 // 📥 FORCE DOWNLOAD ROUTES (Attachment)
-// ✅ FIXED: Using flags: 'attachment' for force download
+// ✅ FIXED: Using manually constructed URL with fl_attachment
 // ============================================
 
 // ===== FORCE DOWNLOAD PO PDF =====
@@ -181,14 +171,7 @@ router.get('/appointment/:id/download-attachment/po', adminAuth, async (req, res
     
     console.log('📥 Force Download PO:', appointment.poFile);
     
-    // ✅ Add flags: 'attachment' for force download
-    const fileUrl = cloudinary.url(appointment.poFile, {
-        secure: true,
-        resource_type: 'raw',
-        format: 'pdf',
-        flags: 'attachment'
-    });
-    
+    const fileUrl = getDownloadUrl(appointment.poFile);
     console.log('📄 Download URL:', fileUrl);
     return res.redirect(fileUrl);
     
@@ -208,13 +191,7 @@ router.get('/appointment/:id/download-attachment/invoice', adminAuth, async (req
     
     console.log('📥 Force Download Invoice:', appointment.invoiceFile);
     
-    const fileUrl = cloudinary.url(appointment.invoiceFile, {
-        secure: true,
-        resource_type: 'raw',
-        format: 'pdf',
-        flags: 'attachment'
-    });
-    
+    const fileUrl = getDownloadUrl(appointment.invoiceFile);
     console.log('📄 Download URL:', fileUrl);
     return res.redirect(fileUrl);
     
@@ -234,13 +211,7 @@ router.get('/appointment/:id/download-attachment/ewaybill', adminAuth, async (re
     
     console.log('📥 Force Download E-Way Bill:', appointment.ewayBillFile);
     
-    const fileUrl = cloudinary.url(appointment.ewayBillFile, {
-        secure: true,
-        resource_type: 'raw',
-        format: 'pdf',
-        flags: 'attachment'
-    });
-    
+    const fileUrl = getDownloadUrl(appointment.ewayBillFile);
     console.log('📄 Download URL:', fileUrl);
     return res.redirect(fileUrl);
     
@@ -260,13 +231,7 @@ router.get('/appointment/:id/download-attachment/pod', adminAuth, async (req, re
     
     console.log('📥 Force Download POD:', appointment.podFile);
     
-    const fileUrl = cloudinary.url(appointment.podFile, {
-        secure: true,
-        resource_type: 'raw',
-        format: 'pdf',
-        flags: 'attachment'
-    });
-    
+    const fileUrl = getDownloadUrl(appointment.podFile);
     console.log('📄 Download URL:', fileUrl);
     return res.redirect(fileUrl);
     
@@ -374,7 +339,6 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 
 // ============================================
 // POST - Update Appointment (Admin Direct) with File Upload
-// ✅ FIXED: Changed from PUT to POST
 // ============================================
 router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
   { name: 'poFile', maxCount: 1 },
