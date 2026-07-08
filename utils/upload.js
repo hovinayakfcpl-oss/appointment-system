@@ -1,85 +1,93 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+<!-- ===== PDF UPLOAD SECTION - SIRF ADMIN KE LIYE ===== -->
+<% if (typeof user !== 'undefined' && user.role === 'admin') { %>
+<div class="col-12">
+    <hr style="border-color: rgba(201, 168, 76, 0.15);">
+    <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="bi bi-file-pdf" style="color: #c9a84c;"></i> Attach Documents (PDF Only) - <span style="color: #c62828;">Admin Only</span>
+    </h6>
+</div>
 
-// ============================================
-// UPLOAD DIRECTORY SETUP
-// ============================================
-const uploadDir = path.join(__dirname, '../uploads');
+<!-- PO PDF Upload -->
+<div class="col-md-4">
+    <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="bi bi-file-text" style="color: #c9a84c;"></i> PO PDF
+    </label>
+    <input type="file" name="poFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
+    <% if (typeof appointment !== 'undefined' && appointment && appointment.poFile) { %>
+        <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.65rem;">
+            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> Current: <%= appointment.poFileOriginalName || 'Uploaded' %>
+        </small>
+    <% } %>
+</div>
 
-// Create uploads directory if it doesn't exist
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-  console.log('✅ Uploads directory created at:', uploadDir);
-} else {
-  console.log('✅ Uploads directory already exists at:', uploadDir);
-}
+<!-- Invoice PDF Upload -->
+<div class="col-md-4">
+    <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="bi bi-receipt" style="color: #c9a84c;"></i> Invoice PDF
+    </label>
+    <input type="file" name="invoiceFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
+    <% if (typeof appointment !== 'undefined' && appointment && appointment.invoiceFile) { %>
+        <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.65rem;">
+            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> Current: <%= appointment.invoiceFileOriginalName || 'Uploaded' %>
+        </small>
+    <% } %>
+</div>
 
-// ============================================
-// FILE FILTER - Only allow PDFs
-// ============================================
-const fileFilter = (req, file, cb) => {
-  console.log('📄 File received:', file.originalname);
-  console.log('📄 File mimetype:', file.mimetype);
-  console.log('📄 File size:', file.size);
-  
-  // Check if file is PDF
-  if (file.mimetype === 'application/pdf' || file.mimetype === 'application/x-pdf') {
-    console.log('✅ PDF file accepted:', file.originalname);
-    cb(null, true);
-  } else {
-    console.log('❌ File rejected - Not a PDF:', file.originalname);
-    cb(new Error('Only PDF files are allowed!'), false);
-  }
-};
+<!-- E-Way Bill PDF Upload -->
+<div class="col-md-4">
+    <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="bi bi-truck" style="color: #c9a84c;"></i> E-Way Bill PDF
+    </label>
+    <input type="file" name="ewayBillFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
+    <% if (typeof appointment !== 'undefined' && appointment && appointment.ewayBillFile) { %>
+        <small style="color: rgba(10, 22, 40, 0.4); font-size: 0.65rem;">
+            <i class="bi bi-check-circle" style="color: #2e7d32;"></i> Current: <%= appointment.ewayBillFileOriginalName || 'Uploaded' %>
+        </small>
+    <% } %>
+</div>
 
-// ============================================
-// STORAGE CONFIGURATION
-// ============================================
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    console.log('📁 Saving file to:', uploadDir);
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    // Create unique filename: timestamp-random-originalname
-    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + '-' + file.originalname;
-    console.log('📄 Generated filename:', uniqueName);
-    cb(null, uniqueName);
-  }
-});
-
-// ============================================
-// MULTER UPLOAD CONFIGURATION
-// ============================================
-const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit per file
-  }
-});
-
-// ============================================
-// ERROR HANDLING MIDDLEWARE (Optional)
-// ============================================
-const handleMulterError = (err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    if (err.code === 'FILE_TOO_LARGE') {
-      console.log('❌ File too large! Max size: 5MB');
-      return res.status(400).json({ error: 'File too large! Max size is 5MB.' });
-    }
-    console.log('❌ Multer Error:', err.message);
-    return res.status(400).json({ error: err.message });
-  } else if (err) {
-    console.log('❌ Unknown Error:', err.message);
-    return res.status(500).json({ error: err.message });
-  }
-  next();
-};
-
-// ============================================
-// EXPORT
-// ============================================
-module.exports = upload;
-module.exports.handleMulterError = handleMulterError;
+<div class="col-12">
+    <small style="color: rgba(10, 22, 40, 0.3); font-size: 0.6rem;">
+        <i class="bi bi-info-circle"></i> Only PDF files are allowed. Max size: 5MB per file.
+    </small>
+</div>
+<% } else { %>
+    <!-- Client ke liye sirf uploaded files dikhao (agar hain toh) -->
+    <% if (typeof appointment !== 'undefined' && appointment && (appointment.poFile || appointment.invoiceFile || appointment.ewayBillFile)) { %>
+    <div class="col-12">
+        <hr style="border-color: rgba(201, 168, 76, 0.15);">
+        <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+            <i class="bi bi-file-pdf" style="color: #c9a84c;"></i> Attached Documents
+        </h6>
+        <div class="row g-2">
+            <% if (appointment.poFile) { %>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-2 p-2" style="background: #f8f4eb; border-radius: 8px; border-left: 3px solid #c9a84c;">
+                    <i class="bi bi-file-text" style="color: #c9a84c;"></i>
+                    <span style="font-weight: 600; font-size: 0.75rem;">PO PDF</span>
+                    <span class="badge" style="background: #2e7d32; color: white; font-size: 0.5rem;">Uploaded</span>
+                </div>
+            </div>
+            <% } %>
+            <% if (appointment.invoiceFile) { %>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-2 p-2" style="background: #f8f4eb; border-radius: 8px; border-left: 3px solid #c9a84c;">
+                    <i class="bi bi-receipt" style="color: #c9a84c;"></i>
+                    <span style="font-weight: 600; font-size: 0.75rem;">Invoice PDF</span>
+                    <span class="badge" style="background: #2e7d32; color: white; font-size: 0.5rem;">Uploaded</span>
+                </div>
+            </div>
+            <% } %>
+            <% if (appointment.ewayBillFile) { %>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-2 p-2" style="background: #f8f4eb; border-radius: 8px; border-left: 3px solid #c9a84c;">
+                    <i class="bi bi-truck" style="color: #c9a84c;"></i>
+                    <span style="font-weight: 600; font-size: 0.75rem;">E-Way Bill PDF</span>
+                    <span class="badge" style="background: #2e7d32; color: white; font-size: 0.5rem;">Uploaded</span>
+                </div>
+            </div>
+            <% } %>
+        </div>
+    </div>
+    <% } %>
+<% } %>

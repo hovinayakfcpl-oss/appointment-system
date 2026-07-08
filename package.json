@@ -1,7 +1,7 @@
 {
   "name": "appointment-management",
   "version": "1.0.0",
-  "description": "Client appointment management system",
+  "description": "Faith Cargo - Client appointment management system",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.0",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
     "ejs": "^6.0.1",
@@ -18,7 +19,8 @@
     "jsonwebtoken": "^9.0.0",
     "method-override": "^3.0.0",
     "mongoose": "^7.0.3",
-    "multer": "^2.2.0"
+    "multer": "^2.2.0",
+    "multer-storage-cloudinary": "^4.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
