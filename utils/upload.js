@@ -1,9 +1,44 @@
 const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 const path = require('path');
 const fs = require('fs');
 
 // ============================================
-// UPLOAD DIRECTORY SETUP
+// CLOUDINARY CONFIG (PREFERRED - PERSISTENT)
+// ============================================
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+console.log('✅ Cloudinary Config:', {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'Not Set',
+  api_key: process.env.CLOUDINARY_API_KEY ? '✅ Set' : '❌ Not Set'
+});
+
+// ============================================
+// STORAGE - Cloudinary (RAW TYPE FOR PDF)
+// ============================================
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'appointment_documents',
+    resource_type: 'raw',           // ✅ PDF ke liye 'raw' type
+    format: 'pdf',
+    public_id: (req, file) => {
+      // Clean filename - remove extension
+      const originalName = file.originalname.replace(/\.[^/.]+$/, '');
+      const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + '-' + originalName;
+      console.log('📄 Cloudinary Public ID:', uniqueName);
+      return uniqueName;
+    }
+  }
+});
+
+// ============================================
+// LOCAL STORAGE (FALLBACK - FOR RENDER PERSISTENT DISK)
 // ============================================
 const uploadDir = path.join(__dirname, '../uploads');
 
@@ -14,6 +49,18 @@ if (!fs.existsSync(uploadDir)) {
 } else {
   console.log('✅ Uploads directory already exists at:', uploadDir);
 }
+
+const localStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    console.log('📁 Saving file to local:', uploadDir);
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + '-' + file.originalname;
+    console.log('📄 Local filename:', uniqueName);
+    cb(null, uniqueName);
+  }
+});
 
 // ============================================
 // FILE FILTER - Only allow PDFs
@@ -32,19 +79,15 @@ const fileFilter = (req, file, cb) => {
 };
 
 // ============================================
-// STORAGE CONFIGURATION
+// CHOOSE STORAGE: Cloudinary if credentials exist, else Local
 // ============================================
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    console.log('📁 Saving file to:', uploadDir);
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + '-' + file.originalname;
-    console.log('📄 Generated filename:', uniqueName);
-    cb(null, uniqueName);
-  }
-});
+const useCloudinary = process.env.CLOUDINARY_CLOUD_NAME && 
+                       process.env.CLOUDINARY_API_KEY && 
+                       process.env.CLOUDINARY_API_SECRET;
+
+console.log('📁 Using storage:', useCloudinary ? 'Cloudinary' : 'Local (uploads folder)');
+
+const storage = useCloudinary ? cloudinaryStorage : localStorage;
 
 // ============================================
 // MULTER UPLOAD CONFIGURATION
