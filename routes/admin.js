@@ -9,7 +9,7 @@ const path = require('path');
 const fs = require('fs');
 
 // ============================================
-// CLOUDINARY CONFIG - RE-CONFIGURE
+// CLOUDINARY CONFIG
 // ============================================
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -24,7 +24,7 @@ console.log('☁️ Cloudinary Config (admin.js):', {
 
 // ============================================
 // HELPER: Get Cloudinary URL for file
-// ✅ FIXED: Manually construct URL without version
+// ✅ FIXED: No .pdf extension - public_id already has full path
 // ============================================
 const getCloudinaryUrl = (publicId) => {
     if (!publicId) return null;
@@ -33,8 +33,10 @@ const getCloudinaryUrl = (publicId) => {
     }
     
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    // ✅ Manually construct URL without version
-    return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}.pdf`;
+    
+    // ✅ public_id already contains folder path
+    // ✅ DO NOT add .pdf extension - Cloudinary handles it
+    return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
 };
 
 // ============================================
@@ -47,8 +49,10 @@ const getDownloadUrl = (publicId) => {
     }
     
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    // ✅ Add attachment flag for force download
-    return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}.pdf`;
+    
+    // ✅ Add fl_attachment before the public_id
+    // ✅ DO NOT add .pdf extension
+    return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}`;
 };
 
 // ============================================
@@ -71,7 +75,6 @@ const deleteFromCloudinary = async (publicId) => {
 
 // ============================================
 // 📄 VIEW PDF ROUTES (Opens in browser - inline)
-// ✅ FIXED: Using manually constructed URL without version
 // ============================================
 
 // ===== VIEW PO PDF =====
@@ -82,11 +85,10 @@ router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 View PO:', appointment.poFile);
+    console.log('📥 View PO - public_id:', appointment.poFile);
     
-    // ✅ Use manually constructed URL
     const fileUrl = getCloudinaryUrl(appointment.poFile);
-    console.log('📄 URL:', fileUrl);
+    console.log('📄 Generated URL:', fileUrl);
     
     return res.redirect(fileUrl);
     
@@ -104,10 +106,10 @@ router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 View Invoice:', appointment.invoiceFile);
+    console.log('📥 View Invoice - public_id:', appointment.invoiceFile);
     
     const fileUrl = getCloudinaryUrl(appointment.invoiceFile);
-    console.log('📄 URL:', fileUrl);
+    console.log('📄 Generated URL:', fileUrl);
     return res.redirect(fileUrl);
     
   } catch (error) {
@@ -124,10 +126,10 @@ router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => 
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 View E-Way Bill:', appointment.ewayBillFile);
+    console.log('📥 View E-Way Bill - public_id:', appointment.ewayBillFile);
     
     const fileUrl = getCloudinaryUrl(appointment.ewayBillFile);
-    console.log('📄 URL:', fileUrl);
+    console.log('📄 Generated URL:', fileUrl);
     return res.redirect(fileUrl);
     
   } catch (error) {
@@ -144,10 +146,10 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 View POD:', appointment.podFile);
+    console.log('📥 View POD - public_id:', appointment.podFile);
     
     const fileUrl = getCloudinaryUrl(appointment.podFile);
-    console.log('📄 URL:', fileUrl);
+    console.log('📄 Generated URL:', fileUrl);
     return res.redirect(fileUrl);
     
   } catch (error) {
@@ -158,7 +160,6 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
 
 // ============================================
 // 📥 FORCE DOWNLOAD ROUTES (Attachment)
-// ✅ FIXED: Using manually constructed URL with fl_attachment
 // ============================================
 
 // ===== FORCE DOWNLOAD PO PDF =====
@@ -169,10 +170,10 @@ router.get('/appointment/:id/download-attachment/po', adminAuth, async (req, res
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 Force Download PO:', appointment.poFile);
+    console.log('📥 Force Download PO - public_id:', appointment.poFile);
     
     const fileUrl = getDownloadUrl(appointment.poFile);
-    console.log('📄 Download URL:', fileUrl);
+    console.log('📄 Generated Download URL:', fileUrl);
     return res.redirect(fileUrl);
     
   } catch (error) {
@@ -189,10 +190,10 @@ router.get('/appointment/:id/download-attachment/invoice', adminAuth, async (req
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 Force Download Invoice:', appointment.invoiceFile);
+    console.log('📥 Force Download Invoice - public_id:', appointment.invoiceFile);
     
     const fileUrl = getDownloadUrl(appointment.invoiceFile);
-    console.log('📄 Download URL:', fileUrl);
+    console.log('📄 Generated Download URL:', fileUrl);
     return res.redirect(fileUrl);
     
   } catch (error) {
@@ -209,10 +210,10 @@ router.get('/appointment/:id/download-attachment/ewaybill', adminAuth, async (re
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 Force Download E-Way Bill:', appointment.ewayBillFile);
+    console.log('📥 Force Download E-Way Bill - public_id:', appointment.ewayBillFile);
     
     const fileUrl = getDownloadUrl(appointment.ewayBillFile);
-    console.log('📄 Download URL:', fileUrl);
+    console.log('📄 Generated Download URL:', fileUrl);
     return res.redirect(fileUrl);
     
   } catch (error) {
@@ -229,10 +230,10 @@ router.get('/appointment/:id/download-attachment/pod', adminAuth, async (req, re
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 Force Download POD:', appointment.podFile);
+    console.log('📥 Force Download POD - public_id:', appointment.podFile);
     
     const fileUrl = getDownloadUrl(appointment.podFile);
-    console.log('📄 Download URL:', fileUrl);
+    console.log('📄 Generated Download URL:', fileUrl);
     return res.redirect(fileUrl);
     
   } catch (error) {
