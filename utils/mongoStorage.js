@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const FileSchema = new mongoose.Schema({
   filename: String,
   originalName: String,
-  data: Buffer, // ✅ File data stored directly
+  data: Buffer,
   contentType: String,
   size: Number,
   createdAt: { type: Date, default: Date.now }
@@ -17,7 +17,6 @@ const File = mongoose.model('File', FileSchema);
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-  // ✅ Allow both PDF mimetypes
   if (file.mimetype === 'application/pdf' || file.mimetype === 'application/x-pdf') {
     cb(null, true);
   } else {
@@ -25,6 +24,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+// ✅ CREATE MULTER INSTANCE
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
@@ -61,7 +61,7 @@ const deleteFile = async (fileId) => {
   return await File.findByIdAndDelete(fileId);
 };
 
-// ✅ Error handling middleware
+// ✅ Error handling
 const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'FILE_TOO_LARGE') {
@@ -83,12 +83,10 @@ const handleMulterError = (err, req, res, next) => {
   next();
 };
 
-// ✅ EXPORT ALL
-module.exports = {
-  upload,           // ✅ IMPORTANT: upload object with fields() method
-  uploadFile,       // ✅ Alias for saveFile
-  saveFile,
-  getFile,
-  deleteFile,
-  handleMulterError
-};
+// ✅ EXPORT - upload must be first
+module.exports = upload; // ✅ This makes upload.fields() work
+module.exports.uploadFile = uploadFile;
+module.exports.saveFile = saveFile;
+module.exports.getFile = getFile;
+module.exports.deleteFile = deleteFile;
+module.exports.handleMulterError = handleMulterError;
