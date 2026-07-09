@@ -164,7 +164,7 @@
                                                     <select name="status" class="form-select form-select-sm" style="border-radius: 6px; border: 2px solid rgba(201, 168, 76, 0.15); padding: 4px 8px; font-size: 0.65rem; font-weight: 600; background: white; color: #0a1628; cursor: pointer; transition: all 0.3s ease; min-width: 90px;" onchange="this.form.submit()">
                                                         <option value="pending" <%= app.status === 'pending' ? 'selected' : '' %> style="color: #e65100;">⏳ Pending</option>
                                                         <option value="confirmed" <%= app.status === 'confirmed' ? 'selected' : '' %> style="color: #00695c;">✅ Confirmed</option>
-                                                        <option value="completed" <%= app.status === 'completed' ? 'selected' : '' %> style="color: #2e7d32;">✔️ Completed</option>
+                                                        <option value="delivered" <%= app.status === 'delivered' ? 'selected' : '' %> style="color: #2e7d32;">✔️ Completed</option>
                                                     </select>
                                                 </form>
                                             </div>

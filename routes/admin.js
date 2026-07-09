@@ -189,7 +189,7 @@ router.get('/dashboard', adminAuth, async (req, res) => {
     
     const totalAppointments = await Appointment.countDocuments();
     const pendingAppointments = await Appointment.countDocuments({ status: 'pending' });
-    const completedAppointments = await Appointment.countDocuments({ status: 'completed' });
+    const completedAppointments = await Appointment.countDocuments({ status: 'delivered' });
     
     const recentAppointments = await Appointment.find()
       .populate('clientId', 'name email')
@@ -245,7 +245,7 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
   try {
     const { status } = req.body;
     
-    if (!['pending', 'confirmed', 'completed'].includes(status)) {
+    if (!['pending', 'confirmed', 'delivered'].includes(status)) {
       return res.redirect('/admin/dashboard?error=Invalid status!');
     }
     
@@ -599,7 +599,7 @@ router.get('/stats', adminAuth, async (req, res) => {
     const totalAppointments = await Appointment.countDocuments();
     const pendingAppointments = await Appointment.countDocuments({ status: 'pending' });
     const confirmedAppointments = await Appointment.countDocuments({ status: 'confirmed' });
-    const completedAppointments = await Appointment.countDocuments({ status: 'completed' });
+    const completedAppointments = await Appointment.countDocuments({ status: 'delivered' });
     
     res.json({
       totalClients,
