@@ -239,9 +239,9 @@ router.get('/client/:id/appointments', adminAuth, async (req, res) => {
 });
 
 // ============================================
-// PUT - Update Appointment Status
+// ✅ FIXED: POST - Update Appointment Status (Changed from PUT to POST)
 // ============================================
-router.put('/appointment/:id/status', adminAuth, async (req, res) => {
+router.post('/appointment/:id/status', adminAuth, async (req, res) => {
   try {
     const { status } = req.body;
     
@@ -295,8 +295,8 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
       deliveryDate, 
       deliveryAddress, 
       remarks,
-      pincode,    // ✅ NEW
-      city        // ✅ NEW
+      pincode,
+      city
     } = req.body;
 
     if (!poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
@@ -344,8 +344,8 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
-        pincode: pincode || '',     // ✅ NEW
-        city: city || '',           // ✅ NEW
+        pincode: pincode || '',
+        city: city || '',
         poFileId: poFile ? poDetails.id : existingAppointment.poFileId,
         poFileOriginalName: poFile ? poDetails.name : existingAppointment.poFileOriginalName,
         invoiceFileId: invoiceFile ? invoiceDetails.id : existingAppointment.invoiceFileId,

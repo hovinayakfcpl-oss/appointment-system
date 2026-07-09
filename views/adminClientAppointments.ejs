@@ -158,10 +158,10 @@
                                                     </button>
                                                 </form>
                                             </div>
-                                            <!-- ===== Status Dropdown ===== -->
+                                            <!-- ===== ✅ Status Dropdown - FIXED (removed _method) ===== -->
                                             <div class="mt-1">
                                                 <form action="/admin/appointment/<%= app._id %>/status" method="POST" class="d-inline">
-                                                    <input type="hidden" name="_method" value="PUT">
+                                                    <!-- ✅ REMOVED _method field - route is now POST -->
                                                     <select name="status" class="form-select form-select-sm" style="border-radius: 6px; border: 2px solid rgba(201, 168, 76, 0.15); padding: 4px 8px; font-size: 0.65rem; font-weight: 600; background: white; color: #0a1628; cursor: pointer; transition: all 0.3s ease; min-width: 90px;" onchange="this.form.submit()">
                                                         <option value="pending" <%= app.status === 'pending' ? 'selected' : '' %> style="color: #e65100;">⏳ Pending</option>
                                                         <option value="confirmed" <%= app.status === 'confirmed' ? 'selected' : '' %> style="color: #00695c;">✅ Confirmed</option>
