@@ -24,6 +24,7 @@ console.log('☁️ Cloudinary Config (admin.js):', {
 
 // ============================================
 // HELPER: Get Cloudinary URL for file
+// ✅ FIXED: Added .pdf extension
 // ============================================
 const getCloudinaryUrl = (publicId) => {
     if (!publicId) return null;
@@ -31,11 +32,13 @@ const getCloudinaryUrl = (publicId) => {
         return publicId;
     }
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
+    // ✅ Add .pdf extension
+    return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}.pdf`;
 };
 
 // ============================================
 // HELPER: Get download URL with attachment flag
+// ✅ FIXED: Added .pdf extension
 // ============================================
 const getDownloadUrl = (publicId) => {
     if (!publicId) return null;
@@ -43,7 +46,8 @@ const getDownloadUrl = (publicId) => {
         return publicId;
     }
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}`;
+    // ✅ Add fl_attachment AND .pdf extension
+    return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}.pdf`;
 };
 
 // ============================================
@@ -88,12 +92,14 @@ const getFileUrl = (appointment, type) => {
 router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.poFileUrl) {
+    if (!appointment || !appointment.poFile) {
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 View PO - URL:', appointment.poFileUrl);
-    return res.redirect(appointment.poFileUrl);
+    // ✅ Generate URL with .pdf extension
+    const fileUrl = getCloudinaryUrl(appointment.poFile);
+    console.log('📥 View PO - URL:', fileUrl);
+    return res.redirect(fileUrl);
     
   } catch (error) {
     console.error('❌ View PO Error:', error);
@@ -105,12 +111,13 @@ router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
 router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.invoiceFileUrl) {
+    if (!appointment || !appointment.invoiceFile) {
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 View Invoice - URL:', appointment.invoiceFileUrl);
-    return res.redirect(appointment.invoiceFileUrl);
+    const fileUrl = getCloudinaryUrl(appointment.invoiceFile);
+    console.log('📥 View Invoice - URL:', fileUrl);
+    return res.redirect(fileUrl);
     
   } catch (error) {
     console.error('❌ View Invoice Error:', error);
@@ -122,12 +129,13 @@ router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
 router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.ewayBillFileUrl) {
+    if (!appointment || !appointment.ewayBillFile) {
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 View E-Way Bill - URL:', appointment.ewayBillFileUrl);
-    return res.redirect(appointment.ewayBillFileUrl);
+    const fileUrl = getCloudinaryUrl(appointment.ewayBillFile);
+    console.log('📥 View E-Way Bill - URL:', fileUrl);
+    return res.redirect(fileUrl);
     
   } catch (error) {
     console.error('❌ View E-Way Bill Error:', error);
@@ -139,12 +147,13 @@ router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => 
 router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.podFileUrl) {
+    if (!appointment || !appointment.podFile) {
       return res.status(404).send('File not found');
     }
     
-    console.log('📥 View POD - URL:', appointment.podFileUrl);
-    return res.redirect(appointment.podFileUrl);
+    const fileUrl = getCloudinaryUrl(appointment.podFile);
+    console.log('📥 View POD - URL:', fileUrl);
+    return res.redirect(fileUrl);
     
   } catch (error) {
     console.error('❌ View POD Error:', error);
@@ -154,7 +163,7 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
 
 // ============================================
 // 📥 FORCE DOWNLOAD ROUTES (Attachment)
-// ✅ FIXED: Using fl_attachment flag for force download
+// ✅ FIXED: Using fl_attachment flag with .pdf extension
 // ============================================
 
 // ===== FORCE DOWNLOAD PO PDF =====
@@ -327,7 +336,7 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 
 // ============================================
 // POST - Update Appointment (Admin Direct) with File Upload
-// ✅ FIXED: Store both public_id and full URL
+// ✅ FIXED: Store both public_id and full URL with .pdf extension
 // ============================================
 router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -362,12 +371,13 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
 
-    // ✅ Get file details
+    // ✅ Get file details with .pdf extension
     const getFileDetails = (file) => {
       if (!file) return { publicId: '', url: '', name: '' };
       const publicId = file.filename || file.path || '';
       const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      const url = `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
+      // ✅ Add .pdf extension to URL
+      const url = `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}.pdf`;
       return {
         publicId: publicId,
         url: url,
@@ -412,7 +422,7 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
-        // ✅ Store both public_id and full URL
+        // ✅ Store both public_id and full URL with .pdf extension
         poFile: poFile ? poDetails.publicId : existingAppointment.poFile,
         poFileUrl: poFile ? poDetails.url : existingAppointment.poFileUrl,
         poFileOriginalName: poFile ? poDetails.name : existingAppointment.poFileOriginalName,
@@ -571,7 +581,6 @@ router.get('/appointment/:id', adminAuth, async (req, res) => {
 
 // ============================================
 // DELETE - Delete Appointment (Admin)
-// ✅ FIXED: Delete URL fields too
 // ============================================
 router.delete('/appointment/:id', adminAuth, async (req, res) => {
   try {
@@ -605,7 +614,6 @@ router.delete('/appointment/:id', adminAuth, async (req, res) => {
 
 // ============================================
 // DELETE - Delete Specific File (Admin)
-// ✅ FIXED: Delete URL fields too
 // ============================================
 router.delete('/appointment/:id/file/:type', adminAuth, async (req, res) => {
   try {
