@@ -17,7 +17,8 @@ const File = mongoose.model('File', FileSchema);
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'application/pdf') {
+  // ✅ Allow both PDF mimetypes
+  if (file.mimetype === 'application/pdf' || file.mimetype === 'application/x-pdf') {
     cb(null, true);
   } else {
     cb(new Error('Only PDF files are allowed!'), false);
@@ -43,8 +44,12 @@ const saveFile = async (file) => {
   });
   
   await newFile.save();
+  console.log('✅ File saved to MongoDB:', newFile._id);
   return { id: newFile._id, name: newFile.originalName };
 };
+
+// ✅ Upload file (alias for saveFile)
+const uploadFile = saveFile;
 
 // ✅ Get file from MongoDB
 const getFile = async (fileId) => {
@@ -56,17 +61,34 @@ const deleteFile = async (fileId) => {
   return await File.findByIdAndDelete(fileId);
 };
 
+// ✅ Error handling middleware
+const handleMulterError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'FILE_TOO_LARGE') {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'File too large! Max size is 5MB.' 
+      });
+    }
+    return res.status(400).json({ 
+      success: false, 
+      error: err.message 
+    });
+  } else if (err) {
+    return res.status(500).json({ 
+      success: false, 
+      error: err.message 
+    });
+  }
+  next();
+};
+
+// ✅ EXPORT ALL
 module.exports = {
-  upload,
+  upload,           // ✅ IMPORTANT: upload object with fields() method
+  uploadFile,       // ✅ Alias for saveFile
   saveFile,
   getFile,
   deleteFile,
-  handleMulterError: (err, req, res, next) => {
-    if (err instanceof multer.MulterError) {
-      return res.status(400).json({ success: false, error: err.message });
-    } else if (err) {
-      return res.status(500).json({ success: false, error: err.message });
-    }
-    next();
-  }
+  handleMulterError
 };

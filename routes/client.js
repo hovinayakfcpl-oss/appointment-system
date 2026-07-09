@@ -4,7 +4,9 @@ const { auth } = require('../middleware/auth');
 const Appointment = require('../models/Appointment');
 const upload = require('../utils/mongoStorage'); // ✅ CHANGED: upload from mongoStorage
 const { uploadFile, deleteFile } = require('../utils/mongoStorage');
-
+// ✅ CORRECT IMPORT
+const upload = require('../utils/mongoStorage'); // This gives the upload object
+const { uploadFile, deleteFile } = require('../utils/mongoStorage');
 // ============================================
 // HELPER: Get file URL (for EJS templates)
 // ============================================
