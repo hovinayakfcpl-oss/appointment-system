@@ -17,7 +17,7 @@ console.log('✅ Cloudinary Config:', {
 });
 
 // ============================================
-// STORAGE - Cloudinary
+// STORAGE - Cloudinary (FULLY FIXED)
 // ============================================
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -26,6 +26,8 @@ const storage = new CloudinaryStorage({
     resource_type: 'image',
     format: 'pdf',
     access_mode: 'public',
+    use_filename: true,        // ✅ ADD THIS
+    unique_filename: true,     // ✅ ADD THIS
     public_id: (req, file) => {
       const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9);
       console.log('📄 Cloudinary Public ID:', uniqueName);
@@ -89,16 +91,15 @@ const handleMulterError = (err, req, res, next) => {
 };
 
 // ============================================
-// ✅ MAIN HELPER: Get full Cloudinary URL from uploaded file
+// HELPER: Get full Cloudinary URL from uploaded file
 // ============================================
 const getFileUrl = (file) => {
   if (!file) return '';
-  // Cloudinary returns full URL in file.path
   return file.path || '';
 };
 
 // ============================================
-// ✅ MAIN HELPER: Get public_id from uploaded file
+// HELPER: Get public_id from uploaded file
 // ============================================
 const getPublicId = (file) => {
   if (!file) return '';
@@ -106,7 +107,7 @@ const getPublicId = (file) => {
 };
 
 // ============================================
-// ✅ HELPER: Get file details from uploaded file
+// HELPER: Get file details from uploaded file
 // ============================================
 const getFileDetails = (file) => {
   if (!file) return { publicId: '', url: '', name: '' };
