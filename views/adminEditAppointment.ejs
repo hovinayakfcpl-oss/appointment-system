@@ -38,9 +38,8 @@
                     </div>
                 <% } %>
                 
-                <!-- ===== FORM - FIXED ACTION ===== -->
+                <!-- ===== FORM - MONGODB GRIDFS ===== -->
                 <form action="/admin/appointment/<%= typeof appointment !== 'undefined' ? appointment._id : '' %>/admin-update" method="POST" enctype="multipart/form-data">
-                    <!-- ===== ✅ METHOD OVERRIDE - FIXED ===== -->
                     <input type="hidden" name="_method" value="PUT">
                     
                     <!-- ===== Appointment Info Card ===== -->
@@ -182,9 +181,7 @@
                         </div>
                     </div>
                     
-                    <!-- ============================================================ -->
                     <!-- ===== FORWARDER DETAILS ===== -->
-                    <!-- ============================================================ -->
                     <div class="col-12 mt-4">
                         <hr style="border-color: rgba(201, 168, 76, 0.15);">
                         <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -193,7 +190,6 @@
                     </div>
                     
                     <div class="row g-3">
-                        <!-- Forwarder Name -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-building" style="color: #c9a84c;"></i> Forwarder Name
@@ -203,8 +199,6 @@
                                    placeholder="Enter Forwarder Name"
                                    style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 12px 18px; transition: all 0.3s ease;">
                         </div>
-                        
-                        <!-- Forwarder LR Number -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-upc-scan" style="color: #c9a84c;"></i> Forwarder LR Number
@@ -216,9 +210,7 @@
                         </div>
                     </div>
                     
-                    <!-- ============================================================ -->
-                    <!-- ===== PDF DOCUMENTS SECTION ===== -->
-                    <!-- ============================================================ -->
+                    <!-- ===== PDF DOCUMENTS SECTION - MONGODB GRIDFS ===== -->
                     <div class="col-12 mt-4">
                         <hr style="border-color: rgba(201, 168, 76, 0.15);">
                         <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -237,7 +229,7 @@
                             </label>
                             <div>
                                 <input type="file" name="poFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
-                                <% if (typeof appointment !== 'undefined' && appointment && appointment.poFile) { %>
+                                <% if (typeof appointment !== 'undefined' && appointment && appointment.poFileId) { %>
                                     <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
                                         <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
                                             <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
@@ -248,13 +240,13 @@
                                                 style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
                                             <i class="bi bi-trash"></i>
                                         </button>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download/po" 
+                                        <a href="/file/<%= appointment.poFileId %>" 
                                            target="_blank" 
                                            class="btn btn-sm" 
                                            style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download-attachment/po" 
+                                        <a href="/file/<%= appointment.poFileId %>/download" 
                                            class="btn btn-sm" 
                                            style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
                                             <i class="bi bi-download"></i>
@@ -271,7 +263,7 @@
                             </label>
                             <div>
                                 <input type="file" name="invoiceFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
-                                <% if (typeof appointment !== 'undefined' && appointment && appointment.invoiceFile) { %>
+                                <% if (typeof appointment !== 'undefined' && appointment && appointment.invoiceFileId) { %>
                                     <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
                                         <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
                                             <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
@@ -282,13 +274,13 @@
                                                 style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
                                             <i class="bi bi-trash"></i>
                                         </button>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download/invoice" 
+                                        <a href="/file/<%= appointment.invoiceFileId %>" 
                                            target="_blank" 
                                            class="btn btn-sm" 
                                            style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download-attachment/invoice" 
+                                        <a href="/file/<%= appointment.invoiceFileId %>/download" 
                                            class="btn btn-sm" 
                                            style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
                                             <i class="bi bi-download"></i>
@@ -305,7 +297,7 @@
                             </label>
                             <div>
                                 <input type="file" name="ewayBillFile" class="form-control" accept=".pdf" style="border: 2px solid #e8d5a3; border-radius: 12px; padding: 8px 12px;">
-                                <% if (typeof appointment !== 'undefined' && appointment && appointment.ewayBillFile) { %>
+                                <% if (typeof appointment !== 'undefined' && appointment && appointment.ewayBillFileId) { %>
                                     <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
                                         <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
                                             <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
@@ -316,13 +308,13 @@
                                                 style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
                                             <i class="bi bi-trash"></i>
                                         </button>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download/ewaybill" 
+                                        <a href="/file/<%= appointment.ewayBillFileId %>" 
                                            target="_blank" 
                                            class="btn btn-sm" 
                                            style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download-attachment/ewaybill" 
+                                        <a href="/file/<%= appointment.ewayBillFileId %>/download" 
                                            class="btn btn-sm" 
                                            style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
                                             <i class="bi bi-download"></i>
@@ -343,9 +335,7 @@
                         </small>
                     </div>
                     
-                    <!-- ============================================================ -->
                     <!-- ===== POD UPLOAD SECTION - ADMIN ONLY ===== -->
-                    <!-- ============================================================ -->
                     <div class="col-12 mt-3">
                         <hr style="border-color: rgba(201, 168, 76, 0.15);">
                         <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -360,7 +350,7 @@
                             </label>
                             <div>
                                 <input type="file" name="podFile" class="form-control" accept=".pdf" style="border: 2px solid #c9a84c; border-radius: 12px; padding: 8px 12px;">
-                                <% if (typeof appointment !== 'undefined' && appointment && appointment.podFile) { %>
+                                <% if (typeof appointment !== 'undefined' && appointment && appointment.podFileId) { %>
                                     <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
                                         <small style="color: rgba(10, 22, 40, 0.6); font-size: 0.6rem;">
                                             <i class="bi bi-check-circle" style="color: #2e7d32;"></i> 
@@ -371,13 +361,13 @@
                                                 style="border-radius: 50px; padding: 2px 10px; font-size: 0.6rem;">
                                             <i class="bi bi-trash"></i>
                                         </button>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download/pod" 
+                                        <a href="/file/<%= appointment.podFileId %>" 
                                            target="_blank" 
                                            class="btn btn-sm" 
                                            style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="/admin/appointment/<%= appointment._id %>/download-attachment/pod" 
+                                        <a href="/file/<%= appointment.podFileId %>/download" 
                                            class="btn btn-sm" 
                                            style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 50px; padding: 2px 10px; font-size: 0.6rem; text-decoration: none;">
                                             <i class="bi bi-download"></i>
@@ -393,7 +383,6 @@
                             <i class="bi bi-info-circle"></i> Only PDF files are allowed. Max size: 5MB.
                         </small>
                     </div>
-                    <!-- ============================================================ -->
                     
                     <!-- ===== BUTTONS ===== -->
                     <div class="col-12 mt-4">
@@ -517,13 +506,9 @@ document.addEventListener('DOMContentLoaded', function() {
         box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
     }
     
-    .btn[href*="/download/"]:hover,
-    .btn[href*="/download-attachment/"]:hover {
+    .btn[href*="/file/"]:hover,
+    .btn[href*="/download"]:hover {
         transform: translateY(-2px) scale(1.05);
-    }
-    
-    .btn[href*="/download-attachment/"]:hover {
-        box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3) !important;
     }
     
     .card-body .form-label {
@@ -620,8 +605,8 @@ document.addEventListener('DOMContentLoaded', function() {
             padding: 2px 8px !important;
         }
         
-        .btn[href*="/download/"],
-        .btn[href*="/download-attachment/"] {
+        .btn[href*="/file/"],
+        .btn[href*="/download"] {
             font-size: 0.55rem !important;
             padding: 2px 8px !important;
         }

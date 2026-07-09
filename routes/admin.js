@@ -4,98 +4,54 @@ const { adminAuth } = require('../middleware/auth');
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
 const upload = require('../utils/upload');
-const cloudinary = require('cloudinary').v2;
-const path = require('path');
-const fs = require('fs');
-
-// ============================================
-// CLOUDINARY CONFIG
-// ============================================
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
-console.log('☁️ Cloudinary Config (admin.js):', {
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '❌ Not Set',
-  api_key: process.env.CLOUDINARY_API_KEY ? '✅ Set' : '❌ Not Set'
-});
-
-// ============================================
-// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
-// ============================================
-const getCloudinaryUrl = (publicId) => {
-    if (!publicId) return null;
-    if (publicId.startsWith('http://') || publicId.startsWith('https://')) {
-        return publicId;
-    }
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    // ✅ 'raw' → 'image'
-    return `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.pdf`;
-};
-
-// ============================================
-// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
-// ============================================
-const getDownloadUrl = (publicId) => {
-    if (!publicId) return null;
-    if (publicId.startsWith('http://') || publicId.startsWith('https://')) {
-        return publicId;
-    }
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    // ✅ 'raw' → 'image'
-    return `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/${publicId}.pdf`;
-};
-
-// ============================================
-// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
-// ============================================
-const deleteFromCloudinary = async (publicId) => {
-    if (!publicId) return;
-    if (publicId.startsWith('http://') || publicId.startsWith('https://')) return;
-    
-    try {
-        const result = await cloudinary.uploader.destroy(publicId, {
-            resource_type: 'image' // ✅ 'raw' → 'image'
-        });
-        console.log(`🗑️ Cloudinary delete result for ${publicId}:`, result);
-        return result;
-    } catch (error) {
-        console.error('❌ Cloudinary delete error:', error);
-    }
-};
+const { uploadFile } = require('../utils/upload');
+const { getFile, deleteFile } = require('../utils/mongoStorage');
+const mongoose = require('mongoose');
 
 // ============================================
 // HELPER: Get file URL (for EJS templates)
 // ============================================
 const getFileUrl = (appointment, type) => {
     const fileMap = {
-        'po': appointment.poFile,
-        'invoice': appointment.invoiceFile,
-        'ewaybill': appointment.ewayBillFile,
-        'pod': appointment.podFile
+        'po': appointment.poFileId,
+        'invoice': appointment.invoiceFileId,
+        'ewaybill': appointment.ewayBillFileId,
+        'pod': appointment.podFileId
     };
-    const publicId = fileMap[type];
-    if (!publicId) return null;
-    return getCloudinaryUrl(publicId);
+    const fileId = fileMap[type];
+    if (!fileId) return null;
+    return `/file/${fileId}`;
 };
 
 // ============================================
-// 📄 VIEW PDF ROUTES (Opens in browser - inline)
+// HELPER: Get download URL (for EJS templates)
+// ============================================
+const getDownloadUrl = (appointment, type) => {
+    const fileMap = {
+        'po': appointment.poFileId,
+        'invoice': appointment.invoiceFileId,
+        'ewaybill': appointment.ewayBillFileId,
+        'pod': appointment.podFileId
+    };
+    const fileId = fileMap[type];
+    if (!fileId) return null;
+    return `/file/${fileId}/download`;
+};
+
+// ============================================
+// 📄 VIEW PDF ROUTES (MongoDB GridFS)
 // ============================================
 
 // ===== VIEW PO PDF =====
 router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.poFile) {
+    if (!appointment || !appointment.poFileId) {
       return res.status(404).send('File not found');
     }
     
-    const fileUrl = getCloudinaryUrl(appointment.poFile);
-    console.log('📥 View PO - URL:', fileUrl);
-    return res.redirect(fileUrl);
+    // ✅ Redirect to GridFS file route
+    return res.redirect(`/file/${appointment.poFileId}`);
     
   } catch (error) {
     console.error('❌ View PO Error:', error);
@@ -107,13 +63,11 @@ router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
 router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.invoiceFile) {
+    if (!appointment || !appointment.invoiceFileId) {
       return res.status(404).send('File not found');
     }
     
-    const fileUrl = getCloudinaryUrl(appointment.invoiceFile);
-    console.log('📥 View Invoice - URL:', fileUrl);
-    return res.redirect(fileUrl);
+    return res.redirect(`/file/${appointment.invoiceFileId}`);
     
   } catch (error) {
     console.error('❌ View Invoice Error:', error);
@@ -125,13 +79,11 @@ router.get('/appointment/:id/download/invoice', adminAuth, async (req, res) => {
 router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.ewayBillFile) {
+    if (!appointment || !appointment.ewayBillFileId) {
       return res.status(404).send('File not found');
     }
     
-    const fileUrl = getCloudinaryUrl(appointment.ewayBillFile);
-    console.log('📥 View E-Way Bill - URL:', fileUrl);
-    return res.redirect(fileUrl);
+    return res.redirect(`/file/${appointment.ewayBillFileId}`);
     
   } catch (error) {
     console.error('❌ View E-Way Bill Error:', error);
@@ -143,13 +95,11 @@ router.get('/appointment/:id/download/ewaybill', adminAuth, async (req, res) => 
 router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.podFile) {
+    if (!appointment || !appointment.podFileId) {
       return res.status(404).send('File not found');
     }
     
-    const fileUrl = getCloudinaryUrl(appointment.podFile);
-    console.log('📥 View POD - URL:', fileUrl);
-    return res.redirect(fileUrl);
+    return res.redirect(`/file/${appointment.podFileId}`);
     
   } catch (error) {
     console.error('❌ View POD Error:', error);
@@ -165,13 +115,11 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
 router.get('/appointment/:id/download-attachment/po', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.poFile) {
+    if (!appointment || !appointment.poFileId) {
       return res.status(404).send('File not found');
     }
     
-    const downloadUrl = getDownloadUrl(appointment.poFile);
-    console.log('📥 Force Download PO - URL:', downloadUrl);
-    return res.redirect(downloadUrl);
+    return res.redirect(`/file/${appointment.poFileId}/download`);
     
   } catch (error) {
     console.error('❌ Force Download PO Error:', error);
@@ -183,13 +131,11 @@ router.get('/appointment/:id/download-attachment/po', adminAuth, async (req, res
 router.get('/appointment/:id/download-attachment/invoice', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.invoiceFile) {
+    if (!appointment || !appointment.invoiceFileId) {
       return res.status(404).send('File not found');
     }
     
-    const downloadUrl = getDownloadUrl(appointment.invoiceFile);
-    console.log('📥 Force Download Invoice - URL:', downloadUrl);
-    return res.redirect(downloadUrl);
+    return res.redirect(`/file/${appointment.invoiceFileId}/download`);
     
   } catch (error) {
     console.error('❌ Force Download Invoice Error:', error);
@@ -201,13 +147,11 @@ router.get('/appointment/:id/download-attachment/invoice', adminAuth, async (req
 router.get('/appointment/:id/download-attachment/ewaybill', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.ewayBillFile) {
+    if (!appointment || !appointment.ewayBillFileId) {
       return res.status(404).send('File not found');
     }
     
-    const downloadUrl = getDownloadUrl(appointment.ewayBillFile);
-    console.log('📥 Force Download E-Way Bill - URL:', downloadUrl);
-    return res.redirect(downloadUrl);
+    return res.redirect(`/file/${appointment.ewayBillFileId}/download`);
     
   } catch (error) {
     console.error('❌ Force Download E-Way Bill Error:', error);
@@ -219,13 +163,11 @@ router.get('/appointment/:id/download-attachment/ewaybill', adminAuth, async (re
 router.get('/appointment/:id/download-attachment/pod', adminAuth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
-    if (!appointment || !appointment.podFile) {
+    if (!appointment || !appointment.podFileId) {
       return res.status(404).send('File not found');
     }
     
-    const downloadUrl = getDownloadUrl(appointment.podFile);
-    console.log('📥 Force Download POD - URL:', downloadUrl);
-    return res.redirect(downloadUrl);
+    return res.redirect(`/file/${appointment.podFileId}/download`);
     
   } catch (error) {
     console.error('❌ Force Download POD Error:', error);
@@ -331,7 +273,7 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 
 // ============================================
 // POST - Update Appointment (Admin Direct) with File Upload
-// ✅ FIXED: Using 'image' in URL
+// ✅ FIXED: Using MongoDB GridFS
 // ============================================
 router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -366,42 +308,31 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
 
-    // ✅ FIXED: Using 'image' instead of 'raw'
-    const getFileDetails = (file) => {
-      if (!file) return { publicId: '', url: '', name: '' };
-      const publicId = file.filename || file.path || '';
-      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      // ✅ 'raw' → 'image'
-      const url = `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.pdf`;
-      return {
-        publicId: publicId,
-        url: url,
-        name: file.originalname || ''
-      };
-    };
-
+    // ✅ Upload files to MongoDB
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
     const podFile = req.files?.podFile ? req.files.podFile[0] : null;
 
-    if (poFile && existingAppointment.poFile) {
-      await deleteFromCloudinary(existingAppointment.poFile);
+    // ✅ Delete old files from MongoDB if new ones are uploaded
+    if (poFile && existingAppointment.poFileId) {
+      await deleteFile(existingAppointment.poFileId);
     }
-    if (invoiceFile && existingAppointment.invoiceFile) {
-      await deleteFromCloudinary(existingAppointment.invoiceFile);
+    if (invoiceFile && existingAppointment.invoiceFileId) {
+      await deleteFile(existingAppointment.invoiceFileId);
     }
-    if (ewayBillFile && existingAppointment.ewayBillFile) {
-      await deleteFromCloudinary(existingAppointment.ewayBillFile);
+    if (ewayBillFile && existingAppointment.ewayBillFileId) {
+      await deleteFile(existingAppointment.ewayBillFileId);
     }
-    if (podFile && existingAppointment.podFile) {
-      await deleteFromCloudinary(existingAppointment.podFile);
+    if (podFile && existingAppointment.podFileId) {
+      await deleteFile(existingAppointment.podFileId);
     }
 
-    const poDetails = getFileDetails(poFile);
-    const invoiceDetails = getFileDetails(invoiceFile);
-    const ewayDetails = getFileDetails(ewayBillFile);
-    const podDetails = getFileDetails(podFile);
+    // ✅ Upload new files
+    const poDetails = poFile ? await uploadFile(poFile) : { id: null, name: '' };
+    const invoiceDetails = invoiceFile ? await uploadFile(invoiceFile) : { id: null, name: '' };
+    const ewayDetails = ewayBillFile ? await uploadFile(ewayBillFile) : { id: null, name: '' };
+    const podDetails = podFile ? await uploadFile(podFile) : { id: null, name: '' };
 
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       req.params.id,
@@ -416,17 +347,14 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
-        poFile: poFile ? poDetails.publicId : existingAppointment.poFile,
-        poFileUrl: poFile ? poDetails.url : existingAppointment.poFileUrl,
+        // ✅ Store MongoDB file IDs
+        poFileId: poFile ? poDetails.id : existingAppointment.poFileId,
         poFileOriginalName: poFile ? poDetails.name : existingAppointment.poFileOriginalName,
-        invoiceFile: invoiceFile ? invoiceDetails.publicId : existingAppointment.invoiceFile,
-        invoiceFileUrl: invoiceFile ? invoiceDetails.url : existingAppointment.invoiceFileUrl,
+        invoiceFileId: invoiceFile ? invoiceDetails.id : existingAppointment.invoiceFileId,
         invoiceFileOriginalName: invoiceFile ? invoiceDetails.name : existingAppointment.invoiceFileOriginalName,
-        ewayBillFile: ewayBillFile ? ewayDetails.publicId : existingAppointment.ewayBillFile,
-        ewayBillFileUrl: ewayBillFile ? ewayDetails.url : existingAppointment.ewayBillFileUrl,
+        ewayBillFileId: ewayBillFile ? ewayDetails.id : existingAppointment.ewayBillFileId,
         ewayBillFileOriginalName: ewayBillFile ? ewayDetails.name : existingAppointment.ewayBillFileOriginalName,
-        podFile: podFile ? podDetails.publicId : existingAppointment.podFile,
-        podFileUrl: podFile ? podDetails.url : existingAppointment.podFileUrl,
+        podFileId: podFile ? podDetails.id : existingAppointment.podFileId,
         podFileOriginalName: podFile ? podDetails.name : existingAppointment.podFileOriginalName,
         updatedAt: Date.now()
       },
@@ -564,7 +492,8 @@ router.get('/appointment/:id', adminAuth, async (req, res) => {
       title: 'Appointment Details',
       user: req.user,
       appointment,
-      getFileUrl
+      getFileUrl,
+      getDownloadUrl
     });
   } catch (error) {
     console.error('Appointment Details Error:', error);
@@ -583,16 +512,17 @@ router.delete('/appointment/:id', adminAuth, async (req, res) => {
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
     
-    const files = [
-      appointment.poFile,
-      appointment.invoiceFile,
-      appointment.ewayBillFile,
-      appointment.podFile
+    // ✅ Delete files from MongoDB
+    const fileIds = [
+      appointment.poFileId,
+      appointment.invoiceFileId,
+      appointment.ewayBillFileId,
+      appointment.podFileId
     ];
     
-    for (const file of files) {
-      if (file && !file.startsWith('http://') && !file.startsWith('https://')) {
-        await deleteFromCloudinary(file);
+    for (const fileId of fileIds) {
+      if (fileId) {
+        await deleteFile(fileId);
       }
     }
     
@@ -619,45 +549,40 @@ router.delete('/appointment/:id/file/:type', adminAuth, async (req, res) => {
 
     let fileField = '';
     let nameField = '';
-    let urlField = '';
-    let fileValue = '';
+    let fileId = null;
     
     switch(type) {
       case 'po':
-        fileField = 'poFile';
+        fileField = 'poFileId';
         nameField = 'poFileOriginalName';
-        urlField = 'poFileUrl';
-        fileValue = appointment.poFile;
+        fileId = appointment.poFileId;
         break;
       case 'invoice':
-        fileField = 'invoiceFile';
+        fileField = 'invoiceFileId';
         nameField = 'invoiceFileOriginalName';
-        urlField = 'invoiceFileUrl';
-        fileValue = appointment.invoiceFile;
+        fileId = appointment.invoiceFileId;
         break;
       case 'ewaybill':
-        fileField = 'ewayBillFile';
+        fileField = 'ewayBillFileId';
         nameField = 'ewayBillFileOriginalName';
-        urlField = 'ewayBillFileUrl';
-        fileValue = appointment.ewayBillFile;
+        fileId = appointment.ewayBillFileId;
         break;
       case 'pod':
-        fileField = 'podFile';
+        fileField = 'podFileId';
         nameField = 'podFileOriginalName';
-        urlField = 'podFileUrl';
-        fileValue = appointment.podFile;
+        fileId = appointment.podFileId;
         break;
       default:
         return res.status(400).json({ error: 'Invalid file type' });
     }
 
-    if (fileValue && !fileValue.startsWith('http://') && !fileValue.startsWith('https://')) {
-      await deleteFromCloudinary(fileValue);
+    // ✅ Delete from MongoDB
+    if (fileId) {
+      await deleteFile(fileId);
     }
 
-    appointment[fileField] = '';
+    appointment[fileField] = null;
     appointment[nameField] = '';
-    appointment[urlField] = '';
     await appointment.save();
 
     res.json({ success: true, message: 'File deleted successfully' });

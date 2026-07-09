@@ -127,7 +127,7 @@
                     </div>
                 </div>
 
-                <!-- ===== PDF DOCUMENTS SECTION ===== -->
+                <!-- ===== PDF DOCUMENTS SECTION - MONGODB GRIDFS ===== -->
                 <div class="row mt-3">
                     <div class="col-12">
                         <h6 style="color: #0a1628; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; border-bottom: 2px solid #c9a84c; padding-bottom: 8px;">
@@ -146,26 +146,23 @@
                                         <i class="bi bi-file-text" style="color: #c9a84c;"></i>
                                         <span style="font-weight: 600; font-size: 0.8rem;">PO PDF</span>
                                     </div>
-                                    <% if (appointment.poFile) { %>
+                                    <% if (appointment.poFileId) { %>
                                         <div class="d-flex align-items-center gap-1">
-                                            <!-- ✅ VIEW PDF - Opens in browser -->
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/po' : '/client/appointment/' + appointment._id + '/download/po' %>" 
+                                            <a href="/file/<%= appointment.poFileId %>" 
                                                target="_blank" 
                                                class="btn btn-sm" 
                                                style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
                                                title="View PDF">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <!-- ✅ DOWNLOAD PDF - Force download -->
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download-attachment/po' : '/client/appointment/' + appointment._id + '/download-attachment/po' %>" 
+                                            <a href="/file/<%= appointment.poFileId %>/download" 
                                                class="btn btn-sm" 
                                                style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
                                                title="Download">
                                                 <i class="bi bi-download"></i>
                                             </a>
-                                            <!-- ✅ DELETE FILE -->
                                             <button type="button" class="btn btn-sm btn-danger delete-file" 
-                                                    data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/po' : '/client/appointment/' + appointment._id + '/file/po' %>" 
+                                                    data-url="/admin/appointment/<%= appointment._id %>/file/po" 
                                                     style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" 
                                                     title="Delete">
                                                 <i class="bi bi-trash"></i>
@@ -184,26 +181,23 @@
                                         <i class="bi bi-receipt" style="color: #c9a84c;"></i>
                                         <span style="font-weight: 600; font-size: 0.8rem;">Invoice PDF</span>
                                     </div>
-                                    <% if (appointment.invoiceFile) { %>
+                                    <% if (appointment.invoiceFileId) { %>
                                         <div class="d-flex align-items-center gap-1">
-                                            <!-- ✅ VIEW PDF -->
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/invoice' : '/client/appointment/' + appointment._id + '/download/invoice' %>" 
+                                            <a href="/file/<%= appointment.invoiceFileId %>" 
                                                target="_blank" 
                                                class="btn btn-sm" 
                                                style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
                                                title="View PDF">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <!-- ✅ DOWNLOAD PDF -->
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download-attachment/invoice' : '/client/appointment/' + appointment._id + '/download-attachment/invoice' %>" 
+                                            <a href="/file/<%= appointment.invoiceFileId %>/download" 
                                                class="btn btn-sm" 
                                                style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
                                                title="Download">
                                                 <i class="bi bi-download"></i>
                                             </a>
-                                            <!-- ✅ DELETE FILE -->
                                             <button type="button" class="btn btn-sm btn-danger delete-file" 
-                                                    data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/invoice' : '/client/appointment/' + appointment._id + '/file/invoice' %>" 
+                                                    data-url="/admin/appointment/<%= appointment._id %>/file/invoice" 
                                                     style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" 
                                                     title="Delete">
                                                 <i class="bi bi-trash"></i>
@@ -222,26 +216,23 @@
                                         <i class="bi bi-truck" style="color: #c9a84c;"></i>
                                         <span style="font-weight: 600; font-size: 0.8rem;">E-Way Bill PDF</span>
                                     </div>
-                                    <% if (appointment.ewayBillFile) { %>
+                                    <% if (appointment.ewayBillFileId) { %>
                                         <div class="d-flex align-items-center gap-1">
-                                            <!-- ✅ VIEW PDF -->
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/ewaybill' : '/client/appointment/' + appointment._id + '/download/ewaybill' %>" 
+                                            <a href="/file/<%= appointment.ewayBillFileId %>" 
                                                target="_blank" 
                                                class="btn btn-sm" 
                                                style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
                                                title="View PDF">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <!-- ✅ DOWNLOAD PDF -->
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download-attachment/ewaybill' : '/client/appointment/' + appointment._id + '/download-attachment/ewaybill' %>" 
+                                            <a href="/file/<%= appointment.ewayBillFileId %>/download" 
                                                class="btn btn-sm" 
                                                style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
                                                title="Download">
                                                 <i class="bi bi-download"></i>
                                             </a>
-                                            <!-- ✅ DELETE FILE -->
                                             <button type="button" class="btn btn-sm btn-danger delete-file" 
-                                                    data-url="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/file/ewaybill' : '/client/appointment/' + appointment._id + '/file/ewaybill' %>" 
+                                                    data-url="/admin/appointment/<%= appointment._id %>/file/ewaybill" 
                                                     style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" 
                                                     title="Delete">
                                                 <i class="bi bi-trash"></i>
@@ -265,25 +256,22 @@
                                             <%= typeof user !== 'undefined' && user.role === 'admin' ? 'Admin' : 'View Only' %>
                                         </span>
                                     </div>
-                                    <% if (appointment.podFile) { %>
+                                    <% if (appointment.podFileId) { %>
                                         <div class="d-flex align-items-center gap-1">
-                                            <!-- ✅ VIEW PDF -->
-                                            <a href="<%= typeof user !== 'undefined' && user.role === 'admin' ? '/admin/appointment/' + appointment._id + '/download/pod' : '/client/appointment/' + appointment._id + '/download/pod' %>" 
+                                            <a href="/file/<%= appointment.podFileId %>" 
                                                target="_blank" 
                                                class="btn btn-sm" 
                                                style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
                                                title="View PDF">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <!-- ✅ DOWNLOAD PDF (if admin) -->
                                             <% if (typeof user !== 'undefined' && user.role === 'admin') { %>
-                                                <a href="/admin/appointment/<%= appointment._id %>/download-attachment/pod" 
+                                                <a href="/file/<%= appointment.podFileId %>/download" 
                                                    class="btn btn-sm" 
                                                    style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; text-decoration: none; transition: all 0.3s ease;" 
                                                    title="Download">
                                                     <i class="bi bi-download"></i>
                                                 </a>
-                                                <!-- ✅ DELETE FILE (Admin only) -->
                                                 <button type="button" class="btn btn-sm btn-danger delete-file" 
                                                         data-url="/admin/appointment/<%= appointment._id %>/file/pod" 
                                                         style="border-radius: 4px; padding: 4px 8px; font-size: 0.6rem;" 
@@ -459,13 +447,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /* View Button Hover */
-    .btn[href*="/download/"]:hover {
+    .btn[href*="/file/"]:hover {
         transform: translateY(-2px) scale(1.05);
         box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3) !important;
     }
     
     /* Download Button Hover */
-    .btn[href*="download-attachment"]:hover {
+    .btn[href*="/download"]:hover {
         transform: translateY(-2px) scale(1.05);
         box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3) !important;
     }

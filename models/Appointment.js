@@ -49,59 +49,42 @@ const AppointmentSchema = new mongoose.Schema({
     default: ''
   },
   // =========================================
-  // ===== PDF FILE FIELDS =====
-  // Store Cloudinary public_id
-  poFile: {
-    type: String,
-    default: ''
-  },
-  // ✅ NEW: Store full Cloudinary URL for direct access
-  poFileUrl: {
-    type: String,
-    default: ''
+  // ===== MONGODB FILE FIELDS (GridFS) =====
+  // PO File
+  poFileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'File',
+    default: null
   },
   poFileOriginalName: {
     type: String,
     default: ''
   },
-  // Store Cloudinary public_id
-  invoiceFile: {
-    type: String,
-    default: ''
-  },
-  // ✅ NEW: Store full Cloudinary URL for direct access
-  invoiceFileUrl: {
-    type: String,
-    default: ''
+  // Invoice File
+  invoiceFileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'File',
+    default: null
   },
   invoiceFileOriginalName: {
     type: String,
     default: ''
   },
-  // Store Cloudinary public_id
-  ewayBillFile: {
-    type: String,
-    default: ''
-  },
-  // ✅ NEW: Store full Cloudinary URL for direct access
-  ewayBillFileUrl: {
-    type: String,
-    default: ''
+  // E-Way Bill File
+  ewayBillFileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'File',
+    default: null
   },
   ewayBillFileOriginalName: {
     type: String,
     default: ''
   },
-  // ===== POD FILE FIELD (ADMIN ONLY) =====
-  // Store Cloudinary public_id
-  podFile: {
-    type: String,
-    default: ''
-  },
-  // ✅ NEW: Store full Cloudinary URL for direct access
-  podFileUrl: {
-    type: String,
-    default: ''
+  // POD File (Admin Only)
+  podFileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'File',
+    default: null
   },
   podFileOriginalName: {
     type: String,
@@ -144,61 +127,49 @@ AppointmentSchema.pre('save', function(next) {
 });
 
 // ============================================
-// ✅ VIRTUAL: Get full Cloudinary URL
+// ✅ VIRTUAL: Get File URL
 // ============================================
-AppointmentSchema.virtual('poFileFullUrl').get(function() {
-  if (!this.poFile) return '';
-  if (this.poFileUrl) return this.poFileUrl;
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloudName}/raw/upload/${this.poFile}`;
+AppointmentSchema.virtual('poFileUrl').get(function() {
+  if (!this.poFileId) return null;
+  return `/file/${this.poFileId}`;
 });
 
-AppointmentSchema.virtual('invoiceFileFullUrl').get(function() {
-  if (!this.invoiceFile) return '';
-  if (this.invoiceFileUrl) return this.invoiceFileUrl;
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloudName}/raw/upload/${this.invoiceFile}`;
+AppointmentSchema.virtual('invoiceFileUrl').get(function() {
+  if (!this.invoiceFileId) return null;
+  return `/file/${this.invoiceFileId}`;
 });
 
-AppointmentSchema.virtual('ewayBillFileFullUrl').get(function() {
-  if (!this.ewayBillFile) return '';
-  if (this.ewayBillFileUrl) return this.ewayBillFileUrl;
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloudName}/raw/upload/${this.ewayBillFile}`;
+AppointmentSchema.virtual('ewayBillFileUrl').get(function() {
+  if (!this.ewayBillFileId) return null;
+  return `/file/${this.ewayBillFileId}`;
 });
 
-AppointmentSchema.virtual('podFileFullUrl').get(function() {
-  if (!this.podFile) return '';
-  if (this.podFileUrl) return this.podFileUrl;
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloudName}/raw/upload/${this.podFile}`;
+AppointmentSchema.virtual('podFileUrl').get(function() {
+  if (!this.podFileId) return null;
+  return `/file/${this.podFileId}`;
 });
 
 // ============================================
-// ✅ VIRTUAL: Get download URL with attachment
+// ✅ VIRTUAL: Get Download URL
 // ============================================
 AppointmentSchema.virtual('poFileDownloadUrl').get(function() {
-  if (!this.poFile) return '';
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${this.poFile}`;
+  if (!this.poFileId) return null;
+  return `/file/${this.poFileId}/download`;
 });
 
 AppointmentSchema.virtual('invoiceFileDownloadUrl').get(function() {
-  if (!this.invoiceFile) return '';
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${this.invoiceFile}`;
+  if (!this.invoiceFileId) return null;
+  return `/file/${this.invoiceFileId}/download`;
 });
 
 AppointmentSchema.virtual('ewayBillFileDownloadUrl').get(function() {
-  if (!this.ewayBillFile) return '';
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${this.ewayBillFile}`;
+  if (!this.ewayBillFileId) return null;
+  return `/file/${this.ewayBillFileId}/download`;
 });
 
 AppointmentSchema.virtual('podFileDownloadUrl').get(function() {
-  if (!this.podFile) return '';
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${this.podFile}`;
+  if (!this.podFileId) return null;
+  return `/file/${this.podFileId}/download`;
 });
 
 // ============================================
