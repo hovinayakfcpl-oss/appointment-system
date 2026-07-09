@@ -17,15 +17,16 @@ console.log('✅ Cloudinary Config:', {
 });
 
 // ============================================
-// STORAGE - Cloudinary (IMAGE TYPE FOR PDF)
-// ✅ FIX 1: Changed resource_type from 'raw' to 'image' for proper PDF viewing
+// STORAGE - Cloudinary (AUTO TYPE FOR PDF)
+// ✅ FIX 1: Changed resource_type from 'image' to 'auto' for better compatibility
 // ✅ FIX 2: Added access_mode: 'public' to fix 401 download error
+// ✅ FIX 3: Store full URL for direct download
 // ============================================
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'appointment_documents',
-    resource_type: 'image', // ✅ CHANGED: 'raw' → 'image' for proper PDF serving
+    resource_type: 'auto', // ✅ CHANGED: 'image' → 'auto' for better compatibility
     format: 'pdf',
     access_mode: 'public', // ✅ FIX: Makes files publicly downloadable
     public_id: (req, file) => {
@@ -92,25 +93,49 @@ const handleMulterError = (err, req, res, next) => {
 };
 
 // ============================================
+// HELPER: Get full Cloudinary URL for file
+// ✅ NEW: Returns complete URL for direct access
+// ============================================
+const getCloudinaryFullUrl = (publicId) => {
+  if (!publicId) return '';
+  if (publicId.startsWith('http://') || publicId.startsWith('https://')) {
+    return publicId;
+  }
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
+};
+
+// ============================================
+// HELPER: Get download URL with attachment flag
+// ✅ NEW: Returns URL with fl_attachment for force download
+// ============================================
+const getCloudinaryDownloadUrl = (publicId) => {
+  if (!publicId) return '';
+  if (publicId.startsWith('http://') || publicId.startsWith('https://')) {
+    return publicId;
+  }
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}`;
+};
+
+// ============================================
 // HELPER: Get public URL for file
-// ✅ FIXED: Using 'image' resource_type
 // ============================================
 const getFileUrl = (publicId) => {
   return cloudinary.url(publicId, {
     secure: true,
-    resource_type: 'image' // ✅ CHANGED: 'raw' → 'image'
+    resource_type: 'auto'
   });
 };
 
 // ============================================
 // HELPER: Get signed URL for secure download
-// ✅ FIXED: Using 'image' resource_type
 // ============================================
 const getSignedUrl = (publicId, expiresInSeconds = 60) => {
   return cloudinary.url(publicId, {
     secure: true,
     sign_url: true,
-    resource_type: 'image', // ✅ CHANGED: 'raw' → 'image'
+    resource_type: 'auto',
     expires_at: Math.floor(Date.now() / 1000) + expiresInSeconds
   });
 };
@@ -123,7 +148,7 @@ const getPdfUrl = (publicId, options = {}) => {
   
   const url = cloudinary.url(publicId, {
     secure: true,
-    resource_type: 'image',
+    resource_type: 'auto',
     format: 'pdf',
     flags: download ? 'attachment' : undefined,
     filename_override: filename || `${publicId}.pdf`
@@ -140,3 +165,5 @@ module.exports.handleMulterError = handleMulterError;
 module.exports.getFileUrl = getFileUrl;
 module.exports.getSignedUrl = getSignedUrl;
 module.exports.getPdfUrl = getPdfUrl;
+module.exports.getCloudinaryFullUrl = getCloudinaryFullUrl;
+module.exports.getCloudinaryDownloadUrl = getCloudinaryDownloadUrl;
