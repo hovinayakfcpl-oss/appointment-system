@@ -20,24 +20,31 @@
                 <a href="/admin/dashboard" class="btn" style="background: rgba(10, 22, 40, 0.05); color: #0a1628; font-weight: 600; border: 2px solid rgba(10, 22, 40, 0.1); border-radius: 50px; padding: 12px 30px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem;">
                     <i class="bi bi-arrow-left"></i> Back to Dashboard
                 </a>
-                <!-- ===== View Client Details ===== -->
                 <a href="/admin/client/<%= typeof client !== 'undefined' ? client._id : '' %>" class="btn" style="background: linear-gradient(135deg, #c9a84c, #a8873a); color: #0a1628; font-weight: 700; border: none; border-radius: 50px; padding: 12px 30px; box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem;">
                     <i class="bi bi-person"></i> Client Details
                 </a>
             </div>
         </div>
         
-        <!-- ===== SEARCH BAR ===== -->
+        <!-- ===== FILTER + SEARCH ===== -->
         <div class="row mb-3 g-2">
+            <div class="col-md-3">
+                <select id="clientAppStatusFilter" class="form-select" style="border-radius: 12px; border: 2px solid #e8d5a3; padding: 12px 18px; font-weight: 600; background: white; color: #0a1628; cursor: pointer; transition: all 0.3s ease;" onchange="filterClientAppTable()">
+                    <option value="all">📋 All Status</option>
+                    <option value="pending">⏳ Pending</option>
+                    <option value="confirmed">✅ Confirmed</option>
+                    <option value="delivered">📦 Delivered</option>
+                </select>
+            </div>
             <div class="col-md-6 col-lg-5">
                 <div class="input-group" style="border-radius: 12px; overflow: hidden; box-shadow: 0 2px 15px rgba(10, 22, 40, 0.04);">
                     <span class="input-group-text" style="background: #0a1628; color: #c9a84c; border: none; padding: 12px 20px; font-size: 1.1rem;">
                         <i class="bi bi-search"></i>
                     </span>
-                    <input type="text" id="clientAppSearchInput" class="form-control" placeholder="Search by PO, Docket, Invoice or Appointment ID..." style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 20px; border-radius: 0 12px 12px 0; transition: all 0.3s ease; font-size: 1rem;">
+                    <input type="text" id="clientAppSearchInput" class="form-control" placeholder="Search by PO, Docket, City, Invoice or ID..." style="border: 2px solid #e8d5a3; border-left: none; padding: 12px 20px; border-radius: 0 12px 12px 0; transition: all 0.3s ease; font-size: 1rem;" onkeyup="filterClientAppTable()">
                 </div>
             </div>
-            <div class="col-md-6 col-lg-7 text-md-end mt-2 mt-md-0">
+            <div class="col-md-3 text-md-end mt-2 mt-md-0">
                 <span class="badge" style="background: rgba(201, 168, 76, 0.08); color: #0a1628; padding: 10px 20px; border-radius: 50px; font-size: 0.8rem; border: 1px solid rgba(201, 168, 76, 0.1);">
                     <i class="bi bi-info-circle" style="color: #c9a84c;"></i> 
                     <span id="clientAppSearchCount"><%= typeof appointments !== 'undefined' ? appointments.length : 0 %></span> appointments found
@@ -77,6 +84,9 @@
                                         <i class="bi bi-receipt" style="color: #c9a84c; font-size: 1rem;"></i> Invoice
                                     </th>
                                     <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; padding: 14px 18px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
+                                        <i class="bi bi-building" style="color: #c9a84c; font-size: 1rem;"></i> City
+                                    </th>
+                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; padding: 14px 18px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-box-seam" style="color: #c9a84c; font-size: 1rem;"></i> Docket
                                     </th>
                                     <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; padding: 14px 18px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
@@ -84,9 +94,6 @@
                                     </th>
                                     <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; padding: 14px 18px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
                                         <i class="bi bi-upc-scan" style="color: #c9a84c; font-size: 1rem;"></i> LR No.
-                                    </th>
-                                    <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; padding: 14px 18px; border-bottom: 3px solid #c9a84c; white-space: nowrap;">
-                                        <i class="bi bi-calendar3" style="color: #c9a84c; font-size: 1rem;"></i> Delivery
                                     </th>
                                     <th style="background: #f8f4eb; color: #0a1628; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; padding: 14px 18px; border-bottom: 3px solid #c9a84c; text-align: center; white-space: nowrap;">
                                         <i class="bi bi-tag" style="color: #c9a84c; font-size: 1rem;"></i> Status
@@ -102,7 +109,9 @@
                                         data-po="<%= app.poNumber.toLowerCase() %>" 
                                         data-docket="<%= (app.docketNumber || '').toLowerCase() %>"
                                         data-invoice="<%= app.invoiceNumber.toLowerCase() %>"
-                                        data-id="<%= app.appointmentId.toLowerCase() %>">
+                                        data-city="<%= (app.city || '').toLowerCase() %>"
+                                        data-id="<%= app.appointmentId.toLowerCase() %>"
+                                        data-status="<%= app.status %>">
                                         <td style="padding: 14px 18px; vertical-align: middle;">
                                             <strong style="color: #0a1628; font-size: 0.9rem;"><%= app.appointmentId %></strong>
                                         </td>
@@ -113,6 +122,9 @@
                                             <%= app.invoiceNumber %>
                                         </td>
                                         <td style="padding: 14px 18px; vertical-align: middle; color: #1a2a4a; font-weight: 600; font-size: 0.9rem;">
+                                            <%= app.city || '-' %>
+                                        </td>
+                                        <td style="padding: 14px 18px; vertical-align: middle; color: #1a2a4a; font-weight: 600; font-size: 0.9rem;">
                                             <%= app.docketNumber || '-' %>
                                         </td>
                                         <td style="padding: 14px 18px; vertical-align: middle; color: #1a2a4a; font-weight: 600; font-size: 0.9rem;">
@@ -120,10 +132,6 @@
                                         </td>
                                         <td style="padding: 14px 18px; vertical-align: middle; color: #1a2a4a; font-weight: 600; font-size: 0.9rem;">
                                             <%= app.forwarderLRNumber || '-' %>
-                                        </td>
-                                        <td style="padding: 14px 18px; vertical-align: middle; color: #1a2a4a; font-weight: 600; font-size: 0.9rem; white-space: nowrap;">
-                                            <i class="bi bi-calendar" style="color: #c9a84c; font-size: 0.8rem;"></i>
-                                            <%= new Date(app.deliveryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %>
                                         </td>
                                         <td style="padding: 14px 18px; vertical-align: middle; text-align: center;">
                                             <span class="badge" style="background: <%= app.status === 'pending' ? 'linear-gradient(135deg, #e65100, #bf360c)' : app.status === 'confirmed' ? 'linear-gradient(135deg, #00695c, #004d40)' : 'linear-gradient(135deg, #2e7d32, #1b5e20)' %>; color: white; padding: 6px 16px; border-radius: 50px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; white-space: nowrap;">
@@ -134,22 +142,15 @@
                                         <td style="padding: 14px 18px; vertical-align: middle; text-align: center;">
                                             <!-- ===== Action Buttons ===== -->
                                             <div class="d-flex flex-wrap align-items-center justify-content-center gap-1">
-                                                <!-- View Details -->
                                                 <a href="/admin/appointment/<%= app._id %>" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 10px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem;" title="View Details">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-                                                
-                                                <!-- Edit Appointment -->
                                                 <a href="/admin/appointment/<%= app._id %>/edit" class="btn btn-sm" style="background: rgba(52, 152, 219, 0.1); color: #2980b9; border: 1px solid rgba(52, 152, 219, 0.15); border-radius: 6px; padding: 6px 10px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem;" title="Edit Appointment">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
-                                                
-                                                <!-- Edit Forwarder -->
                                                 <a href="/admin/appointment/<%= app._id %>/edit-forwarder" class="btn btn-sm" style="background: rgba(201, 168, 76, 0.1); color: #c9a84c; border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 6px; padding: 6px 10px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem;" title="Edit Forwarder">
                                                     <i class="bi bi-truck"></i>
                                                 </a>
-                                                
-                                                <!-- Delete Appointment -->
                                                 <form action="/admin/appointment/<%= app._id %>" method="POST" class="d-inline">
                                                     <input type="hidden" name="_method" value="DELETE">
                                                     <button type="submit" class="btn btn-sm" style="background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.15); border-radius: 6px; padding: 6px 10px; transition: all 0.3s ease; font-weight: 600; font-size: 0.65rem;" onclick="return confirm('Are you sure you want to delete this appointment?')" title="Delete Appointment">
@@ -164,7 +165,7 @@
                                                     <select name="status" class="form-select form-select-sm" style="border-radius: 6px; border: 2px solid rgba(201, 168, 76, 0.15); padding: 4px 8px; font-size: 0.65rem; font-weight: 600; background: white; color: #0a1628; cursor: pointer; transition: all 0.3s ease; min-width: 90px;" onchange="this.form.submit()">
                                                         <option value="pending" <%= app.status === 'pending' ? 'selected' : '' %> style="color: #e65100;">⏳ Pending</option>
                                                         <option value="confirmed" <%= app.status === 'confirmed' ? 'selected' : '' %> style="color: #00695c;">✅ Confirmed</option>
-                                                        <option value="delivered" <%= app.status === 'delivered' ? 'selected' : '' %> style="color: #2e7d32;">✔️ Completed</option>
+                                                        <option value="delivered" <%= app.status === 'delivered' ? 'selected' : '' %> style="color: #2e7d32;">📦 Delivered</option>
                                                     </select>
                                                 </form>
                                             </div>
@@ -186,56 +187,69 @@
     </div>
 </div>
 
-<!-- ===== SEARCH JAVASCRIPT ===== -->
+<!-- ===== FILTER + SEARCH JAVASCRIPT ===== -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+function filterClientAppTable() {
     const searchInput = document.getElementById('clientAppSearchInput');
+    const statusFilter = document.getElementById('clientAppStatusFilter');
     const rows = document.querySelectorAll('#clientAppTable tbody tr');
     const searchCount = document.getElementById('clientAppSearchCount');
-    const totalCount = rows.length;
+    
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const statusValue = statusFilter ? statusFilter.value : 'all';
+    
+    let visibleCount = 0;
 
+    rows.forEach(row => {
+        const poNumber = row.getAttribute('data-po') || '';
+        const docketNumber = row.getAttribute('data-docket') || '';
+        const invoiceNumber = row.getAttribute('data-invoice') || '';
+        const city = row.getAttribute('data-city') || '';
+        const appointmentId = row.getAttribute('data-id') || '';
+        const status = row.getAttribute('data-status') || '';
+        
+        const matchesSearch = poNumber.includes(searchTerm) || 
+                              docketNumber.includes(searchTerm) || 
+                              invoiceNumber.includes(searchTerm) || 
+                              city.includes(searchTerm) || 
+                              appointmentId.includes(searchTerm);
+        
+        const matchesStatus = statusValue === 'all' || status === statusValue;
+        
+        if (matchesSearch && matchesStatus) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    searchCount.textContent = visibleCount;
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('clientAppSearchInput');
+    const statusFilter = document.getElementById('clientAppStatusFilter');
+    
     if (searchInput) {
-        searchInput.addEventListener('keyup', function() {
-            const searchTerm = this.value.toLowerCase().trim();
-            let visibleCount = 0;
-
-            rows.forEach(row => {
-                const poNumber = row.getAttribute('data-po') || '';
-                const docketNumber = row.getAttribute('data-docket') || '';
-                const invoiceNumber = row.getAttribute('data-invoice') || '';
-                const appointmentId = row.getAttribute('data-id') || '';
-                
-                if (poNumber.includes(searchTerm) || 
-                    docketNumber.includes(searchTerm) || 
-                    invoiceNumber.includes(searchTerm) || 
-                    appointmentId.includes(searchTerm)) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            if (searchTerm === '') {
-                searchCount.textContent = totalCount;
-            } else {
-                searchCount.textContent = visibleCount;
-            }
-        });
+        searchInput.addEventListener('keyup', filterClientAppTable);
+    }
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterClientAppTable);
     }
 });
 </script>
 
 <!-- ===== Extra Styles ===== -->
 <style>
-    /* Table Row Hover */
     .table tbody tr:hover {
         background: rgba(201, 168, 76, 0.05) !important;
         transform: scale(1.01);
         box-shadow: 0 2px 10px rgba(10, 22, 40, 0.04);
     }
     
-    /* All Button Hover Effects */
     .table tbody a.btn-sm:hover {
         transform: translateY(-2px) scale(1.08);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -266,33 +280,33 @@ document.addEventListener('DOMContentLoaded', function() {
         border-color: #c9a84c !important;
     }
     
-    /* Select Dropdown Hover */
     .table tbody select.form-select:hover {
         border-color: #c9a84c !important;
         box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.08);
     }
     
-    /* Select Dropdown Focus */
     .table tbody select.form-select:focus {
         border-color: #c9a84c !important;
         box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12);
     }
     
-    /* Back Button Hover */
+    #clientAppStatusFilter:focus {
+        border-color: #c9a84c !important;
+        box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12) !important;
+    }
+    
     .btn[href="/admin/dashboard"]:hover {
         background: rgba(10, 22, 40, 0.1) !important;
         border-color: rgba(10, 22, 40, 0.2) !important;
         transform: translateY(-2px);
     }
     
-    /* Client Details Button Hover */
     .btn[href*="/admin/client/"]:hover {
         transform: translateY(-3px) scale(1.02);
         box-shadow: 0 8px 40px rgba(201, 168, 76, 0.45) !important;
         background: linear-gradient(135deg, #e8d5a3, #c9a84c) !important;
     }
     
-    /* Status Badge Animation */
     .badge {
         transition: all 0.3s ease;
     }
@@ -301,7 +315,6 @@ document.addEventListener('DOMContentLoaded', function() {
         transform: scale(1.05);
     }
     
-    /* Search Input Focus */
     #clientAppSearchInput:focus {
         border-color: #c9a84c !important;
         box-shadow: none !important;
@@ -312,7 +325,6 @@ document.addEventListener('DOMContentLoaded', function() {
         border-radius: 12px !important;
     }
     
-    /* Responsive */
     @media (max-width: 992px) {
         .table thead th {
             font-size: 0.6rem !important;

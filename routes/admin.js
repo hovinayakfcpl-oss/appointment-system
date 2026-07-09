@@ -3,7 +3,7 @@ const router = express.Router();
 const { adminAuth } = require('../middleware/auth');
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
-const upload = require('../utils/mongoStorage'); // ✅ CHANGED
+const upload = require('../utils/mongoStorage');
 const { uploadFile, deleteFile } = require('../utils/mongoStorage');
 const mongoose = require('mongoose');
 
@@ -189,7 +189,7 @@ router.get('/dashboard', adminAuth, async (req, res) => {
     
     const totalAppointments = await Appointment.countDocuments();
     const pendingAppointments = await Appointment.countDocuments({ status: 'pending' });
-    const completedAppointments = await Appointment.countDocuments({ status: 'delivered' });
+    const deliveredAppointments = await Appointment.countDocuments({ status: 'delivered' });
     
     const recentAppointments = await Appointment.find()
       .populate('clientId', 'name email')
@@ -202,7 +202,7 @@ router.get('/dashboard', adminAuth, async (req, res) => {
       clients: clientData,
       totalAppointments,
       pendingAppointments,
-      completedAppointments,
+      deliveredAppointments,
       recentAppointments,
       success: req.query.success || null,
       error: req.query.error || null
@@ -271,7 +271,7 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 
 // ============================================
 // POST - Update Appointment (Admin Direct) with File Upload
-// ✅ FIXED: Using MongoDB storage
+// ✅ UPDATED: Added pincode and city fields
 // ============================================
 router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -294,7 +294,9 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
       contactNumber,
       deliveryDate, 
       deliveryAddress, 
-      remarks 
+      remarks,
+      pincode,    // ✅ NEW
+      city        // ✅ NEW
     } = req.body;
 
     if (!poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
@@ -306,13 +308,11 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
 
-    // ✅ Get uploaded files
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
     const podFile = req.files?.podFile ? req.files.podFile[0] : null;
 
-    // ✅ Delete old files from MongoDB if new ones are uploaded
     if (poFile && existingAppointment.poFileId) {
       await deleteFile(existingAppointment.poFileId);
     }
@@ -326,7 +326,6 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
       await deleteFile(existingAppointment.podFileId);
     }
 
-    // ✅ Upload new files
     const poDetails = poFile ? await uploadFile(poFile) : { id: null, name: '' };
     const invoiceDetails = invoiceFile ? await uploadFile(invoiceFile) : { id: null, name: '' };
     const ewayDetails = ewayBillFile ? await uploadFile(ewayBillFile) : { id: null, name: '' };
@@ -345,7 +344,8 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
-        // ✅ Store MongoDB file IDs
+        pincode: pincode || '',     // ✅ NEW
+        city: city || '',           // ✅ NEW
         poFileId: poFile ? poDetails.id : existingAppointment.poFileId,
         poFileOriginalName: poFile ? poDetails.name : existingAppointment.poFileOriginalName,
         invoiceFileId: invoiceFile ? invoiceDetails.id : existingAppointment.invoiceFileId,
@@ -510,7 +510,6 @@ router.delete('/appointment/:id', adminAuth, async (req, res) => {
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
     
-    // ✅ Delete files from MongoDB
     const fileIds = [
       appointment.poFileId,
       appointment.invoiceFileId,
@@ -574,7 +573,6 @@ router.delete('/appointment/:id/file/:type', adminAuth, async (req, res) => {
         return res.status(400).json({ error: 'Invalid file type' });
     }
 
-    // ✅ Delete from MongoDB
     if (fileId) {
       await deleteFile(fileId);
     }
@@ -599,14 +597,14 @@ router.get('/stats', adminAuth, async (req, res) => {
     const totalAppointments = await Appointment.countDocuments();
     const pendingAppointments = await Appointment.countDocuments({ status: 'pending' });
     const confirmedAppointments = await Appointment.countDocuments({ status: 'confirmed' });
-    const completedAppointments = await Appointment.countDocuments({ status: 'delivered' });
+    const deliveredAppointments = await Appointment.countDocuments({ status: 'delivered' });
     
     res.json({
       totalClients,
       totalAppointments,
       pendingAppointments,
       confirmedAppointments,
-      completedAppointments
+      deliveredAppointments
     });
   } catch (error) {
     console.error('Stats Error:', error);

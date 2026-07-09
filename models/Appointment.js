@@ -99,6 +99,16 @@ const AppointmentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  // ✅ NEW FIELDS - Pincode & City
+  pincode: {
+    type: String,
+    default: ''
+  },
+  city: {
+    type: String,
+    default: ''
+  },
+  // =========================================
   remarks: {
     type: String,
     default: ''
@@ -170,6 +180,16 @@ AppointmentSchema.virtual('ewayBillFileDownloadUrl').get(function() {
 AppointmentSchema.virtual('podFileDownloadUrl').get(function() {
   if (!this.podFileId) return null;
   return `/file/${this.podFileId}/download`;
+});
+
+// ============================================
+// ✅ VIRTUAL: Get Full Address
+// ============================================
+AppointmentSchema.virtual('fullAddress').get(function() {
+  let address = this.deliveryAddress || '';
+  if (this.city) address += `, ${this.city}`;
+  if (this.pincode) address += ` - ${this.pincode}`;
+  return address;
 });
 
 // ============================================

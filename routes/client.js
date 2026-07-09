@@ -77,6 +77,7 @@ router.get('/appointment/new', auth, (req, res) => {
 
 // ============================================
 // POST - Create Appointment with File Upload
+// ✅ UPDATED: Added pincode and city fields
 // ============================================
 router.post('/appointment', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -99,7 +100,9 @@ router.post('/appointment', auth, upload.fields([
       contactNumber,
       deliveryDate, 
       deliveryAddress, 
-      remarks 
+      remarks,
+      pincode,    // ✅ NEW
+      city        // ✅ NEW
     } = req.body;
 
     if (!appointmentId || !poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
@@ -148,6 +151,8 @@ router.post('/appointment', auth, upload.fields([
       deliveryDate,
       deliveryAddress,
       remarks: remarks || '',
+      pincode: pincode || '',     // ✅ NEW
+      city: city || '',           // ✅ NEW
       status: 'pending',
       poFileId: poDetails.id,
       poFileOriginalName: poDetails.name,
@@ -174,7 +179,7 @@ router.post('/appointment', auth, upload.fields([
 });
 
 // ============================================
-// ✅ GET - Edit Appointment Form (Client)
+// GET - Edit Appointment Form (Client)
 // ============================================
 router.get('/appointment/:id/edit', auth, async (req, res) => {
   try {
@@ -201,7 +206,8 @@ router.get('/appointment/:id/edit', auth, async (req, res) => {
 });
 
 // ============================================
-// ✅ PUT - Update Appointment (Client)
+// PUT - Update Appointment (Client)
+// ✅ UPDATED: Added pincode and city fields
 // ============================================
 router.put('/appointment/:id', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -222,7 +228,9 @@ router.put('/appointment/:id', auth, upload.fields([
       contactNumber,
       deliveryDate, 
       deliveryAddress, 
-      remarks 
+      remarks,
+      pincode,    // ✅ NEW
+      city        // ✅ NEW
     } = req.body;
 
     if (!poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
@@ -273,6 +281,8 @@ router.put('/appointment/:id', auth, upload.fields([
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
+        pincode: pincode || '',     // ✅ NEW
+        city: city || '',           // ✅ NEW
         poFileId: poFile ? poDetails.id : existingAppointment.poFileId,
         poFileOriginalName: poFile ? poDetails.name : existingAppointment.poFileOriginalName,
         invoiceFileId: invoiceFile ? invoiceDetails.id : existingAppointment.invoiceFileId,
