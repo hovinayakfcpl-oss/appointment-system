@@ -3,6 +3,7 @@ const router = express.Router();
 const { auth } = require('../middleware/auth');
 const Appointment = require('../models/Appointment');
 const upload = require('../utils/upload');
+const { uploadFile } = require('../utils/upload');
 const cloudinary = require('cloudinary').v2;
 const path = require('path');
 const fs = require('fs');
@@ -22,7 +23,7 @@ console.log('☁️ Cloudinary Config (client.js):', {
 });
 
 // ============================================
-// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
+// HELPER: Get Cloudinary URL for file (VIEW)
 // ============================================
 const getCloudinaryUrl = (publicId) => {
     if (!publicId) return null;
@@ -30,12 +31,11 @@ const getCloudinaryUrl = (publicId) => {
         return publicId;
     }
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    // ✅ 'raw' → 'image'
     return `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.pdf`;
 };
 
 // ============================================
-// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
+// HELPER: Get download URL with attachment flag
 // ============================================
 const getDownloadUrl = (publicId) => {
     if (!publicId) return null;
@@ -43,12 +43,11 @@ const getDownloadUrl = (publicId) => {
         return publicId;
     }
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    // ✅ 'raw' → 'image'
     return `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/${publicId}.pdf`;
 };
 
 // ============================================
-// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
+// HELPER: Delete file from Cloudinary
 // ============================================
 const deleteFromCloudinary = async (publicId) => {
     if (!publicId) return;
@@ -56,7 +55,7 @@ const deleteFromCloudinary = async (publicId) => {
     
     try {
         const result = await cloudinary.uploader.destroy(publicId, {
-            resource_type: 'image' // ✅ 'raw' → 'image'
+            resource_type: 'image'
         });
         console.log(`🗑️ Cloudinary delete result for ${publicId}:`, result);
         return result;
@@ -122,7 +121,7 @@ router.get('/appointment/new', auth, (req, res) => {
 
 // ============================================
 // POST - Create Appointment with File Upload
-// ✅ FIXED: Using 'image' in URL
+// ✅ FIXED: Using uploadFile from upload.js
 // ============================================
 router.post('/appointment', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -169,27 +168,15 @@ router.post('/appointment', auth, upload.fields([
       });
     }
 
-    // ✅ FIXED: Using 'image' instead of 'raw'
-    const getFileDetails = (file) => {
-      if (!file) return { publicId: '', url: '', name: '' };
-      const publicId = file.filename || file.path || '';
-      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      // ✅ 'raw' → 'image'
-      const url = `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.pdf`;
-      return {
-        publicId: publicId,
-        url: url,
-        name: file.originalname || ''
-      };
-    };
-
+    // ✅ UPLOAD FILES TO CLOUDINARY
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
 
-    const poDetails = getFileDetails(poFile);
-    const invoiceDetails = getFileDetails(invoiceFile);
-    const ewayDetails = getFileDetails(ewayBillFile);
+    // ✅ Upload files using the helper from upload.js
+    const poDetails = poFile ? await uploadFile(poFile) : { publicId: '', url: '', name: '' };
+    const invoiceDetails = invoiceFile ? await uploadFile(invoiceFile) : { publicId: '', url: '', name: '' };
+    const ewayDetails = ewayBillFile ? await uploadFile(ewayBillFile) : { publicId: '', url: '', name: '' };
 
     console.log('📄 PO File:', poDetails.publicId || 'No file');
     console.log('📄 Invoice File:', invoiceDetails.publicId || 'No file');
@@ -263,7 +250,7 @@ router.get('/appointment/:id/edit', auth, async (req, res) => {
 
 // ============================================
 // PUT - Update Appointment (Client)
-// ✅ FIXED: Using 'image' in URL
+// ✅ FIXED: Using uploadFile from upload.js
 // ============================================
 router.put('/appointment/:id', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -300,20 +287,7 @@ router.put('/appointment/:id', auth, upload.fields([
       return res.redirect('/client/dashboard?error=Appointment not found!');
     }
 
-    // ✅ FIXED: Using 'image' instead of 'raw'
-    const getFileDetails = (file) => {
-      if (!file) return { publicId: '', url: '', name: '' };
-      const publicId = file.filename || file.path || '';
-      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      // ✅ 'raw' → 'image'
-      const url = `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.pdf`;
-      return {
-        publicId: publicId,
-        url: url,
-        name: file.originalname || ''
-      };
-    };
-
+    // ✅ UPLOAD FILES TO CLOUDINARY
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
@@ -329,9 +303,10 @@ router.put('/appointment/:id', auth, upload.fields([
       await deleteFromCloudinary(existingAppointment.ewayBillFile);
     }
 
-    const poDetails = getFileDetails(poFile);
-    const invoiceDetails = getFileDetails(invoiceFile);
-    const ewayDetails = getFileDetails(ewayBillFile);
+    // ✅ Upload new files
+    const poDetails = poFile ? await uploadFile(poFile) : { publicId: '', url: '', name: '' };
+    const invoiceDetails = invoiceFile ? await uploadFile(invoiceFile) : { publicId: '', url: '', name: '' };
+    const ewayDetails = ewayBillFile ? await uploadFile(ewayBillFile) : { publicId: '', url: '', name: '' };
 
     console.log('📄 PO File:', poDetails.publicId || 'No file');
     console.log('📄 Invoice File:', invoiceDetails.publicId || 'No file');
@@ -379,7 +354,6 @@ router.put('/appointment/:id', auth, upload.fields([
 
 // ============================================
 // 📄 DOWNLOAD ROUTES - SIMPLE REDIRECT
-// ✅ FIXED: Using stored URL directly
 // ============================================
 
 // ===== VIEW PO PDF (Client) =====
@@ -468,7 +442,6 @@ router.get('/appointment/:id/download/pod', auth, async (req, res) => {
 
 // ============================================
 // 📥 FORCE DOWNLOAD ROUTES (Attachment)
-// ✅ FIXED: Using fl_attachment flag
 // ============================================
 
 // ===== FORCE DOWNLOAD PO PDF (Client) =====
@@ -539,7 +512,6 @@ router.get('/appointment/:id/download-attachment/ewaybill', auth, async (req, re
 
 // ============================================
 // DELETE - Delete Specific File (Client)
-// ✅ FIXED: Delete from Cloudinary too
 // ============================================
 router.delete('/appointment/:id/file/:type', auth, async (req, res) => {
   try {
@@ -606,7 +578,6 @@ router.delete('/appointment/:id/file/:type', auth, async (req, res) => {
 
 // ============================================
 // DELETE - Delete Appointment (Client)
-// ✅ FIXED: Delete from Cloudinary too
 // ============================================
 router.delete('/appointment/:id', auth, async (req, res) => {
   try {

@@ -1,5 +1,4 @@
 const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 
 // ============================================
@@ -17,24 +16,9 @@ console.log('✅ Cloudinary Config:', {
 });
 
 // ============================================
-// STORAGE - Cloudinary (FULLY FIXED)
+// MULTER - Memory Storage (No local files)
 // ============================================
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'appointment_documents',
-    resource_type: 'image',
-    format: 'pdf',
-    access_mode: 'public',
-    use_filename: true,        // ✅ ADD THIS
-    unique_filename: true,     // ✅ ADD THIS
-    public_id: (req, file) => {
-      const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      console.log('📄 Cloudinary Public ID:', uniqueName);
-      return uniqueName;
-    }
-  }
-});
+const storage = multer.memoryStorage();
 
 // ============================================
 // FILE FILTER - Only allow PDFs
@@ -59,9 +43,89 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024
+    fileSize: 5 * 1024 * 1024 // 5MB
   }
 });
+
+// ============================================
+// ✅ CLOUDINARY UPLOAD FUNCTION - FORCES IMAGE TYPE
+// ============================================
+const uploadToCloudinary = (fileBuffer, options = {}) => {
+  return new Promise((resolve, reject) => {
+    const uploadOptions = {
+      folder: options.folder || 'appointment_documents',
+      resource_type: 'image', // ✅ FORCED IMAGE
+      format: 'pdf',
+      access_mode: 'public',
+      use_filename: true,
+      unique_filename: true,
+      public_id: options.publicId || undefined
+    };
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+      uploadOptions,
+      (error, result) => {
+        if (error) {
+          console.error('❌ Cloudinary upload error:', error);
+          reject(error);
+        } else {
+          console.log('✅ Cloudinary upload success:', result.public_id);
+          resolve(result);
+        }
+      }
+    );
+    uploadStream.end(fileBuffer);
+  });
+};
+
+// ============================================
+// ✅ HELPER: Upload single file and return details
+// ============================================
+const uploadFile = async (file) => {
+  if (!file) return { publicId: '', url: '', name: '' };
+  
+  try {
+    const result = await uploadToCloudinary(file.buffer, {
+      folder: 'appointment_documents',
+      publicId: Date.now() + '-' + Math.round(Math.random() * 1E9)
+    });
+    
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const url = `https://res.cloudinary.com/${cloudName}/image/upload/${result.public_id}.pdf`;
+    
+    return {
+      publicId: result.public_id,
+      url: url,
+      name: file.originalname || ''
+    };
+  } catch (error) {
+    console.error('❌ Upload error:', error);
+    return { publicId: '', url: '', name: '' };
+  }
+};
+
+// ============================================
+// ✅ HELPER: Upload multiple files
+// ============================================
+const uploadMultipleFiles = async (files) => {
+  const results = {};
+  const fileMap = {
+    poFile: 'poFile',
+    invoiceFile: 'invoiceFile',
+    ewayBillFile: 'ewayBillFile',
+    podFile: 'podFile'
+  };
+  
+  for (const [key, fieldName] of Object.entries(fileMap)) {
+    if (files[fieldName] && files[fieldName][0]) {
+      results[fieldName] = await uploadFile(files[fieldName][0]);
+    } else {
+      results[fieldName] = { publicId: '', url: '', name: '' };
+    }
+  }
+  
+  return results;
+};
 
 // ============================================
 // ERROR HANDLING MIDDLEWARE
@@ -91,40 +155,10 @@ const handleMulterError = (err, req, res, next) => {
 };
 
 // ============================================
-// HELPER: Get full Cloudinary URL from uploaded file
-// ============================================
-const getFileUrl = (file) => {
-  if (!file) return '';
-  return file.path || '';
-};
-
-// ============================================
-// HELPER: Get public_id from uploaded file
-// ============================================
-const getPublicId = (file) => {
-  if (!file) return '';
-  return file.filename || '';
-};
-
-// ============================================
-// HELPER: Get file details from uploaded file
-// ============================================
-const getFileDetails = (file) => {
-  if (!file) return { publicId: '', url: '', name: '' };
-  const publicId = file.filename || '';
-  const url = file.path || '';
-  return {
-    publicId: publicId,
-    url: url,
-    name: file.originalname || ''
-  };
-};
-
-// ============================================
 // EXPORT
 // ============================================
 module.exports = upload;
 module.exports.handleMulterError = handleMulterError;
-module.exports.getFileUrl = getFileUrl;
-module.exports.getPublicId = getPublicId;
-module.exports.getFileDetails = getFileDetails;
+module.exports.uploadToCloudinary = uploadToCloudinary;
+module.exports.uploadFile = uploadFile;
+module.exports.uploadMultipleFiles = uploadMultipleFiles;
