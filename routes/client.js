@@ -6,7 +6,6 @@ const upload = require('../utils/upload');
 const cloudinary = require('cloudinary').v2;
 const path = require('path');
 const fs = require('fs');
-const https = require('https'); // ✅ ADDED for file download
 
 // ============================================
 // CLOUDINARY CONFIG
@@ -17,9 +16,13 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+console.log('☁️ Cloudinary Config (client.js):', {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '❌ Not Set',
+  api_key: process.env.CLOUDINARY_API_KEY ? '✅ Set' : '❌ Not Set'
+});
+
 // ============================================
-// HELPER: Get Cloudinary URL for file
-// ✅ FIXED: Using raw resource_type for better compatibility
+// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
 // ============================================
 const getCloudinaryUrl = (publicId) => {
     if (!publicId) return null;
@@ -27,11 +30,12 @@ const getCloudinaryUrl = (publicId) => {
         return publicId;
     }
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
+    // ✅ 'raw' → 'image'
+    return `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.pdf`;
 };
 
 // ============================================
-// HELPER: Get download URL with attachment flag
+// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
 // ============================================
 const getDownloadUrl = (publicId) => {
     if (!publicId) return null;
@@ -39,40 +43,12 @@ const getDownloadUrl = (publicId) => {
         return publicId;
     }
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}`;
+    // ✅ 'raw' → 'image'
+    return `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/${publicId}.pdf`;
 };
 
 // ============================================
-// HELPER: Download file from URL using https
-// ============================================
-const downloadFile = (url) => {
-    return new Promise((resolve, reject) => {
-        https.get(url, (response) => {
-            if (response.statusCode === 302 || response.statusCode === 301) {
-                https.get(response.headers.location, (redirectResponse) => {
-                    const chunks = [];
-                    redirectResponse.on('data', (chunk) => chunks.push(chunk));
-                    redirectResponse.on('end', () => resolve(Buffer.concat(chunks)));
-                    redirectResponse.on('error', reject);
-                }).on('error', reject);
-                return;
-            }
-            
-            if (response.statusCode !== 200) {
-                reject(new Error(`HTTP ${response.statusCode}`));
-                return;
-            }
-            
-            const chunks = [];
-            response.on('data', (chunk) => chunks.push(chunk));
-            response.on('end', () => resolve(Buffer.concat(chunks)));
-            response.on('error', reject);
-        }).on('error', reject);
-    });
-};
-
-// ============================================
-// HELPER: Delete file from Cloudinary
+// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
 // ============================================
 const deleteFromCloudinary = async (publicId) => {
     if (!publicId) return;
@@ -80,7 +56,7 @@ const deleteFromCloudinary = async (publicId) => {
     
     try {
         const result = await cloudinary.uploader.destroy(publicId, {
-            resource_type: 'raw'
+            resource_type: 'image' // ✅ 'raw' → 'image'
         });
         console.log(`🗑️ Cloudinary delete result for ${publicId}:`, result);
         return result;
@@ -146,7 +122,7 @@ router.get('/appointment/new', auth, (req, res) => {
 
 // ============================================
 // POST - Create Appointment with File Upload
-// ✅ FIXED: Store both public_id and full URL
+// ✅ FIXED: Using 'image' in URL
 // ============================================
 router.post('/appointment', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -193,12 +169,13 @@ router.post('/appointment', auth, upload.fields([
       });
     }
 
-    // ✅ Get file details
+    // ✅ FIXED: Using 'image' instead of 'raw'
     const getFileDetails = (file) => {
       if (!file) return { publicId: '', url: '', name: '' };
       const publicId = file.filename || file.path || '';
       const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      const url = `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
+      // ✅ 'raw' → 'image'
+      const url = `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.pdf`;
       return {
         publicId: publicId,
         url: url,
@@ -286,7 +263,7 @@ router.get('/appointment/:id/edit', auth, async (req, res) => {
 
 // ============================================
 // PUT - Update Appointment (Client)
-// ✅ FIXED: Store both public_id and full URL
+// ✅ FIXED: Using 'image' in URL
 // ============================================
 router.put('/appointment/:id', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -323,12 +300,13 @@ router.put('/appointment/:id', auth, upload.fields([
       return res.redirect('/client/dashboard?error=Appointment not found!');
     }
 
-    // ✅ Get file details
+    // ✅ FIXED: Using 'image' instead of 'raw'
     const getFileDetails = (file) => {
       if (!file) return { publicId: '', url: '', name: '' };
       const publicId = file.filename || file.path || '';
       const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      const url = `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
+      // ✅ 'raw' → 'image'
+      const url = `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.pdf`;
       return {
         publicId: publicId,
         url: url,

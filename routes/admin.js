@@ -23,8 +23,7 @@ console.log('☁️ Cloudinary Config (admin.js):', {
 });
 
 // ============================================
-// HELPER: Get Cloudinary URL for file
-// ✅ FIXED: Added .pdf extension
+// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
 // ============================================
 const getCloudinaryUrl = (publicId) => {
     if (!publicId) return null;
@@ -32,13 +31,12 @@ const getCloudinaryUrl = (publicId) => {
         return publicId;
     }
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    // ✅ Add .pdf extension
-    return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}.pdf`;
+    // ✅ 'raw' → 'image'
+    return `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.pdf`;
 };
 
 // ============================================
-// HELPER: Get download URL with attachment flag
-// ✅ FIXED: Added .pdf extension
+// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
 // ============================================
 const getDownloadUrl = (publicId) => {
     if (!publicId) return null;
@@ -46,12 +44,12 @@ const getDownloadUrl = (publicId) => {
         return publicId;
     }
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    // ✅ Add fl_attachment AND .pdf extension
-    return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}.pdf`;
+    // ✅ 'raw' → 'image'
+    return `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/${publicId}.pdf`;
 };
 
 // ============================================
-// HELPER: Delete file from Cloudinary
+// ✅ FIXED: HELPER - Using 'image' instead of 'raw'
 // ============================================
 const deleteFromCloudinary = async (publicId) => {
     if (!publicId) return;
@@ -59,7 +57,7 @@ const deleteFromCloudinary = async (publicId) => {
     
     try {
         const result = await cloudinary.uploader.destroy(publicId, {
-            resource_type: 'raw'
+            resource_type: 'image' // ✅ 'raw' → 'image'
         });
         console.log(`🗑️ Cloudinary delete result for ${publicId}:`, result);
         return result;
@@ -85,7 +83,6 @@ const getFileUrl = (appointment, type) => {
 
 // ============================================
 // 📄 VIEW PDF ROUTES (Opens in browser - inline)
-// ✅ FIXED: Using stored URL directly
 // ============================================
 
 // ===== VIEW PO PDF =====
@@ -96,7 +93,6 @@ router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
       return res.status(404).send('File not found');
     }
     
-    // ✅ Generate URL with .pdf extension
     const fileUrl = getCloudinaryUrl(appointment.poFile);
     console.log('📥 View PO - URL:', fileUrl);
     return res.redirect(fileUrl);
@@ -163,7 +159,6 @@ router.get('/appointment/:id/download/pod', adminAuth, async (req, res) => {
 
 // ============================================
 // 📥 FORCE DOWNLOAD ROUTES (Attachment)
-// ✅ FIXED: Using fl_attachment flag with .pdf extension
 // ============================================
 
 // ===== FORCE DOWNLOAD PO PDF =====
@@ -336,7 +331,7 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 
 // ============================================
 // POST - Update Appointment (Admin Direct) with File Upload
-// ✅ FIXED: Store both public_id and full URL with .pdf extension
+// ✅ FIXED: Using 'image' in URL
 // ============================================
 router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -371,13 +366,13 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
 
-    // ✅ Get file details with .pdf extension
+    // ✅ FIXED: Using 'image' instead of 'raw'
     const getFileDetails = (file) => {
       if (!file) return { publicId: '', url: '', name: '' };
       const publicId = file.filename || file.path || '';
       const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      // ✅ Add .pdf extension to URL
-      const url = `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}.pdf`;
+      // ✅ 'raw' → 'image'
+      const url = `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.pdf`;
       return {
         publicId: publicId,
         url: url,
@@ -390,7 +385,6 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
     const podFile = req.files?.podFile ? req.files.podFile[0] : null;
 
-    // ✅ Delete old files from Cloudinary if new ones are uploaded
     if (poFile && existingAppointment.poFile) {
       await deleteFromCloudinary(existingAppointment.poFile);
     }
@@ -422,7 +416,6 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
-        // ✅ Store both public_id and full URL with .pdf extension
         poFile: poFile ? poDetails.publicId : existingAppointment.poFile,
         poFileUrl: poFile ? poDetails.url : existingAppointment.poFileUrl,
         poFileOriginalName: poFile ? poDetails.name : existingAppointment.poFileOriginalName,
