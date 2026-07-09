@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
 const Appointment = require('../models/Appointment');
-const upload = require('../utils/mongoStorage'); // ✅ CHANGED: upload from mongoStorage
-const { uploadFile, deleteFile } = require('../utils/mongoStorage');
-// ✅ CORRECT IMPORT
-const upload = require('../utils/mongoStorage'); // This gives the upload object
-const { uploadFile, deleteFile } = require('../utils/mongoStorage');
+const { uploadFile, deleteFile } = require('../utils/mongoStorage'); // ✅ REMOVED upload from here
+const upload = require('../utils/mongoStorage'); // ✅ KEEP THIS ONE
+const { getFile } = require('../utils/mongoStorage');
+
 // ============================================
 // HELPER: Get file URL (for EJS templates)
 // ============================================
