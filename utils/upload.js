@@ -18,17 +18,18 @@ console.log('✅ Cloudinary Config:', {
 
 // ============================================
 // STORAGE - Cloudinary (AUTO TYPE FOR PDF)
-// ✅ FIX 1: Changed resource_type from 'image' to 'auto' for better compatibility
-// ✅ FIX 2: Added access_mode: 'public' to fix 401 download error
+// ✅ FIX 1: resource_type 'auto' for better compatibility
+// ✅ FIX 2: access_mode: 'public' to fix 401 download error
 // ✅ FIX 3: Store full URL for direct download
+// ✅ FIX 4: Added .pdf extension to URL helpers
 // ============================================
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'appointment_documents',
-    resource_type: 'auto', // ✅ CHANGED: 'image' → 'auto' for better compatibility
+    resource_type: 'auto',
     format: 'pdf',
-    access_mode: 'public', // ✅ FIX: Makes files publicly downloadable
+    access_mode: 'public', // ✅ MUST HAVE - Makes files publicly downloadable
     public_id: (req, file) => {
       const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9);
       console.log('📄 Cloudinary Public ID:', uniqueName);
@@ -44,7 +45,6 @@ const fileFilter = (req, file, cb) => {
   console.log('📄 File received:', file.originalname);
   console.log('📄 File mimetype:', file.mimetype);
   
-  // Allow PDF files
   if (file.mimetype === 'application/pdf' || file.mimetype === 'application/x-pdf') {
     console.log('✅ PDF file accepted:', file.originalname);
     cb(null, true);
@@ -93,8 +93,7 @@ const handleMulterError = (err, req, res, next) => {
 };
 
 // ============================================
-// HELPER: Get full Cloudinary URL for file
-// ✅ NEW: Returns complete URL for direct access
+// ✅ FIXED: HELPER: Get full Cloudinary URL with .pdf extension
 // ============================================
 const getCloudinaryFullUrl = (publicId) => {
   if (!publicId) return '';
@@ -102,12 +101,12 @@ const getCloudinaryFullUrl = (publicId) => {
     return publicId;
   }
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}`;
+  // ✅ Added .pdf extension
+  return `https://res.cloudinary.com/${cloudName}/raw/upload/${publicId}.pdf`;
 };
 
 // ============================================
-// HELPER: Get download URL with attachment flag
-// ✅ NEW: Returns URL with fl_attachment for force download
+// ✅ FIXED: HELPER: Get download URL with attachment flag and .pdf extension
 // ============================================
 const getCloudinaryDownloadUrl = (publicId) => {
   if (!publicId) return '';
@@ -115,7 +114,8 @@ const getCloudinaryDownloadUrl = (publicId) => {
     return publicId;
   }
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}`;
+  // ✅ Added .pdf extension
+  return `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment/${publicId}.pdf`;
 };
 
 // ============================================
@@ -124,7 +124,8 @@ const getCloudinaryDownloadUrl = (publicId) => {
 const getFileUrl = (publicId) => {
   return cloudinary.url(publicId, {
     secure: true,
-    resource_type: 'auto'
+    resource_type: 'auto',
+    format: 'pdf'
   });
 };
 
@@ -136,6 +137,7 @@ const getSignedUrl = (publicId, expiresInSeconds = 60) => {
     secure: true,
     sign_url: true,
     resource_type: 'auto',
+    format: 'pdf',
     expires_at: Math.floor(Date.now() / 1000) + expiresInSeconds
   });
 };
@@ -158,6 +160,21 @@ const getPdfUrl = (publicId, options = {}) => {
 };
 
 // ============================================
+// ✅ NEW: HELPER: Check if file exists on Cloudinary
+// ============================================
+const fileExistsOnCloudinary = async (publicId) => {
+  if (!publicId) return false;
+  try {
+    const url = getCloudinaryFullUrl(publicId);
+    const response = await fetch(url, { method: 'HEAD' });
+    return response.ok;
+  } catch (error) {
+    console.error('❌ File check error:', error);
+    return false;
+  }
+};
+
+// ============================================
 // EXPORT
 // ============================================
 module.exports = upload;
@@ -167,3 +184,4 @@ module.exports.getSignedUrl = getSignedUrl;
 module.exports.getPdfUrl = getPdfUrl;
 module.exports.getCloudinaryFullUrl = getCloudinaryFullUrl;
 module.exports.getCloudinaryDownloadUrl = getCloudinaryDownloadUrl;
+module.exports.fileExistsOnCloudinary = fileExistsOnCloudinary;
