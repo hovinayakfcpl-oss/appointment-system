@@ -3,9 +3,8 @@ const router = express.Router();
 const { adminAuth } = require('../middleware/auth');
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
-const upload = require('../utils/upload');
-const { uploadFile } = require('../utils/upload');
-const { getFile, deleteFile } = require('../utils/mongoStorage');
+const upload = require('../utils/mongoStorage'); // ✅ CHANGED
+const { uploadFile, deleteFile } = require('../utils/mongoStorage');
 const mongoose = require('mongoose');
 
 // ============================================
@@ -39,7 +38,7 @@ const getDownloadUrl = (appointment, type) => {
 };
 
 // ============================================
-// 📄 VIEW PDF ROUTES (MongoDB GridFS)
+// 📄 VIEW PDF ROUTES (MongoDB)
 // ============================================
 
 // ===== VIEW PO PDF =====
@@ -50,7 +49,6 @@ router.get('/appointment/:id/download/po', adminAuth, async (req, res) => {
       return res.status(404).send('File not found');
     }
     
-    // ✅ Redirect to GridFS file route
     return res.redirect(`/file/${appointment.poFileId}`);
     
   } catch (error) {
@@ -273,7 +271,7 @@ router.put('/appointment/:id/status', adminAuth, async (req, res) => {
 
 // ============================================
 // POST - Update Appointment (Admin Direct) with File Upload
-// ✅ FIXED: Using MongoDB GridFS
+// ✅ FIXED: Using MongoDB storage
 // ============================================
 router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -308,7 +306,7 @@ router.post('/appointment/:id/admin-update', adminAuth, upload.fields([
       return res.redirect('/admin/dashboard?error=Appointment not found!');
     }
 
-    // ✅ Upload files to MongoDB
+    // ✅ Get uploaded files
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;

@@ -2,9 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
 const Appointment = require('../models/Appointment');
-const upload = require('../utils/upload');
-const { uploadFile } = require('../utils/upload');
-const { getFile, deleteFile } = require('../utils/mongoStorage');
+const upload = require('../utils/mongoStorage'); // ✅ CHANGED: upload from mongoStorage
+const { uploadFile, deleteFile } = require('../utils/mongoStorage');
 
 // ============================================
 // HELPER: Get file URL (for EJS templates)
@@ -78,7 +77,7 @@ router.get('/appointment/new', auth, (req, res) => {
 
 // ============================================
 // POST - Create Appointment with File Upload
-// ✅ FIXED: Using MongoDB GridFS
+// ✅ FIXED: Using MongoDB storage
 // ============================================
 router.post('/appointment', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -125,19 +124,19 @@ router.post('/appointment', auth, upload.fields([
       });
     }
 
-    // ✅ UPLOAD FILES TO MONGODB
+    // ✅ Get uploaded files
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
 
-    // ✅ Upload files using the helper from mongoStorage
+    // ✅ Upload files to MongoDB
     const poDetails = poFile ? await uploadFile(poFile) : { id: null, name: '' };
     const invoiceDetails = invoiceFile ? await uploadFile(invoiceFile) : { id: null, name: '' };
     const ewayDetails = ewayBillFile ? await uploadFile(ewayBillFile) : { id: null, name: '' };
 
-    console.log('📄 PO File:', poDetails.id || 'No file');
-    console.log('📄 Invoice File:', invoiceDetails.id || 'No file');
-    console.log('📄 E-Way Bill File:', ewayDetails.id || 'No file');
+    console.log('📄 PO File ID:', poDetails.id || 'No file');
+    console.log('📄 Invoice File ID:', invoiceDetails.id || 'No file');
+    console.log('📄 E-Way Bill File ID:', ewayDetails.id || 'No file');
 
     const appointment = new Appointment({
       clientId: req.user._id,
@@ -204,7 +203,7 @@ router.get('/appointment/:id/edit', auth, async (req, res) => {
 
 // ============================================
 // PUT - Update Appointment (Client)
-// ✅ FIXED: Using MongoDB GridFS
+// ✅ FIXED: Using MongoDB storage
 // ============================================
 router.put('/appointment/:id', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -241,7 +240,7 @@ router.put('/appointment/:id', auth, upload.fields([
       return res.redirect('/client/dashboard?error=Appointment not found!');
     }
 
-    // ✅ UPLOAD FILES TO MONGODB
+    // ✅ Get uploaded files
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
@@ -262,9 +261,9 @@ router.put('/appointment/:id', auth, upload.fields([
     const invoiceDetails = invoiceFile ? await uploadFile(invoiceFile) : { id: null, name: '' };
     const ewayDetails = ewayBillFile ? await uploadFile(ewayBillFile) : { id: null, name: '' };
 
-    console.log('📄 PO File:', poDetails.id || 'No file');
-    console.log('📄 Invoice File:', invoiceDetails.id || 'No file');
-    console.log('📄 E-Way Bill File:', ewayDetails.id || 'No file');
+    console.log('📄 PO File ID:', poDetails.id || 'No file');
+    console.log('📄 Invoice File ID:', invoiceDetails.id || 'No file');
+    console.log('📄 E-Way Bill File ID:', ewayDetails.id || 'No file');
 
     const updatedAppointment = await Appointment.findOneAndUpdate(
       { _id: req.params.id, clientId: req.user._id },
@@ -304,7 +303,7 @@ router.put('/appointment/:id', auth, upload.fields([
 });
 
 // ============================================
-// 📄 DOWNLOAD ROUTES - MongoDB GridFS
+// 📄 DOWNLOAD ROUTES - MongoDB
 // ============================================
 
 // ===== VIEW PO PDF (Client) =====
@@ -460,7 +459,6 @@ router.get('/appointment/:id/download-attachment/ewaybill', auth, async (req, re
 
 // ============================================
 // DELETE - Delete Specific File (Client)
-// ✅ FIXED: Using MongoDB GridFS
 // ============================================
 router.delete('/appointment/:id/file/:type', auth, async (req, res) => {
   try {
@@ -522,7 +520,6 @@ router.delete('/appointment/:id/file/:type', auth, async (req, res) => {
 
 // ============================================
 // DELETE - Delete Appointment (Client)
-// ✅ FIXED: Using MongoDB GridFS
 // ============================================
 router.delete('/appointment/:id', auth, async (req, res) => {
   try {
