@@ -77,7 +77,6 @@ router.get('/appointment/new', auth, (req, res) => {
 
 // ============================================
 // POST - Create Appointment with File Upload
-// ✅ UPDATED: Added pincode and city fields
 // ============================================
 router.post('/appointment', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -101,8 +100,8 @@ router.post('/appointment', auth, upload.fields([
       deliveryDate, 
       deliveryAddress, 
       remarks,
-      pincode,    // ✅ NEW
-      city        // ✅ NEW
+      pincode,
+      city
     } = req.body;
 
     if (!appointmentId || !poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
@@ -151,8 +150,8 @@ router.post('/appointment', auth, upload.fields([
       deliveryDate,
       deliveryAddress,
       remarks: remarks || '',
-      pincode: pincode || '',     // ✅ NEW
-      city: city || '',           // ✅ NEW
+      pincode: pincode || '',
+      city: city || '',
       status: 'pending',
       poFileId: poDetails.id,
       poFileOriginalName: poDetails.name,
@@ -206,10 +205,10 @@ router.get('/appointment/:id/edit', auth, async (req, res) => {
 });
 
 // ============================================
-// PUT - Update Appointment (Client)
-// ✅ UPDATED: Added pincode and city fields
+// ✅ FIXED: POST - Update Appointment (Client)
+// ✅ Changed from router.put to router.post to fix method override issue
 // ============================================
-router.put('/appointment/:id', auth, upload.fields([
+router.post('/appointment/:id', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
   { name: 'invoiceFile', maxCount: 1 },
   { name: 'ewayBillFile', maxCount: 1 }
@@ -229,8 +228,8 @@ router.put('/appointment/:id', auth, upload.fields([
       deliveryDate, 
       deliveryAddress, 
       remarks,
-      pincode,    // ✅ NEW
-      city        // ✅ NEW
+      pincode,
+      city
     } = req.body;
 
     if (!poNumber || !invoiceNumber || !deliveryDate || !deliveryAddress) {
@@ -281,8 +280,8 @@ router.put('/appointment/:id', auth, upload.fields([
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
-        pincode: pincode || '',     // ✅ NEW
-        city: city || '',           // ✅ NEW
+        pincode: pincode || '',
+        city: city || '',
         poFileId: poFile ? poDetails.id : existingAppointment.poFileId,
         poFileOriginalName: poFile ? poDetails.name : existingAppointment.poFileOriginalName,
         invoiceFileId: invoiceFile ? invoiceDetails.id : existingAppointment.invoiceFileId,

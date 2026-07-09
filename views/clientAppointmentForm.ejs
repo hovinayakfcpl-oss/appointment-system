@@ -26,27 +26,22 @@
                 <!-- ===== DYNAMIC FORM ACTION ===== -->
                 <% 
                     let formAction = '/client/appointment';
-                    let formMethod = 'POST';
                     let isEdit = false;
                     
                     if (typeof appointment !== 'undefined' && appointment) {
                         isEdit = true;
                         if (typeof user !== 'undefined' && user.role === 'admin') {
                             formAction = '/admin/appointment/' + appointment._id + '/admin-update';
-                            formMethod = 'POST';
                         } else {
                             formAction = '/client/appointment/' + appointment._id;
-                            formMethod = 'POST';
                         }
                     }
                 %>
                 
-                <!-- ===== FORM WITH enctype FOR FILE UPLOAD ===== -->
+                <!-- ===== ✅ FORM - FIXED: Removed _method field ===== -->
                 <form action="<%= formAction %>" method="POST" enctype="multipart/form-data">
-                    <!-- ===== METHOD OVERRIDE FOR PUT ===== -->
-                    <% if (isEdit) { %>
-                        <input type="hidden" name="_method" value="PUT">
-                    <% } %>
+                    <!-- ===== ✅ NO _method FIELD NEEDED ===== -->
+                    <!-- Client update route is now POST, not PUT -->
                     
                     <div class="row g-3">
                         <!-- ===== APPOINTMENT ID ===== -->
@@ -215,7 +210,7 @@
                         </div>
                         
                         <!-- ============================================================ -->
-                        <!-- ===== PINCODE & CITY - NEW FIELDS ===== -->
+                        <!-- ===== PINCODE & CITY ===== -->
                         <!-- ============================================================ -->
                         <div class="col-md-6">
                             <label class="form-label" style="color: #0a1628; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -268,7 +263,7 @@
                         </div>
                         
                         <!-- ============================================================ -->
-                        <!-- ===== PDF UPLOAD SECTION - MONGODB GRIDFS ===== -->
+                        <!-- ===== PDF UPLOAD SECTION ===== -->
                         <!-- ============================================================ -->
                         <div class="col-12">
                             <hr style="border-color: rgba(201, 168, 76, 0.15);">
@@ -389,7 +384,7 @@
                         </div>
                         
                         <!-- ============================================================ -->
-                        <!-- ===== POD UPLOAD SECTION - ADMIN ONLY (ON EDIT PAGE) ===== -->
+                        <!-- ===== POD UPLOAD SECTION - ADMIN ONLY ===== -->
                         <!-- ============================================================ -->
                         <% if (typeof user !== 'undefined' && user.role === 'admin' && isEdit) { %>
                         <div class="col-12">
