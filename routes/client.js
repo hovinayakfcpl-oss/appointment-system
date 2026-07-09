@@ -2,9 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
 const Appointment = require('../models/Appointment');
-const { uploadFile, deleteFile } = require('../utils/mongoStorage'); // ✅ REMOVED upload from here
-const upload = require('../utils/mongoStorage'); // ✅ KEEP THIS ONE
-const { getFile } = require('../utils/mongoStorage');
+const { uploadFile, deleteFile } = require('../utils/mongoStorage'); 
+const upload = require('../utils/mongoStorage');
 
 // ============================================
 // HELPER: Get file URL (for EJS templates)
@@ -78,7 +77,6 @@ router.get('/appointment/new', auth, (req, res) => {
 
 // ============================================
 // POST - Create Appointment with File Upload
-// ✅ FIXED: Using MongoDB storage
 // ============================================
 router.post('/appointment', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -125,12 +123,10 @@ router.post('/appointment', auth, upload.fields([
       });
     }
 
-    // ✅ Get uploaded files
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
 
-    // ✅ Upload files to MongoDB
     const poDetails = poFile ? await uploadFile(poFile) : { id: null, name: '' };
     const invoiceDetails = invoiceFile ? await uploadFile(invoiceFile) : { id: null, name: '' };
     const ewayDetails = ewayBillFile ? await uploadFile(ewayBillFile) : { id: null, name: '' };
@@ -153,7 +149,6 @@ router.post('/appointment', auth, upload.fields([
       deliveryAddress,
       remarks: remarks || '',
       status: 'pending',
-      // ✅ Store MongoDB file IDs
       poFileId: poDetails.id,
       poFileOriginalName: poDetails.name,
       invoiceFileId: invoiceDetails.id,
@@ -179,7 +174,7 @@ router.post('/appointment', auth, upload.fields([
 });
 
 // ============================================
-// GET - Edit Appointment Form
+// ✅ GET - Edit Appointment Form (Client)
 // ============================================
 router.get('/appointment/:id/edit', auth, async (req, res) => {
   try {
@@ -187,24 +182,26 @@ router.get('/appointment/:id/edit', auth, async (req, res) => {
       _id: req.params.id,
       clientId: req.user._id
     });
+    
     if (!appointment) {
-      return res.redirect('/client/dashboard');
+      return res.redirect('/client/dashboard?error=Appointment not found!');
     }
+    
     res.render('clientAppointmentForm', {
       title: 'Edit Appointment',
       user: req.user,
       appointment,
-      appointmentId: appointment.appointmentId
+      appointmentId: appointment.appointmentId,
+      isEdit: true
     });
   } catch (error) {
     console.error('Edit Appointment Error:', error);
-    res.redirect('/client/dashboard');
+    res.redirect('/client/dashboard?error=Failed to load appointment!');
   }
 });
 
 // ============================================
-// PUT - Update Appointment (Client)
-// ✅ FIXED: Using MongoDB storage
+// ✅ PUT - Update Appointment (Client)
 // ============================================
 router.put('/appointment/:id', auth, upload.fields([
   { name: 'poFile', maxCount: 1 },
@@ -241,12 +238,10 @@ router.put('/appointment/:id', auth, upload.fields([
       return res.redirect('/client/dashboard?error=Appointment not found!');
     }
 
-    // ✅ Get uploaded files
     const poFile = req.files?.poFile ? req.files.poFile[0] : null;
     const invoiceFile = req.files?.invoiceFile ? req.files.invoiceFile[0] : null;
     const ewayBillFile = req.files?.ewayBillFile ? req.files.ewayBillFile[0] : null;
 
-    // ✅ Delete old files from MongoDB if new ones are uploaded
     if (poFile && existingAppointment.poFileId) {
       await deleteFile(existingAppointment.poFileId);
     }
@@ -257,7 +252,6 @@ router.put('/appointment/:id', auth, upload.fields([
       await deleteFile(existingAppointment.ewayBillFileId);
     }
 
-    // ✅ Upload new files
     const poDetails = poFile ? await uploadFile(poFile) : { id: null, name: '' };
     const invoiceDetails = invoiceFile ? await uploadFile(invoiceFile) : { id: null, name: '' };
     const ewayDetails = ewayBillFile ? await uploadFile(ewayBillFile) : { id: null, name: '' };
@@ -279,7 +273,6 @@ router.put('/appointment/:id', auth, upload.fields([
         deliveryDate,
         deliveryAddress,
         remarks: remarks || '',
-        // ✅ Store MongoDB file IDs
         poFileId: poFile ? poDetails.id : existingAppointment.poFileId,
         poFileOriginalName: poFile ? poDetails.name : existingAppointment.poFileOriginalName,
         invoiceFileId: invoiceFile ? invoiceDetails.id : existingAppointment.invoiceFileId,
@@ -304,7 +297,7 @@ router.put('/appointment/:id', auth, upload.fields([
 });
 
 // ============================================
-// 📄 DOWNLOAD ROUTES - MongoDB
+// 📄 DOWNLOAD ROUTES
 // ============================================
 
 // ===== VIEW PO PDF (Client) =====
@@ -503,7 +496,6 @@ router.delete('/appointment/:id/file/:type', auth, async (req, res) => {
         return res.status(400).json({ error: 'Invalid file type' });
     }
 
-    // ✅ Delete from MongoDB
     if (fileId) {
       await deleteFile(fileId);
     }
@@ -533,7 +525,6 @@ router.delete('/appointment/:id', auth, async (req, res) => {
       return res.status(404).send('Appointment not found');
     }
 
-    // ✅ Delete files from MongoDB
     const fileIds = [
       appointment.poFileId,
       appointment.invoiceFileId,
